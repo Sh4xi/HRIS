@@ -1,10 +1,10 @@
-<div class="relative flex flex-col items-center justify-center min-h-screen bg-cover bg-center" style="background-image: url('assets/Background.png');">
+<div class="relative flex flex-col items-center justify-center min-h-screen">
 
   <!-- Text and logo at the top -->
   <div class="absolute top-7 text-center w-full">
     <div class="flex items-center justify-center">
       <img src="assets/LOGO-main.png" alt="Logo" class="h-10 w-10 mr-2">
-      <p class="text-white">Quanby IT solutions Inc.</p>
+      <p class="text-white">Quanby Solutions Inc.</p>
     </div>
   </div>
 
@@ -54,12 +54,12 @@
         
         <!-- Error message for wrong password -->
         <div *ngIf="passwordError" class="text-red-500 mt-2 text-sm">
-          Incorrect username or password. Please try again.
+          <p>Incorrect username or password. Please try again.</p>
         </div>
 
         <!-- Login button -->
         <div class="flex items-center justify-center mt-8 mb-4 md:mt-5 md:mb-0"> <!-- Adjusted margin top and bottom for responsiveness -->
-          <button type="login" class="px-6 py-2 md:px-8 md:py-3 text-white bg-blue-600 rounded-md hover:bg-blue-700">Sign In</button>
+          <button type="login" class="px-6 py-2 md:px-8 md:py-3 text-white bg-blue-600 rounded-md hover:bg-blue-900">Sign In</button>
         </div>
       </form>
     </div>
