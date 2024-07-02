@@ -3,12 +3,12 @@ import { RouterOutlet } from '@angular/router';
 import { LoginFailedComponent } from './login-failed/login-failed.component';
 
 @Component({
-    selector: 'app-root',
-    standalone: true,
-    templateUrl: './app.component.html',
-    styleUrl: './app.component.css',
-    imports: [RouterOutlet, LoginFailedComponent]
+  selector: 'app-root',
+  standalone: true,
+  imports: [RouterOutlet],
+  template: '<router-outlet></router-outlet>'
 })
+
 export class AppComponent {
   title = 'HRIS_login-page';
   passwordHidden: boolean = true;
