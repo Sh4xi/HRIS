@@ -1,74 +1,77 @@
-<div class="relative flex flex-col items-center justify-center min-h-screen">
+<div class="relative flex flex-col items-center justify-center min-h-screen bg-cover bg-center" style="background-image: url('assets/Background.png');">
 
-    <!-- Text and logo at the top -->
-    <div class="absolute top-7 text-center w-full">
-      <div class="flex items-center justify-center">
-        <img src="assets/LOGO-main.png" alt="Logo" class="h-10 w-10 mr-2">
-        <p class="text-white">Quanby IT solutions Inc.</p>
-      </div>
+  <!-- Text and logo at the top -->
+  <div class="absolute top-7 text-center w-full">
+    <div class="flex items-center justify-center">
+      <img src="assets/LOGO-main.png" alt="Logo" class="h-10 w-10 mr-2">
+      <p class="text-white">Quanby IT solutions Inc.</p>
     </div>
-  
-    <!-- Container for the login box -->
-    <div class="flex bg-white shadow-lg rounded-lg overflow-hidden w-3/4 md:w-3/4 lg:w-1/2 mx-auto">
-  
-      <!-- Left side for SVG illustration (hidden on small screens) -->
-      <div class="hidden md:flex md:w-1/2 my-10 items-center justify-center flex-col p-4">
-        <!-- SVG image centered within its container -->
-        <img src="assets/laptopgirl.svg" alt="laptopgirl" class="object-contain w-3/4 h-3/4 mx-auto">
-        
-        <!-- Paragraph below the SVG image -->
-        <h1 class="text-2xl font-bold text-black text-center">Welcome!</h1>
-        <p class="text-center mt-1 px-5 max-w text-gray-600">Kindly input your account credentials to access the Human Resource Information System.</p>
-      </div>
-  
-      <!-- Right side for the login form -->
-      <div class="w-full md:w-1/2 my-10 md:p-10">
-        <!-- Welcome text -->
-        <h1 class="text-3xl font-bold text-black text-center">Login</h1>
-        
-        <!-- Login form -->
-        <form>
-          <!-- Username input field -->
-          <div class="mt-4">
-            <label for="username" class="block font-semibold text-gray-600 p-2">Username</label>
-            <input type="text" id="username" name="username" class="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-600" required>
-          </div>
-          
-          <!-- Password input field -->
-          <div class="mt-4">
-            <label for="password" class="block font-semibold text-gray-600 p-2">Password</label>
-            <input type="password" id="password" name="password" class="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-600" required>
-          </div>
-          
-          <!-- Submit button -->
-          <div class="flex items-center justify-center mt-5">
-            <button type="submit" class="px-6 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700">Log in</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  
-    <!-- Bottom section for contact info -->
-    <div class="absolute bottom-5 text-center w-full">
-      <div class="flex justify-center space-x-4">
-        <!-- Email -->
-        <div class="flex items-center">
-          <img src="assets/Email.png" alt="Email" class="h-6 w-6 mr-2">
-          <a href="mailto:inquiries@quanbyit.com" class="text-white">inquiriesquanbyit.com</a>
-        </div>
-        
-        <!-- Facebook -->
-        <div class="flex items-center">
-          <img src="assets/facebook.png" alt="Facebook" class="h-6 w-6 mr-2">
-          <a href="https://www.facebook.com/quanbysolutionsinc/" target="_blank" rel="noopener noreferrer" class="text-white">Quanby Solutions Inc.</a>
-        </div>
-        
-        <!-- Telephone -->
-        <div class="flex items-center">
-          <img src="assets/telno.png" alt="Telno" class="h-6 w-6 mr-2">
-          <p class="text-white">052 4311169 / 742 1170</p>
-        </div>
-      </div>
-    </div>
-  
   </div>
+
+  <!-- Container for the login box -->
+  <div class="flex bg-white shadow-lg rounded-lg overflow-hidden w-full md:w-3/4 lg:w-1/2 mx-auto"> //resizable 
+
+    <!-- Left side for SVG illustration (hidden on small screens) -->
+    <div class="hidden md:flex md:w-1/2 my-10 items-center justify-center flex-col p-4">
+      <!-- SVG image centered within its container -->
+      <img src="assets/laptopgirl.svg" alt="laptopgirl" class="object-contain w-3/4 h-3/4 mx-auto">
+      
+      <!-- Paragraph below the SVG image -->
+      <h1 class="text-2xl font-bold text-black text-center">Welcome!</h1>
+      <p class="text-center mt-1 px-5 max-w text-gray-600">Kindly input your account credentials to access the Human Resource Information System.</p>
+    </div>
+
+    <!-- Right side for the login form -->
+    <div class="w-full md:w-1/2 my-10 md:p-10">
+      <!-- Welcome text -->
+      <h1 class="text-3xl font-bold text-black text-center">Login</h1>
+      
+      <!-- Login form -->
+      <form>
+        <!-- Username input field -->
+        <div class="mt-4">
+          <label for="username" class="block font-semibold text-gray-600 p-2">Username</label>
+          <input type="text" id="username" name="username" class="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-600" required>
+        </div>
+        
+        <!-- Password input field -->
+        <div class="mt-4 relative">
+          <label for="password" class="block font-semibold text-gray-600 p-2">Password</label>
+          <input type="password" id="password" name="password" class="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-600" required>
+          <span class="absolute inset-y-0 right-2 pr-3 mt-12 flex items-center cursor-pointer" (click)="togglePasswordVisibility()">
+            <i class="fa" [ngClass]="showPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
+          </span>
+        </div>
+        
+        <!-- Submit button -->
+        <div class="flex items-center justify-center mt-5">
+          <button type="submit" class="px-6 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700">Log in</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Bottom section for contact info -->
+  <div class="absolute bottom-5 text-center w-full">
+    <div class="flex justify-center space-x-4">
+      <!-- Email -->
+      <div class="flex items-center">
+        <img src="assets/Email.png" alt="Email" class="h-6 w-6 mr-2">
+        <a href="mailto:inquiries@quanbyit.com" class="text-white">inquiriesquanbyit.com</a>
+      </div>
+      
+      <!-- Facebook -->
+      <div class="flex items-center">
+        <img src="assets/facebook.png" alt="Facebook" class="h-6 w-6 mr-2">
+        <a href="https://www.facebook.com/quanbysolutionsinc/" target="_blank" rel="noopener noreferrer" class="text-white">Quanby Solutions Inc.</a>
+      </div>
+      
+      <!-- Telephone -->
+      <div class="flex items-center">
+        <img src="assets/telno.png" alt="Telno" class="h-6 w-6 mr-2">
+        <p class="text-white">052 4311169 / 742 1170</p>
+      </div>
+    </div>
+  </div>
+
+</div>
