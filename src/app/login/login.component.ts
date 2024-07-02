@@ -9,9 +9,26 @@ import { CommonModule } from '@angular/common';
   styleUrl: './login.component.css'
 })
 export class LoginComponent {
-  showPassword: boolean = false;
-
-  togglePasswordVisibility(): void{
-    this.showPassword = !this.showPassword;
+    username: string = '';
+    password: string = '';
+    showPassword: boolean = false;
+    passwordError: boolean = false; // Flag to show/hide password error message
+  
+    // Function to toggle password visibility
+    togglePasswordVisibility() {
+      this.showPassword = !this.showPassword;
+    }
+  
+    // Function to handle form submission
+    submitForm() {
+      // Simulate checking password validity (replace with actual logic)
+      if (this.password !== 'correctpassword') {
+        this.passwordError = true;
+      } else {
+        // Clear error and proceed with login logic
+        this.passwordError = false;
+        // Replace with actual login logic (e.g., navigate to dashboard)
+        console.log('Logged in successfully');
+      }
+    }
   }
-}

@@ -9,7 +9,7 @@
   </div>
 
   <!-- Container for the login box -->
-  <div class="flex bg-white shadow-lg rounded-lg overflow-hidden w-full md:w-3/4 lg:w-1/2 mx-auto"> //resizable 
+  <div class="flex bg-white shadow-lg rounded-lg overflow-hidden w-full md:w-3/4 lg:w-1/2 mx-auto">
 
     <!-- Left side for SVG illustration (hidden on small screens) -->
     <div class="hidden md:flex md:w-1/2 my-10 items-center justify-center flex-col p-4">
@@ -22,9 +22,9 @@
     </div>
 
     <!-- Right side for the login form -->
-    <div class="w-full md:w-1/2 my-10 md:p-10">
+    <div class="w-full md:w-1/2 my-8 md:p-10">
       <!-- Welcome text -->
-      <h1 class="text-3xl font-bold text-black text-center">Login</h1>
+      <h1 class="text-3xl font-bold text-black text-center mb-4 md:mt-0 md:mb-8">Login</h1>
       
       <!-- Login form -->
       <form>
@@ -37,15 +37,29 @@
         <!-- Password input field -->
         <div class="mt-4 relative">
           <label for="password" class="block font-semibold text-gray-600 p-2">Password</label>
-          <input type="password" id="password" name="password" class="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-600" required>
-          <span class="absolute inset-y-0 right-2 pr-3 mt-12 flex items-center cursor-pointer" (click)="togglePasswordVisibility()">
+          <input
+            [type]="showPassword ? 'text' : 'password'"
+            id="password"
+            name="password"
+            class="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-600"
+            required
+          />
+          <span
+            class="absolute inset-y-0 right-2 mt-12 pr-3 flex items-center cursor-pointer"
+            (click)="togglePasswordVisibility()"
+          >
             <i class="fa" [ngClass]="showPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
           </span>
         </div>
         
-        <!-- Submit button -->
-        <div class="flex items-center justify-center mt-5">
-          <button type="submit" class="px-6 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700">Log in</button>
+        <!-- Error message for wrong password -->
+        <div *ngIf="passwordError" class="text-red-500 mt-2 text-sm">
+          Incorrect username or password. Please try again.
+        </div>
+
+        <!-- Login button -->
+        <div class="flex items-center justify-center mt-8 mb-4 md:mt-5 md:mb-0"> <!-- Adjusted margin top and bottom for responsiveness -->
+          <button type="login" class="px-6 py-2 md:px-8 md:py-3 text-white bg-blue-600 rounded-md hover:bg-blue-700">Sign In</button>
         </div>
       </form>
     </div>
