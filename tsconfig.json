@@ -1,34 +1,33 @@
 {
+  "compileOnSave": false,
   "compilerOptions": {
-    "target": "es5",
-    "module": "es2015",
-    "moduleResolution": "node",
+    "baseUrl": "./",
+    "outDir": "./dist/out-tsc",
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
     "sourceMap": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "lib": ["es2018", "dom"],
-    "types": [],
-    "allowJs": false,
-    "checkJs": false,
-    "jsx": "preserve",
-    "outDir": "./dist/out-tsc/",
-    "rootDir": "./",
-    "files": ["**/*.ts", "app-routing.module.ts"],
-    "composite": false,
     "declaration": false,
-    "isolatedModules": true,
-    "noImplicitAny": false,
-    "noImplicitThis": false,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
-    "skipLibCheck": true,
-    "skipDefaultLibCheck": true,
-    "compileOnSave": false
+    "downlevelIteration": true,
+    "experimentalDecorators": true,
+    "moduleResolution": "node",
+    "importHelpers": true,
+    "target": "ES2022",
+    "module": "ES2022",
+    "useDefineForClassFields": true,
+    "lib": [
+      "ES2022",
+      "dom"
+    ],
+    "allowSyntheticDefaultImports": true
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
     "strictInjectionParameters": true,
-    "disableTypeScriptVersionCheck": true,
+    "strictInputAccessModifiers": true,
     "strictTemplates": true
   }
 }
