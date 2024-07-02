@@ -1,0 +1,16 @@
+/* otp-popup.component.css */
+
+#otp-modal {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  input[type="text"] {
+    outline: none;
+  }
+  
+  button {
+    cursor: pointer;
+  }
+  
