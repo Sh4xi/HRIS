@@ -3,11 +3,13 @@ import { RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { UserManagementComponent } from './user-management/user-management.component';
+import { LoginFailedComponent } from './login-failed/login-failed.component';
+import { OtpPopupComponent } from './otp-popup/otp-popup.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, CommonModule, DashboardComponent, UserManagementComponent],
+  imports: [RouterOutlet, CommonModule, DashboardComponent, UserManagementComponent, LoginFailedComponent, OtpPopupComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
