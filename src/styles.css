@@ -8,7 +8,6 @@
 
 body {
     background-color: #f3f4f6; /* Light gray background color */
-    background-image: url('assets/Background.png'); /* Path to your background image */
     background-size: cover;
     background-position: center;
     margin: 0;
