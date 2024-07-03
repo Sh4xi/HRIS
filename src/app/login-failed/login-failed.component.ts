@@ -31,6 +31,6 @@ onSubmit() {
   // Here you would typically send the ticket to a server
   // For now, we'll just set a flag to indicate submission
   this.ticketSubmitted = true;
-  // this.router.navigate(['/otp']);
+   this.router.navigate(['/otp']);
 }
 }
