@@ -1,65 +1,48 @@
-<div class="relative flex flex-col items-center justify-center min-h-screen" style="background-image: url('./assets/Background.png');">
+<div class="relative flex flex-col items-center justify-center min-h-screen">
 
   <!-- Text and logo at the top -->
   <div class="absolute top-7 text-center w-full">
     <div class="flex items-center justify-center">
       <img src="assets/LOGO-main.png" alt="Logo" class="h-10 w-10 mr-2">
-      <p class="text-white">Quanby Solutions Inc.</p>
+      <p class="text-white">Quanby IT solutions Inc.</p>
     </div>
   </div>
 
   <!-- Container for the login box -->
-  <div class="flex bg-white shadow-lg rounded-lg overflow-hidden w-full md:w-3/4 lg:w-1/2 mx-auto">
+  <div class="flex bg-white shadow-lg rounded-lg overflow-hidden w-3/4 md:w-3/4 lg:w-1/2 mx-auto">
 
     <!-- Left side for SVG illustration (hidden on small screens) -->
     <div class="hidden md:flex md:w-1/2 my-10 items-center justify-center flex-col p-4">
       <!-- SVG image centered within its container -->
       <img src="assets/laptopgirl.svg" alt="laptopgirl" class="object-contain w-3/4 h-3/4 mx-auto">
-      
+
       <!-- Paragraph below the SVG image -->
       <h1 class="text-2xl font-bold text-black text-center">Welcome!</h1>
       <p class="text-center mt-1 px-5 max-w text-gray-600">Kindly input your account credentials to access the Human Resource Information System.</p>
     </div>
 
     <!-- Right side for the login form -->
-    <div class="w-full md:w-1/2 my-8 md:p-10">
+    <div class="w-full md:w-1/2 my-10 md:p-10">
       <!-- Welcome text -->
-      <h1 class="text-3xl font-bold text-black text-center mb-4 md:mt-0 md:mb-8">Login</h1>
-      
+      <h1 class="text-3xl font-bold text-black text-center">Login</h1>
+
       <!-- Login form -->
-      <form>
+      <form (ngSubmit)="onSubmit()">
         <!-- Username input field -->
         <div class="mt-4">
           <label for="username" class="block font-semibold text-gray-600 p-2">Username</label>
-          <input type="text" id="username" name="username" class="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-600" required>
-        </div>
-        
-        <!-- Password input field -->
-        <div class="mt-4 relative">
-          <label for="password" class="block font-semibold text-gray-600 p-2">Password</label>
-          <input
-            [type]="showPassword ? 'text' : 'password'"
-            id="password"
-            name="password"
-            class="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-600"
-            required
-          />
-          <span
-            class="absolute inset-y-0 right-2 mt-12 pr-3 flex items-center cursor-pointer"
-            (click)="togglePasswordVisibility()"
-          >
-            <i class="fa" [ngClass]="showPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
-          </span>
-        </div>
-        
-        <!-- Error message for wrong password -->
-        <div *ngIf="passwordError" class="text-red-500 mt-2 text-sm">
-          <p>Incorrect username or password. Please try again.</p>
+          <input type="text" id="username" [(ngModel)]="email" name="email" class="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-600" required>
         </div>
 
-        <!-- Login button -->
-        <div class="flex items-center justify-center mt-8 mb-4 md:mt-5 md:mb-0"> <!-- Adjusted margin top and bottom for responsiveness -->
-          <button type="login" class="px-6 py-2 md:px-8 md:py-3 text-white bg-blue-600 rounded-md hover:bg-blue-900">Sign In</button>
+        <!-- Password input field -->
+        <div class="mt-4">
+          <label for="password" class="block font-semibold text-gray-600 p-2">Password</label>
+          <input type="password" id="password" [(ngModel)]="password" name="password" class="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-600" required>
+        </div>
+
+        <!-- Submit button -->
+        <div class="flex items-center justify-center mt-5">
+          <button type="submit" class="px-6 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700">Log in</button>
         </div>
       </form>
     </div>
@@ -73,13 +56,13 @@
         <img src="assets/Email.png" alt="Email" class="h-6 w-6 mr-2">
         <a href="mailto:inquiries@quanbyit.com" class="text-white">inquiriesquanbyit.com</a>
       </div>
-      
+
       <!-- Facebook -->
       <div class="flex items-center">
         <img src="assets/facebook.png" alt="Facebook" class="h-6 w-6 mr-2">
         <a href="https://www.facebook.com/quanbysolutionsinc/" target="_blank" rel="noopener noreferrer" class="text-white">Quanby Solutions Inc.</a>
       </div>
-      
+
       <!-- Telephone -->
       <div class="flex items-center">
         <img src="assets/telno.png" alt="Telno" class="h-6 w-6 mr-2">
