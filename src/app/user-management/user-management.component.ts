@@ -41,7 +41,7 @@ export class UserManagementComponent implements OnInit {
     department: '',
     type: ''
   };
-
+  
   toggleModal() {
     this.showModal = !this.showModal;
   }
