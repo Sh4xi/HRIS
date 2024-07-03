@@ -15,4 +15,11 @@ import { OtpPopupComponent } from './otp-popup/otp-popup.component';
 })
 export class AppComponent {
   title = 'HRIS_login-page';
+  passwordHidden: boolean = true;
+
+  togglePasswordVisibility(): void {
+    this.passwordHidden = !this.passwordHidden;
+    const passwordField = document.getElementById('password') as HTMLInputElement;
+    passwordField.type = this.passwordHidden ? 'password' : 'text';
+  }
 }
