@@ -30,6 +30,47 @@ export class UserManagementComponent implements OnInit {
   itemsPerPage: number = 10;
   totalPages: number = 1;
 
+  showModal = false;
+  photoPreviewUrl = 'https://via.placeholder.com/200x200';
+  employee = {
+    email: '',
+    firstName: '',
+    middleName: '',
+    surname: '',
+    position: '',
+    department: '',
+    type: ''
+  };
+
+  toggleModal() {
+    this.showModal = !this.showModal;
+  }
+
+  onPhotoChange(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.photoPreviewUrl = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  onSubmit() {
+    if (this.isFormValid()) {
+      this.createEmployee(this.employee);
+      this.toggleModal();
+    } else {
+      console.log('Please fill in all required fields');
+    }
+  }
+
+  isFormValid(): boolean {
+    return !!(this.employee.email && this.employee.firstName && this.employee.surname &&
+              this.employee.position && this.employee.department && this.employee.type);
+  }
+
   ngOnInit() {
     this.users = [
       {
@@ -206,7 +247,9 @@ export class UserManagementComponent implements OnInit {
   searchTable() {
     this.filteredUsers = this.users.filter(user =>
       user.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-      user.email.toLowerCase().includes(this.searchTerm.toLowerCase())
+      user.email.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+      user.department.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+      user.position.toLowerCase().includes(this.searchTerm.toLowerCase())
     );
     this.updatePagination();
   }
@@ -218,9 +261,28 @@ export class UserManagementComponent implements OnInit {
   }
 
   // Function to add a new employee (placeholder function)
-  addEmployee() {
-    // Implement your add employee logic here
-    console.log("Adding New Employee");
+  createEmployee(employee: any) {
+    const newUser: User = {
+      profile: employee.photoPreviewUrl || 'assets/default-profile.jpg',
+      name: `${employee.firstName} ${employee.middleName ? employee.middleName + ' ' : ''}${employee.surname}`,
+      email: employee.email,
+      password: '***************',
+      department: employee.department,
+      position: employee.position,
+      term: employee.type,
+      status: 'Active',
+      access: true
+    };
+  
+    this.users.push(newUser);
+    this.filteredUsers = this.users;
+    this.updatePagination();
+  
+    console.log('New employee created:', newUser);
+  }
+
+  toggleUserAccess(user: User) {
+    user.access = !user.access;
   }
 
   deleteUsers() {
