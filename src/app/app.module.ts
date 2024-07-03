@@ -1,18 +1,17 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { FormsModule } from '@angular/forms'; // <-- Import FormsModule
-import { UserManagementComponent } from './user-management/user-management.component';
-
+import { HttpClientModule } from '@angular/common/http';
+import { AppComponent } from './app.component';
+import { LoginModule } from './login/login.module';
 
 @NgModule({
-  declarations: [
-    UserManagementComponent
-  ],
+  declarations: [AppComponent],
   imports: [
     BrowserModule,
-    FormsModule // <-- Add FormsModule to imports array
+    HttpClientModule,
+    LoginModule
   ],
   providers: [],
-  bootstrap: [UserManagementComponent]
+  bootstrap: [AppComponent]
 })
 export class AppModule { }

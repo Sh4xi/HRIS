@@ -20,7 +20,7 @@ export class DataService {
   constructor(private http: HttpClient) { }
 
   getBackendData() {
-    this.http.get('http://your-backend-url/api/data')
+    this.http.get('https://vhmftufkipgbxmcimeuq.supabase.co')
      .subscribe(
         (response: any) => {
           console.log(response);

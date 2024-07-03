@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { environment } from '../environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -9,8 +10,8 @@ export class SupabaseService {
   private isLockAcquired = false;
 
   constructor() {
-    const supabaseUrl = 'https://hvqvmxakmursjidtfmdj.supabase.co';
-    const supabaseKey = process.env['eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2cXZteGFrbXVyc2ppZHRmbWRqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTg2MDA4MjQsImV4cCI6MjAzNDE3NjgyNH0.dykJM61G-58LEnAyCUU6-irano2f4vraV8t1l8C5KZ8'] ?? ''; // Correctly referencing environment variable
+    const supabaseUrl = environment.supabaseUrl;
+    const supabaseKey = environment.supabaseKey;
     this.supabase = createClient(supabaseUrl, supabaseKey);
   }
 
@@ -32,5 +33,18 @@ export class SupabaseService {
   releaseLock(): void {
     console.log('Releasing lock...');
     this.isLockAcquired = false;
+  }
+
+  async authenticateUser(email: string, password: string): Promise<any> {
+    const { data, error } = await this.supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    if (error) {
+      console.error('Authentication error:', error.message);
+    } else {
+      console.log('User authenticated:', data);
+    }
+    return { data, error };
   }
 }

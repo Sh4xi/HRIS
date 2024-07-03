@@ -8,7 +8,7 @@ import { LoginComponent } from './login.component';
   imports: [
     CommonModule,
     LoginRoutingModule,
-    LoginComponent  // Import the standalone component
+    LoginComponent  // This is correct for a standalone component
   ],
   providers: [LoginAttemptService]
 })

@@ -4,20 +4,14 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class LoginAttemptService {
-  private loginAttempts = 0;
-  private maxAttempts = 3;
+  private loginAttempts: number = 0;
 
-  constructor() { }
-
-  incrementLoginAttempts() {
+  incrementLoginAttempts(): void {
     this.loginAttempts++;
+    console.log(`Login attempts: ${this.loginAttempts}`);
   }
 
-  shouldRestrictAccount(): boolean {
-    return this.loginAttempts >= this.maxAttempts;
-  }
-
-  resetLoginAttempts() {
-    this.loginAttempts = 0;
+  getLoginAttempts(): number {
+    return this.loginAttempts;
   }
 }
