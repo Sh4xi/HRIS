@@ -13,6 +13,7 @@ export class SupabaseService {
     const supabaseUrl = environment.supabaseUrl;
     const supabaseKey = environment.supabaseKey;
     this.supabase = createClient(supabaseUrl, supabaseKey);
+    console.log('Supabase client initialized with URL:', supabaseUrl);
   }
 
   async acquireLock(): Promise<boolean> {
@@ -36,15 +37,20 @@ export class SupabaseService {
   }
 
   async authenticateUser(email: string, password: string): Promise<any> {
+    console.log('Authenticating user with email:', email);
+
     const { data, error } = await this.supabase.auth.signInWithPassword({
       email,
       password,
     });
+
     if (error) {
       console.error('Authentication error:', error.message);
+      console.debug('Request details:', { email, password });
     } else {
       console.log('User authenticated:', data);
     }
+
     return { data, error };
   }
 }

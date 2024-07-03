@@ -1,0 +1,19 @@
+create environment folder together wit the contents
+app.modules.ts
+app.ts
+src/app/login/login-routing.module.ts
+login.component.html
+src/app/login/login.component.ts 
+src/app/login/login.module.ts
+LoginFailedComponent.html
+LoginFailedComponent.ts
+loginAttemptService.ts
+supabase.service.ts
+app.module.ts
+app component ts files
+main server.ts
+main.ts
+.env
+server.ts
+package.json
+tsconfig.json
