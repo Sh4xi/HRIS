@@ -1,34 +1,24 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { LoginAttemptService } from '../services/login-attempt.service';
+import { LoginFailedComponent } from '../login-failed/login-failed.component';
 
 @Component({
   selector: 'app-login',
-  standalone: true,
-  imports: [CommonModule],
   templateUrl: './login.component.html',
-  styleUrl: './login.component.css'
+  standalone: true,
+  imports: [CommonModule, FormsModule, LoginFailedComponent]
 })
 export class LoginComponent {
-    username: string = '';
-    password: string = '';
-    showPassword: boolean = false;
-    passwordError: boolean = false; // Flag to show/hide password error message
-  
-    // Function to toggle password visibility
-    togglePasswordVisibility() {
-      this.showPassword = !this.showPassword;
-    }
-  
-    // Function to handle form submission
-    submitForm() {
-      // Simulate checking password validity (replace with actual logic)
-      if (this.password !== 'correctpassword') {
-        this.passwordError = true;
-      } else {
-        // Clear error and proceed with login logic
-        this.passwordError = false;
-        // Replace with actual login logic (e.g., navigate to dashboard)
-        console.log('Logged in successfully');
-      }
-    }
+  username: string = '';
+  password: string = '';
+  email: string = '';
+
+  constructor(public loginAttemptService: LoginAttemptService) {}
+
+  onSubmit(): void {
+    // Your login logic here
+    this.loginAttemptService.incrementLoginAttempts();
   }
+}
