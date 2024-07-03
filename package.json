@@ -1,5 +1,5 @@
 {
-  "name": "hris-login-page",
+  "name": "frontend",
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
@@ -7,26 +7,24 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "serve:ssr:HRIS_login-page": "node dist/hris-login-page/server/server.mjs"
+    "serve:ssr:Frontend": "node dist/frontend/server/server.mjs"
   },
   "private": true,
   "dependencies": {
     "@angular/animations": "^17.3.0",
+    "@angular/cdk": "^17.3.10",
     "@angular/common": "^17.3.0",
     "@angular/compiler": "^17.3.0",
     "@angular/core": "^17.3.0",
     "@angular/forms": "^17.3.0",
+    "@angular/material": "^17.3.10",
     "@angular/platform-browser": "^17.3.0",
     "@angular/platform-browser-dynamic": "^17.3.0",
     "@angular/platform-server": "^17.3.0",
     "@angular/router": "^17.3.0",
     "@angular/ssr": "^17.3.8",
-    "@fortawesome/fontawesome-free": "^6.5.2",
-    "@npmcli/package-json": "^5.2.0",
-    "express": "^4.19.2",
-    "glob": "^10.4.2",
-    "lru-cache": "^10.3.0",
-    "rimraf": "^5.0.7",
+    "@supabase/supabase-js": "^2.44.2",
+    "express": "^4.18.2",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.14.3"
