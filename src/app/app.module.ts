@@ -1,22 +1,33 @@
+import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
-import { FormsModule } from '@angular/forms'; // <-- Import FormsModule
-import { UserManagementComponent } from './user-management/user-management.component';
-import { LoginFailedComponent } from './login-failed/login-failed.component';
-import { OtpPopupComponent } from './otp-popup/otp-popup.component';
-
 
 @NgModule({
-  declarations: [
-    UserManagementComponent,
-    LoginFailedComponent,
-    OtpPopupComponent
-  ],
   imports: [
-    BrowserModule,
-    FormsModule // <-- Add FormsModule to imports array
+    HttpClientModule,
   ],
-  providers: [],
-  bootstrap: [UserManagementComponent, LoginFailedComponent, OtpPopupComponent]
 })
 export class AppModule { }
+
+// You should move the getBackendData function to a service or a component
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class DataService {
+
+  constructor(private http: HttpClient) { }
+
+  getBackendData() {
+    this.http.get('http://your-backend-url/api/data')
+     .subscribe(
+        (response: any) => {
+          console.log(response);
+        },
+        (error: any) => {
+          console.error(error);
+        }
+      );
+  }
+}
