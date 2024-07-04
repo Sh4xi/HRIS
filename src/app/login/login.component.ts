@@ -17,6 +17,7 @@ export class LoginComponent {
   password: string = '';
   email: string = '';
   logins: any[] = [];
+  errorMessage: string = ''; // Add this line
 
   constructor(
     public loginAttemptService: LoginAttemptService,
@@ -30,7 +31,7 @@ export class LoginComponent {
 
   authenticateUser(): void {
     const supabaseUrl = 'https://vhmftufkipgbxmcimeuq.supabase.co';
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZobWZ0dWZraXBnYnhtY2ltZXVxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTk5MDExODAsImV4cCI6MjAzNTQ3NzE4MH0.7bzTx5n4SpXA1Go9kCRfgsxUIpK8j68vM-hIpVKJcnw'; // Update with your Supabase key, ensure it's set correctly
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZobWZ0dWZraXBnYnhtY2ltZXVxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTk5MDExODAsImV4cCI6MjAzNTQ3NzE4MH0.7bzTx5n4SpXA1Go9kCRfgsxUIpK8j68vM-hIpVKJcnw';
 
     const headers = new HttpHeaders({
       'apikey': supabaseKey,
@@ -44,16 +45,20 @@ export class LoginComponent {
     };
 
     this.http.post(`${supabaseUrl}/auth/v1/token?grant_type=password`, credentials, { headers })
-      .subscribe((response: any) => {
-        if (response.access_token) {
-          // User is authenticated, redirect to dashboard or whatever
-          console.log('User authenticated!');
-        } else {
-          // User is not authenticated, show error message
-          console.error('Invalid credentials');
+      .subscribe(
+        (response: any) => {
+          if (response.access_token) {
+            console.log('User authenticated!');
+            this.errorMessage = ''; // Clear any existing error message
+          } else {
+            console.error('Invalid credentials');
+            this.errorMessage = 'Incorrect password. Try again.';
+          }
+        },
+        (error: any) => {
+          console.error(error);
+          this.errorMessage = 'Incorrect password. Try again.';
         }
-      }, (error: any) => {
-        console.error(error);
-      });
+      );
   }
 }
