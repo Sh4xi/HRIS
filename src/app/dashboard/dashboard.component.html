@@ -1,39 +1,25 @@
 <div class="flex h-screen bg-gray-100">
-    <!-- Sidebar -->
-    <div class="w-64 bg-white shadow-md">
-      <div class="p-4 text-lg font-semibold">HRIS Dashboard</div>
-      <ul>
-        <li class="p-4 hover:bg-gray-200"><a href="#">Overview</a></li>
-        <li class="p-4 hover:bg-gray-200"><a href="#">Employee Management</a></li>
-        <li class="p-4 hover:bg-gray-200"><a href="#">Attendance</a></li>
-        <li class="p-4 hover:bg-gray-200"><a href="#">Payroll</a></li>
-        <li class="p-4 hover:bg-gray-200"><a href="#">Performance</a></li>
-        <li class="p-4 hover:bg-gray-200"><a href="#">Recruitment</a></li>
-        <li class="p-4 hover:bg-gray-200"><a href="#">Reports</a></li>
-      </ul>
-    </div>
-  
-    <!-- Main Content -->
-    <div class="flex-1 p-6">
-      <h1 class="text-2xl font-bold mb-4">Welcome to the HRIS Dashboard</h1>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <!-- Card 1 -->
-        <div class="bg-white p-6 rounded-lg shadow-md">
-          <h2 class="text-xl font-semibold mb-2">Total Employees</h2>
-          <p class="text-gray-700 text-lg">150</p>
-        </div>
-        <!-- Card 2 -->
-        <div class="bg-white p-6 rounded-lg shadow-md">
-          <h2 class="text-xl font-semibold mb-2">Leaves Pending</h2>
-          <p class="text-gray-700 text-lg">5</p>
-        </div>
-        <!-- Card 3 -->
-        <div class="bg-white p-6 rounded-lg shadow-md">
-          <h2 class="text-xl font-semibold mb-2">New Applications</h2>
-          <p class="text-gray-700 text-lg">8</p>
-        </div>
+  <!-- Sidebar -->
+  <div class="w-64 bg-white shadow-md">
+    <div class="p-4 text-lg font-semibold">HRIS Dashboard</div>
+    <ul>
+      <li *ngFor="let item of sidebarItems" class="p-4 hover:bg-gray-200">
+        <a [routerLink]="item.route" class="cursor-pointer">{{ item.name }}</a>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Main Content -->
+  <div class="flex-1 p-6">
+    <h1 class="text-2xl font-bold mb-4">Welcome to the HRIS Dashboard</h1>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <!-- Dashboard Cards -->
+      <div *ngFor="let card of dashboardCards" class="bg-white p-6 rounded-lg shadow-md">
+        <h2 class="text-xl font-semibold mb-2">{{ card.title }}</h2>
+        <p class="text-gray-700 text-lg">{{ card.value }}</p>
       </div>
     </div>
   </div>
+</div>
   
   
