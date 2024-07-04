@@ -8,5 +8,5 @@ app.get('/api/data', (req, res) => {
   res.json({ message: 'Hello from backend!' });
 });
 
-const PORT = process.env.PORT as const || 3000;
+const PORT = process.env['PORT'] ? parseInt(process.env['PORT'], 10) : 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

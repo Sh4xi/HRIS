@@ -1,19 +1,55 @@
-import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
-import { HttpClientModule, provideHttpClient, withFetch } from '@angular/common/http'; // Updated import
-import { AppComponent } from './app.component';
-import { LoginModule } from './login/login.module';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { Component, Injectable, NgModule } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { DashboardComponent } from './dashboard/dashboard.component';
+import { UserManagementComponent } from './user-management/user-management.component';
+import { LoginFailedComponent } from '../app/login-failed/login-failed.component';
 
 @NgModule({
-  declarations: [AppComponent],
   imports: [
-    BrowserModule,
     HttpClientModule,
-    LoginModule
+    RouterOutlet,
+    CommonModule,
+    DashboardComponent,
+    UserManagementComponent,
+    LoginFailedComponent
   ],
-  providers: [
-    provideHttpClient(withFetch()) // Add this line
-  ],
-  bootstrap: [AppComponent]
 })
 export class AppModule { }
+
+@Injectable({
+  providedIn: 'root'
+})
+export class DataService {
+  constructor(private http: HttpClient) { }
+
+  getBackendData() {
+    this.http.get('http://your-backend-url/api/data')
+     .subscribe(
+        (response: any) => {
+          console.log(response);
+        },
+        (error: any) => {
+          console.error(error);
+        }
+      );
+  }
+}
+
+@Component({
+  selector: 'app-root',
+  standalone: true,
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
+})
+export class AppComponent {
+  title = 'HRIS_login-page';
+  passwordHidden: boolean = true;
+
+  togglePasswordVisibility(): void {
+    this.passwordHidden = !this.passwordHidden;
+    const passwordField = document.getElementById('password') as HTMLInputElement;
+    passwordField.type = this.passwordHidden ? 'password' : 'text';
+  }
+}
