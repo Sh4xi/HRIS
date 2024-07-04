@@ -4,14 +4,18 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class LoginAttemptService {
-  private loginAttempts: number = 0;
+  private loginAttempts = 0;
+  private maxAttempts = 3;
 
   incrementLoginAttempts(): void {
     this.loginAttempts++;
-    console.log(`Login attempts: ${this.loginAttempts}`);
   }
 
-  getLoginAttempts(): number {
-    return this.loginAttempts;
+  resetLoginAttempts(): void {
+    this.loginAttempts = 0;
+  }
+
+  isAttemptsExhausted(): boolean {
+    return this.loginAttempts >= this.maxAttempts;
   }
 }

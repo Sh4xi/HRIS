@@ -1,7 +1,9 @@
+// login.component.ts
 import { Component } from '@angular/core';
 import { HttpClient, HttpClientModule, HttpHeaders } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { LoginAttemptService } from '../services/login-attempt.service';
 import { LoginFailedComponent } from '../login-failed/login-failed.component';
 
@@ -17,14 +19,20 @@ export class LoginComponent {
   password: string = '';
   logins: any[] = [];
   errorMessage: string = '';
-  isLoading: boolean = false;  // Add this line
+  isLoading: boolean = false;
 
   constructor(
     public loginAttemptService: LoginAttemptService,
-    private http: HttpClient
+    private http: HttpClient,
+    private router: Router
   ) {}
 
   onSubmit(): void {
+    if (this.loginAttemptService.isAttemptsExhausted()) {
+      this.router.navigate(['/login-failed']);
+      return;
+    }
+
     if (this.validateForm()) {
       this.loginAttemptService.incrementLoginAttempts();
       this.authenticateUser();
@@ -77,23 +85,30 @@ export class LoginComponent {
           if (response.access_token) {
             console.log('User authenticated!');
             this.errorMessage = '';
+            this.loginAttemptService.resetLoginAttempts();
             // Here you should redirect the user or set some auth state
             // For example:
             // this.router.navigate(['/dashboard']);
           } else {
-            console.error('Invalid credentials');
-            this.errorMessage = 'Invalid email or password. Please try again.';
+            this.handleLoginFailure('Invalid email or password. Please try again.');
           }
         },
         (error: any) => {
           this.isLoading = false;
           console.error('Error:', error);
           if (error.status === 400) {
-            this.errorMessage = 'Invalid email or password. Please try again.';
+            this.handleLoginFailure('Invalid email or password. Please try again.');
           } else {
-            this.errorMessage = 'An error occurred. Please try again later.';
+            this.handleLoginFailure('An error occurred. Please try again later.');
           }
         }
       );
+  }
+
+  private handleLoginFailure(message: string): void {
+    this.errorMessage = message;
+    if (this.loginAttemptService.isAttemptsExhausted()) {
+      this.router.navigate(['/login-failed']);
+    }
   }
 }
