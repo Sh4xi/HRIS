@@ -29,6 +29,7 @@ export class UserManagementComponent implements OnInit {
   currentPage: number = 1;
   itemsPerPage: number = 10;
   totalPages: number = 1;
+  activeTab: string = 'users';
 
   showModal = false;
   photoPreviewUrl = 'https://via.placeholder.com/200x200';
@@ -316,5 +317,9 @@ export class UserManagementComponent implements OnInit {
       this.currentPage++;
       this.paginate();
     }
+  }
+
+  onTabClick(tab: string) {
+    this.activeTab = tab;
   }
 }
