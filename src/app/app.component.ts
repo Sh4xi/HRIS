@@ -1,18 +1,21 @@
+import { HttpClientModule } from '@angular/common/http';
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { RouterModule, RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { DashboardComponent } from './dashboard/dashboard.component';
-import { UserManagementComponent } from './user-management/user-management.component';
-import { LoginFailedComponent } from '../app/login-failed/login-failed.component';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css'],
   standalone: true,
-  imports: [RouterOutlet, CommonModule, DashboardComponent, UserManagementComponent, LoginFailedComponent],
-  template: `
-    <router-outlet></router-outlet>
-  `,
-  styleUrls: ['./app.component.css']
+  imports: [
+    CommonModule,
+    FormsModule,
+    HttpClientModule,
+    RouterModule,
+    RouterOutlet
+  ]
 })
 export class AppComponent {
   title = 'HRIS_login-page';

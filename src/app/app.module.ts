@@ -1,55 +1,35 @@
-import { HttpClient, HttpClientModule } from '@angular/common/http';
-import { Component, Injectable, NgModule } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { HttpClientModule } from '@angular/common/http';
+import { RouterModule, Routes } from '@angular/router';
+
+import { AppComponent } from './app.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { UserManagementComponent } from './user-management/user-management.component';
-import { LoginFailedComponent } from '../app/login-failed/login-failed.component';
+import { LoginFailedComponent } from './login-failed/login-failed.component';
+import { LoginComponent } from './login/login.component';
+
+const routes: Routes = [
+  { path: '', component: LoginComponent },
+  { path: 'dashboard', component: DashboardComponent },
+  { path: 'user-management', component: UserManagementComponent },
+  { path: 'login-failed', component: LoginFailedComponent }
+];
 
 @NgModule({
-  imports: [
-    HttpClientModule,
-    RouterOutlet,
-    CommonModule,
+  declarations: [
+    AppComponent,
     DashboardComponent,
     UserManagementComponent,
-    LoginFailedComponent
+    LoginComponent,
+    LoginFailedComponent  // Ensure this component is declared
   ],
+  imports: [
+    BrowserModule,
+    HttpClientModule,
+    RouterModule.forRoot(routes)
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
 })
 export class AppModule { }
-
-@Injectable({
-  providedIn: 'root'
-})
-export class DataService {
-  constructor(private http: HttpClient) { }
-
-  getBackendData() {
-    this.http.get('http://your-backend-url/api/data')
-     .subscribe(
-        (response: any) => {
-          console.log(response);
-        },
-        (error: any) => {
-          console.error(error);
-        }
-      );
-  }
-}
-
-@Component({
-  selector: 'app-root',
-  standalone: true,
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
-})
-export class AppComponent {
-  title = 'HRIS_login-page';
-  passwordHidden: boolean = true;
-
-  togglePasswordVisibility(): void {
-    this.passwordHidden = !this.passwordHidden;
-    const passwordField = document.getElementById('password') as HTMLInputElement;
-    passwordField.type = this.passwordHidden ? 'password' : 'text';
-  }
-}

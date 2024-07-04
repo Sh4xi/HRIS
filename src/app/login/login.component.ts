@@ -1,19 +1,19 @@
-// login.component.ts
 import { Component } from '@angular/core';
-import { HttpClient, HttpClientModule, HttpHeaders } from '@angular/common/http';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { LoginAttemptService } from '../services/login-attempt.service';
-import { LoginFailedComponent } from '../login-failed/login-failed.component';
+
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css'],
   standalone: true,
-  imports: [CommonModule, FormsModule, HttpClientModule, LoginFailedComponent]
+  imports: [FormsModule, CommonModule]
 })
+
 export class LoginComponent {
   email: string = '';
   password: string = '';
