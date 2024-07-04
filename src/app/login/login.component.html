@@ -1,4 +1,6 @@
-<div class="relative flex flex-col items-center justify-center min-h-screen">
+<link href="https://fonts.cdnfonts.com/css/sf-pro-display" rel="stylesheet">
+
+<div class="relative flex flex-col items-center justify-center min-h-screen ">
 
   <!-- Text and logo at the top -->
   <div class="absolute top-7 text-center w-full">
@@ -9,22 +11,21 @@
   </div>
 
   <!-- Container for the login box -->
-  <div class="flex bg-white shadow-lg rounded-lg overflow-hidden w-3/4 md:w-3/4 lg:w-1/2 mx-auto">
+  <div class="flex bg-white shadow-lg rounded-lg overflow-hidden w-[70%]">
 
     <!-- Left side for SVG illustration (hidden on small screens) -->
-    <div class="hidden md:flex md:w-1/2 my-10 items-center justify-center flex-col p-4">
+    <div class="flex basis-[65%] justify-center align-center flex-col bg-[#E9ECF1]">
       <!-- SVG image centered within its container -->
-      <img src="assets/laptopgirl.svg" alt="laptopgirl" class="object-contain w-3/4 h-3/4 mx-auto">
+      <img src="assets/laptopgirl.svg" alt="laptopgirl" class="object-contain h-[70%] mx-auto">
 
       <!-- Paragraph below the SVG image -->
-      <h1 class="text-2xl font-bold text-black text-center">Welcome!</h1>
-      <p class="text-center mt-1 px-5 max-w text-gray-600">Kindly input your account credentials to access the Human Resource Information System.</p>
+      <p class="text-center p-5 text-gray-600 text-balance -mb-5">Kindly input your account credentials to access<br> the <strong>Human Resource Information System.</strong></p>
     </div>
 
     <!-- Right side for the login form -->
-    <div class="w-full md:w-1/2 my-10 md:p-10">
+    <div class="flex basis-[35%] justify-center align-center flex-col ml-9 mr-9 bg-white">
       <!-- Welcome text -->
-      <h1 class="text-3xl font-bold text-black text-center">Login</h1>
+      <h1 class="text-3xl font-bold text-black text-center">Welcome Back!</h1>
 
       <!-- Error message alert -->
       <div *ngIf="errorMessage" class="mt-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
@@ -35,20 +36,20 @@
       <form (ngSubmit)="onSubmit()">
         <!-- Email input field -->
         <div class="mt-4">
-          <label for="email" class="block font-semibold text-gray-600 p-2">Email</label>
-          <input type="email" id="email" [(ngModel)]="email" name="email" class="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-600" required>
+          <label for="email" class="block text-gray-600 p-2">Email</label>
+          <input type="email" id="email" [(ngModel)]="email" name="email" class="w-full h-10 px-4 py-2 mt-1 border-none bg-[#E9ECF1] rounded-md focus:bg-custom-gradient outline-none" required>
         </div>
 
         <!-- Password input field -->
         <div class="mt-4">
-          <label for="password" class="block font-semibold text-gray-600 p-2">Password</label>
-          <input type="password" id="password" [(ngModel)]="password" name="password" class="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-600" required>
+          <label for="password" class="block text-gray-600 p-1">Password</label>
+          <input type="password" id="password" [(ngModel)]="password" name="password" class="w-full h-10 px-4 py-2 mt-1 border-none bg-[#E9ECF1] rounded-md focus:bg-custom-gradient outline-none" required>
         </div>
 
         <!-- Submit button -->
         <div class="flex items-center justify-center mt-5">
-          <button type="submit" [disabled]="isLoading" class="px-6 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:bg-blue-300">
-            <span *ngIf="!isLoading">Log in</span>
+          <button type="submit" [disabled]="isLoading" class="w-full h-10 px-4 py-2 mt-2 border-none rounded-md text-white bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300">
+            <span *ngIf="!isLoading" class="font-medium">Log In</span>
             <span *ngIf="isLoading">Logging in...</span>
           </button>
         </div>
