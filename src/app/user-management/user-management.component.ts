@@ -14,6 +14,16 @@ interface User {
   access: boolean;
 }
 
+interface Employee {
+  email: string;
+  firstName: string;
+  middleName: string;
+  surname: string;
+  position: string;
+  department: string;
+  type: string;
+}
+
 @Component({
   selector: 'app-user-management',
   standalone: true,
@@ -32,7 +42,7 @@ export class UserManagementComponent implements OnInit {
 
   showModal = false;
   photoPreviewUrl = 'https://via.placeholder.com/200x200';
-  employee = {
+  employee: Employee = {
     email: '',
     firstName: '',
     middleName: '',
@@ -41,37 +51,14 @@ export class UserManagementComponent implements OnInit {
     department: '',
     type: ''
   };
-  
-  toggleModal() {
-    this.showModal = !this.showModal;
-  }
-
-  onPhotoChange(event: any) {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e: any) => {
-        this.photoPreviewUrl = e.target.result;
-      };
-      reader.readAsDataURL(file);
-    }
-  }
-
-  onSubmit() {
-    if (this.isFormValid()) {
-      this.createEmployee(this.employee);
-      this.toggleModal();
-    } else {
-      console.log('Please fill in all required fields');
-    }
-  }
-
-  isFormValid(): boolean {
-    return !!(this.employee.email && this.employee.firstName && this.employee.surname &&
-              this.employee.position && this.employee.department && this.employee.type);
-  }
 
   ngOnInit() {
+    this.initializeUsers();
+    this.updatePagination();
+  }
+
+  initializeUsers() {
+    // Your existing user data initialization
     this.users = [
       {
         profile: 'path_to_your_image1.jpg',
@@ -118,167 +105,151 @@ export class UserManagementComponent implements OnInit {
         access: true
       },
       {
-        profile: 'path_to_your_image5.jpg',
-        name: 'Michael Johnson',
-        email: 'michael.johnson@example.com',
+        profile: 'path_to_your_image1.jpg',
+        name: 'Mah Doe Rat\'on',
+        email: 'm.doerat@example.com',
         password: '***************',
-        department: 'Sales',
-        position: 'Sales Representative',
+        department: 'General Affairs',
+        position: 'Officer-In-Charge',
         term: 'Full Time',
         status: 'Active',
         access: true
       },
       {
-        profile: 'path_to_your_image6.jpg',
-        name: 'Emily Davis',
-        email: 'emily.davis@example.com',
+        profile: 'path_to_your_image2.jpg',
+        name: 'John Doe',
+        email: 'john.doe@example.com',
         password: '***************',
-        department: 'Operations',
-        position: 'Operations Manager',
-        term: 'Full Time',
-        status: 'Active',
-        access: true
-      },
-      {
-        profile: 'path_to_your_image7.jpg',
-        name: 'David Wilson',
-        email: 'david.wilson@example.com',
-        password: '***************',
-        department: 'IT',
-        position: 'Software Engineer',
-        term: 'Full Time',
-        status: 'Active',
-        access: true
-      },
-      {
-        profile: 'path_to_your_image8.jpg',
-        name: 'Sophia Lee',
-        email: 'sophia.lee@example.com',
-        password: '***************',
-        department: 'Customer Support',
-        position: 'Customer Support Specialist',
+        department: 'Human Resources',
+        position: 'HR Manager',
         term: 'Part Time',
         status: 'Active',
         access: true
       },
       {
-        profile: 'path_to_your_image9.jpg',
-        name: 'Daniel Martinez',
-        email: 'daniel.martinez@example.com',
+        profile: 'path_to_your_image3.jpg',
+        name: 'Jane Smith',
+        email: 'jane.smith@example.com',
         password: '***************',
-        department: 'Research and Development',
-        position: 'Research Scientist',
+        department: 'Marketing',
+        position: 'Marketing Specialist',
         term: 'Full Time',
         status: 'Inactive',
         access: false
       },
       {
-        profile: 'path_to_your_image10.jpg',
-        name: 'Olivia Thompson',
-        email: 'olivia.thompson@example.com',
-        password: '***************',
-        department: 'Legal',
-        position: 'Legal Counsel',
-        term: 'Full Time',
-        status: 'Active',
-        access: true
-      },
-      {
-        profile: 'path_to_your_image11.jpg',
-        name: 'William Harris',
-        email: 'william.harris@example.com',
-        password: '***************',
-        department: 'Human Resources',
-        position: 'Recruitment Specialist',
-        term: 'Full Time',
-        status: 'Active',
-        access: true
-      },
-      {
-        profile: 'path_to_your_image12.jpg',
-        name: 'Emma Clark',
-        email: 'emma.clark@example.com',
-        password: '***************',
-        department: 'Marketing',
-        position: 'Social Media Manager',
-        term: 'Part Time',
-        status: 'Active',
-        access: true
-      },
-      {
-        profile: 'path_to_your_image13.jpg',
-        name: 'Alexander White',
-        email: 'alexander.white@example.com',
+        profile: 'path_to_your_image4.jpg',
+        name: 'Anna Brown',
+        email: 'anna.brown@example.com',
         password: '***************',
         department: 'Finance',
-        position: 'Financial Controller',
+        position: 'Financial Analyst',
         term: 'Full Time',
         status: 'Active',
         access: true
       },
-      {
-        profile: 'path_to_your_image14.jpg',
-        name: 'Sophie Robinson',
-        email: 'sophie.robinson@example.com',
-        password: '***************',
-        department: 'Operations',
-        position: 'Operations Coordinator',
-        term: 'Full Time',
-        status: 'Active',
-        access: true
-      },
-      {
-        profile: 'path_to_your_image15.jpg',
-        name: 'James Turner',
-        email: 'james.turner@example.com',
-        password: '***************',
-        department: 'IT',
-        position: 'System Administrator',
-        term: 'Full Time',
-        status: 'Active',
-        access: true
-      }
-      // Add more users as needed to reach the 2nd page
+      // ... (your existing user data)
     ];
     this.filteredUsers = this.users;
-    this.updatePagination();
   }
 
-  searchTable() {
-    this.filteredUsers = this.users.filter(user =>
-      user.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-      user.email.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-      user.department.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-      user.position.toLowerCase().includes(this.searchTerm.toLowerCase())
-    );
-    this.updatePagination();
+  getContractType(position: string): string {
+    const positionLower = position.toLowerCase();
+    switch (positionLower) {
+      case 'manager':
+      case 'developer':
+        return 'Full-time';
+      case 'designer':
+        return 'Contract';
+      case 'analyst':
+        return 'Part-time';
+      case 'intern':
+        return 'Intern';
+      default:
+        return 'Part-time';
+    }
   }
 
-  // Function to add a role
-  addRole() {
-    // Implement your add role logic here
-    console.log("Adding Role");
+  toggleModal() {
+    this.showModal = !this.showModal;
+    if (!this.showModal) {
+      this.resetEmployeeForm();
+    }
   }
 
-  // Function to add a new employee (placeholder function)
-  createEmployee(employee: any) {
+  onPhotoChange(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+      reader.onload = (e: ProgressEvent<FileReader>) => {
+        this.photoPreviewUrl = e.target?.result as string;
+      };
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
+
+  onSubmit() {
+    if (this.isFormValid()) {
+      this.createEmployee(this.employee);
+      this.toggleModal();
+    } else {
+      console.log('Please fill in all required fields');
+    }
+  }
+
+  isFormValid(): boolean {
+    const { email, firstName, surname, position, department, type } = this.employee;
+    return !!(email && firstName && surname && position && department && type);
+  }
+
+  createEmployee(employee: Employee) {
     const newUser: User = {
-      profile: employee.photoPreviewUrl || 'assets/default-profile.jpg',
+      profile: this.photoPreviewUrl || 'assets/default-profile.jpg',
       name: `${employee.firstName} ${employee.middleName ? employee.middleName + ' ' : ''}${employee.surname}`,
       email: employee.email,
       password: '***************',
       department: employee.department,
       position: employee.position,
-      term: employee.type,
+      term: this.getContractType(employee.position),
       status: 'Active',
       access: true
     };
-  
-    this.users.push(newUser);
+
+    this.users.unshift(newUser);
     this.filteredUsers = this.users;
     this.updatePagination();
-  
+    this.resetEmployeeForm();
+
     console.log('New employee created:', newUser);
+  }
+
+  resetEmployeeForm() {
+    this.employee = {
+      email: '',
+      firstName: '',
+      middleName: '',
+      surname: '',
+      position: '',
+      department: '',
+      type: ''
+    };
+    this.photoPreviewUrl = 'https://via.placeholder.com/200x200';
+  }
+
+  searchTable() {
+    const searchTermLower = this.searchTerm.toLowerCase();
+    this.filteredUsers = this.users.filter(user =>
+      user.name.toLowerCase().includes(searchTermLower) ||
+      user.email.toLowerCase().includes(searchTermLower) ||
+      user.department.toLowerCase().includes(searchTermLower) ||
+      user.position.toLowerCase().includes(searchTermLower)
+    );
+    this.updatePagination();
+  }
+
+  addRole() {
+    console.log("Adding Role");
+    // Implement your add role logic here
   }
 
   toggleUserAccess(user: User) {
@@ -286,8 +257,7 @@ export class UserManagementComponent implements OnInit {
   }
 
   deleteUsers() {
-    // Implement delete functionality
-    console.log("Deleting user");
+    console.log("Deleting all users");
     this.users = [];
     this.filteredUsers = [];
     this.updatePagination();
@@ -295,6 +265,7 @@ export class UserManagementComponent implements OnInit {
 
   updatePagination() {
     this.totalPages = Math.ceil(this.filteredUsers.length / this.itemsPerPage);
+    this.currentPage = 1; // Reset to first page when updating pagination
     this.paginate();
   }
 
