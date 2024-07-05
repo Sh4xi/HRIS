@@ -5,12 +5,13 @@ import { UserManagementComponent } from './user-management/user-management.compo
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { LoginFailedComponent } from './login-failed/login-failed.component';
 import { OtpPopupComponent } from './otp-popup/otp-popup.component';
+import { AuthGuard } from './auth/auth.guard';
 
 const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
   { path: 'user-management', component: UserManagementComponent },
-  { path: 'dashboard', component: DashboardComponent },
+  { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
   { path: 'login-failed', component: LoginFailedComponent },
   { path: 'otp-popup', component: OtpPopupComponent },
   { path: '**', redirectTo: '/login' } // Wildcard route for a 404 page
@@ -21,3 +22,4 @@ const routes: Routes = [
   exports: [RouterModule]
 })
 export class AppRoutingModule { }
+

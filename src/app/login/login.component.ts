@@ -5,7 +5,6 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { LoginAttemptService } from '../services/login-attempt.service';
 
-
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
@@ -13,7 +12,6 @@ import { LoginAttemptService } from '../services/login-attempt.service';
   standalone: true,
   imports: [FormsModule, CommonModule]
 })
-
 export class LoginComponent {
   email: string = '';
   password: string = '';
@@ -86,9 +84,8 @@ export class LoginComponent {
             console.log('User authenticated!');
             this.errorMessage = '';
             this.loginAttemptService.resetLoginAttempts();
-            // Here you should redirect the user or set some auth state
-            // For example:
-            // this.router.navigate(['/dashboard']);
+            localStorage.setItem('token', response.access_token); // Store the token for authentication
+            this.router.navigate(['/dashboard']); // Redirect to the dashboard
           } else {
             this.handleLoginFailure('Invalid email or password. Please try again.');
           }
@@ -105,10 +102,8 @@ export class LoginComponent {
       );
   }
 
-  private handleLoginFailure(message: string): void {
+  handleLoginFailure(message: string): void {
     this.errorMessage = message;
-    if (this.loginAttemptService.isAttemptsExhausted()) {
-      this.router.navigate(['/login-failed']);
-    }
   }
 }
+
