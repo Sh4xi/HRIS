@@ -16,11 +16,7 @@ import { AuditTrailComponent } from './audit-trail/audit-trail.component';
     DashboardComponent,
     UserManagementComponent,
     LoginFailedComponent,
-<<<<<<< HEAD
     AppRoutingModule
-=======
-    AuditTrailComponent
->>>>>>> fb7292f4a2245218d95c992a68e78a5ddf42983a
   ],
 })
 export class AppModule { }
