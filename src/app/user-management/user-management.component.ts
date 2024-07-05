@@ -30,6 +30,10 @@ export class UserManagementComponent implements OnInit {
   itemsPerPage: number = 10;
   totalPages: number = 1;
   activeTab: string = 'users';
+  showManagePopup = false;
+  showAddPopup = false;
+  showEditPopup = false;
+  showAccessRightsPopup = false;
 
   showModal = false;
   photoPreviewUrl = 'https://via.placeholder.com/200x200';
@@ -319,7 +323,40 @@ export class UserManagementComponent implements OnInit {
     }
   }
 
-  onTabClick(tab: string) {
+  setActiveTab(tab: string) {
     this.activeTab = tab;
   }
+
+  toggleManagePopup() {
+    this.showManagePopup = !this.showManagePopup;
+  }
+
+  toggleAddPopup(){
+    this.showAddPopup = !this.showAddPopup;
+  }
+
+  closeAddPopup() {
+    this.showAddPopup = false;
+  }
+
+  toggleEditPopup(){
+    this.showEditPopup = !this.showAddPopup;
+  }
+
+  closeEditPopup(){
+    this.showEditPopup = false;
+  }
+
+  toggleAccessRightsPopup(){
+    this.showAccessRightsPopup = !this.showAccessRightsPopup;
+  }
+
+  exitPopup(): void{
+    this.showManagePopup = false;
+  }
+
+  closePopupOutside(event: MouseEvent): void {
+    this.showManagePopup = false;
+  }
+
 }

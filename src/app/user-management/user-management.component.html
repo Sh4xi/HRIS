@@ -1,28 +1,28 @@
-<header class="bg-gray-800 text-white flex justify-center items-center py-4 px-6"> <!-- Header Section -->
+<header class="bg-white-800 text-white flex justify-center items-center py-4 px-6"> <!-- Header Section -->
   <h1 class="text-xl">User Management System</h1>
 </header>
 
 
 <main class="p-6"> <!-- Main Section -->
   <H1 class ="text-white">Employees</H1>
-  <div class="tabs flex">
-    <button (click)="onTabClick('users')" [class.active]="activeTab === 'users'" class="bg-red-400 h-[50px] p-[20px]">Users</button>
-    <button (click)="onTabClick('roles')" [class.active]="activeTab === 'roles'" class="bg-red-400 h-[50px] p-[20px]">Roles</button>
+
+
+  <div class="flex mb-6">
+    <button (click)="setActiveTab('users')" [ngClass]="activeTab === 'users' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-500'" class="mr-4">Users</button>
+    <button (click)="setActiveTab('roles')" [ngClass]="activeTab === 'roles' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-500'">Roles</button>
   </div>
 
-  <div *ngIf="activeTab === 'users'">
+  <div *ngIf="activeTab === 'users'" class="flex flex-col h-screen">
     <section id="user-list">
       <div class="mb-4 flex justify-between items-center"> <!-- Search and Action Buttons -->
-        <input type="text" [(ngModel)]="searchTerm" placeholder="Search..." class="border rounded p-2 w-64"> <!-- Search Input -->
+        <input type="text" [(ngModel)]="searchTerm" placeholder="Search..." class="w-half p-2 border rounded-lg"> <!-- Search Input -->
         <div class="space-x-4"> <!-- Action Buttons Container -->
-          <button class="bg-red-500 text-white px-4 py-2 rounded" (click)="deleteUsers()">Delete</button> <!-- Delete Button -->
-          <button class="bg-blue-500 text-white px-4 py-2 rounded" (click)="addRole()">Add Role</button> <!-- Add Role Button -->
+          <button class="bg-red-500 text-white px-4 py-2 rounded-lg" (click)="deleteUsers()">Delete</button> <!-- Delete Button -->
+          <button class="bg-blue-500 text-white px-4 py-2 rounded-lg" (click)="addRole()">Add Role</button> <!-- Add Role Button -->
           <button (click)="toggleModal()"
-            class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300
-            font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700
-            dark:focus:ring-blue-800" type="button">
-            + New Employee
-          </button>
+            class="text-white bg-blue-500 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300
+            font-medium rounded-lg text-sm px-4 py-2 text-center dark:bg-blue-500 dark:hover:bg-blue-700
+            dark:focus:ring-blue-800" type="button">+ New Employee</button>
         </div>
       </div>
 
@@ -125,39 +125,50 @@
         </div>
       </div>
 
-        <div *ngIf="filteredUsers.length > 0"> <!-- User Table -->
-          <table class="w-full border-collapse"> <!-- Table Container -->
-            <thead>
-              <tr class="bg-gray-200"> <!-- Table Header Row -->
-                <th class="border p-2">Profile</th>
-                <th class="border p-2">Name</th>
-                <th class="border p-2">Password</th>
-                <th class="border p-2">Department</th>
-                <th class="border p-2">Role</th>
-                <th class="border p-2">Status</th>
-                <th class="border p-2">Access</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let user of paginatedUsers; let i = index" class="bg-white"> <!-- User Data Rows -->
-                <td class="border p-2">
-                  <img [src]="user.profile" alt="Profile Picture" class="w-10 h-10 rounded-full"> <!-- Profile Picture -->
-                </td>
-                <td class="border p-2">{{ user.name }}</td> <!-- User Name -->
-                <td class="border p-2">***************</td> <!-- Password Placeholder -->
-                <td class="border p-2">{{ user.department }}</td> <!-- User Department -->
-                <td class="border p-2">{{ user.position }}</td> <!-- User Role/Position -->
-                <td class="border p-2">{{ user.status }}</td> <!-- User Status -->
-                <td class="border p-2">
-                  <label class="switch"> <!-- Access Toggle Switch -->
-                    <input type="checkbox" class="access-toggle visually-hidden" [(ngModel)]="user.access" (change)="toggleUserAccess(user)">
-                    <span class="slider round flex justify-center items-center"></span>
-                  </label>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+      <div *ngIf="filteredUsers.length > 0" class="p-4 rounded-lg shadow-lg bg-white">
+        <table class="w-full border-collapse">
+          <thead>
+            <tr class="bg-gray-100 text-gray-700 uppercase text-sm leading-normal">
+              <th class="py-3 px-6 text-left">Profile</th>
+              <th class="py-3 px-6 text-left">Name</th>
+              <th class="py-3 px-6 text-left">Password</th>
+              <th class="py-3 px-6 text-left">Department</th>
+              <th class="py-3 px-6 text-left">Role</th>
+              <th class="py-3 px-6 text-left">Status</th>
+              <th class="py-3 px-6 text-center">Access</th>
+            </tr>
+          </thead>
+          <tbody class="text-gray-600 text-sm font-light">
+            <tr *ngFor="let user of paginatedUsers; let i = index" class="border-b border-gray-200 hover:bg-gray-100">
+              <td class="py-3 px-6 text-left whitespace-nowrap">
+                <div class="flex items-center">
+                  <img [src]="user.profile" alt="Profile Picture" class="w-10 h-10 rounded-full border-2 border-gray-200">
+                </div>
+              </td>
+              <td class="py-3 px-6 text-left">{{ user.name }}</td>
+              <td class="py-3 px-6 text-left">
+                <span class="bg-gray-200 text-gray-600 py-1 px-3 rounded-full text-xs">Hidden</span>
+              </td>
+              <td class="py-3 px-6 text-left">{{ user.department }}</td>
+              <td class="py-3 px-6 text-left">{{ user.position }}</td>
+              <td class="py-3 px-6 text-left">
+                <span [ngClass]="{
+                  'bg-green-200 text-green-600': user.status === 'Active',
+                  'bg-red-200 text-red-600': user.status === 'Inactive'
+                }" class="py-1 px-3 rounded-full text-xs">
+                  {{ user.status }}
+                </span>
+              </td>
+              <td class="py-3 px-6 text-center">
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" class="sr-only peer" [(ngModel)]="user.access" (change)="toggleUserAccess(user)">
+                  <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
         <div class="flex justify-between items-center mt-4"> <!-- Pagination Controls -->
           <button class="bg-gray-500 text-white px-4 py-2 rounded" (click)="prevPage()" [disabled]="currentPage === 1">Previous</button> <!-- Previous Page Button -->
@@ -169,50 +180,161 @@
 
   <div *ngIf="activeTab === 'roles'">
     <section id="user-list">
-      <div class="mb-4 flex justify-between items-center"> <!-- Search and Action Buttons -->
-        <input type="text" [(ngModel)]="searchTerm" placeholder="Search..." class="border rounded p-2 w-64"> <!-- Search Input -->
-        <div class="space-x-4"> <!-- Action Buttons Container -->
-          <button class="bg-red-500 text-white px-4 py-2 rounded" (click)="deleteUsers()">Delete</button> <!-- Delete Button -->
-          <button class="bg-blue-500 text-white px-4 py-2 rounded" (click)="addRole()">Add Role</button> <!-- Add Role Button -->
-          <button (click)="toggleModal()"
-            class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300
-            font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700
-            dark:focus:ring-blue-800" type="button">
-            + New Role
-          </button>
-        </div>
+      <div class="flex justify-between mb-6">
+        <input type="text" placeholder="Search..." class="w-half p-2 border rounded-lg">
+        <div>
+          <button class="px-4 py-2 bg-blue-500 text-white rounded mr-2">Edit</button>
+          <button (click)="toggleManagePopup()" class="px-4 py-2 bg-black text-white rounded">Manage</button>
+        </div>      
       </div>
-
-        <div *ngIf="filteredUsers.length > 0"> <!-- User Table -->
-          <table class="w-full border-collapse"> <!-- Table Container -->
+    
+      <div class="flex grid-cols-1 md:grid-cols-2 gap-8 justify-center items-center">
+        <div class="bg-white shadow-lg rounded-lg p-4 w-1/2 max-w-2xl">
+          <table class=" w-full">
             <thead>
-              <tr class="bg-gray-200"> <!-- Table Header Row -->
-                <!--<th class="border p-2">Profile</th>-->
-                <th class="border p-2">Name</th>
-                <th class="border p-2">Designation</th>
-
+              <tr>
+                <th class="text-left py-2">Name</th>
+                <th class="text-left py-2">Designation</th> 
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let user of paginatedUsers; let i = index" class="bg-white"> <!-- User Data Rows -->
-                
-                <td class="border p-2">{{ user.name }}</td>
-                <td class="border p2">
-                  <div class="flex flex-col">
-                    <span class="font-bold text-base text-justify">{{ user.department }}</span> <!-- User Department -->
-                    <span class="text-sm italic text-gray-600 text-justify">{{ user.position }}</span> <!-- User Role/Position -->
+              <tr class="border-t">
+                <td class="py-4 flex items-center">
+                  <img src="" alt="Cheska Trinidad" class="w-10 h-10 rounded-full mr-4">
+                  <div>
+                    <p>Cheska Trinidad</p>
+                    <p class="text-sm text-gray-500">cheskatrinidad</p>
                   </div>
-                </td>    
+                </td>
+                <td class="py-4">
+                  <p>I.T Department</p>
+                  <p class="text-sm text-gray-500">Graphic Designer</p>
+                  <a href="#" class="text-blue-500 text-sm">Edit</a>
+                </td>
+              </tr>
+              <tr class="border-t">
+                <td class="py-4 flex items-center">
+                  <img src="" alt="Juan Dela Cruz" class="w-10 h-10 rounded-full mr-4">
+                  <div>
+                    <p>Juan Dela Cruz</p>
+                    <p class="text-sm text-gray-500">juandelacruzgmail.com</p>
+                  </div>
+                </td>
+                <td class="py-4">
+                  <p>Software Department</p>
+                  <p class="text-sm text-gray-500">Data Analyst</p>
+                  <a href="#" class="text-blue-500 text-sm">Edit</a>
+                </td>
               </tr>
             </tbody>
           </table>
-        </div>
-
-        <div class="flex justify-between items-center mt-4"> <!-- Pagination Controls -->
-          <button class="bg-gray-500 text-white px-4 py-2 rounded" (click)="prevPage()" [disabled]="currentPage === 1">Previous</button> <!-- Previous Page Button -->
-          <span class="text-gray-600">Page {{ currentPage }} of {{ totalPages }}</span> <!-- Page Number Indicator -->
-          <button class="bg-gray-500 text-white px-4 py-2 rounded" (click)="nextPage()" [disabled]="currentPage === totalPages">Next</button> <!-- Next Page Button -->
-        </div>
+        </div>       
+      </div>
     </section>
+
+    <!-- Popup Overlay -->
+    <!-- Main Popup -->
+    <div *ngIf="showManagePopup" 
+        class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+        (click)="closePopupOutside($event)">
+      <div class="bg-white rounded-lg p-8 max-w-md w-full" (click)="$event.stopPropagation()">
+        <h2 class="text-2xl font-bold mb-4">Manage Roles and Departments</h2>
+        <div class="space-y-4">
+          <button (click)="toggleAddPopup()" class="w-full px-4 py-2 bg-blue-500 text-white rounded">Add Role/Department</button>
+          <button (click)="toggleEditPopup()" class="w-full px-4 py-2 bg-green-500 text-white rounded">Edit Role/Department</button>
+          <button (click)="toggleAccessRightsPopup()" class="w-full px-4 py-2 bg-yellow-500 text-white rounded">Manage Access Rights</button>
+        </div>
+        <button (click)="toggleManagePopup()" class="mt-4 px-4 py-2 bg-gray-200 text-gray-800 rounded">Close</button>
+      </div>
+    </div>
+
+
+    <!-- Add Role/Department Popup -->
+    <div *ngIf="showAddPopup" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+      <div class="bg-white rounded-lg p-8 max-w-md w-full">
+        <h2 class="text-2xl font-bold mb-4">Add Role/Department</h2>
+        <div class="flex flex-col space-y-4">
+          <div class="mb-4">
+            <label for="role" class="block text-sm font-medium text-gray-700">Role</label>
+            <input type="text" id="role" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+          </div>
+          <div class="mb-4">
+            <label for="department" class="block text-sm font-medium text-gray-700">Department</label>
+            <input type="text" id="department" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+          </div>
+        </div>
+        <div class="flex justify-end space-x-2 mt-4">
+          <button (click)="closeAddPopup()" class="mt-4 px-4 py-2 bg-gray-200 text-gray-800 rounded">Cancel</button>
+          <button class="mt-4 px-4 py-2 bg-green-500 text-white rounded">Add</button>
+        </div>
+        <button (click)="toggleAddPopup()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6L18 18"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Edit Role/Department Popup -->
+    <div *ngIf="showEditPopup" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+      <div class="bg-white rounded-lg p-8 max-w-md w-full">
+        <h2 class="text-2xl font-bold mb-4">Edit Role/Department</h2>
+        <!-- Add form fields here -->
+        <div class="flex justify-end space-x-2 mt-4">
+          <button (click)="closeEditPopup()" class="mt-4 px-4 py-2 bg-gray-200 text-gray-800 rounded">Cancel</button>
+          <button class="mt-4 px-4 py-2 bg-green-500 text-white rounded">Update</button>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- Manage Access Rights Popup -->
+    <div *ngIf="showAccessRightsPopup" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+      <div class="bg-white rounded-lg p-8 max-w-md w-full">
+        <h2 class="text-2xl font-bold mb-4">Manage Access Rights</h2>
+        <!-- Add access rights management UI here -->
+        <div class="bg-white shadow-lg rounded-lg p-4">
+          <div class="flex mb-4">
+            <div class="w-1/2 pl-2"> <!--Select Department Snippet Starts Here-->
+              <label class="block mb-2 text-gray-700">Select Department</label>
+              <select class="w-full p-2 border rounded-lg">
+                <option>Select Department</option>
+                <!-- Add more options as needed -->
+              </select>
+            </div> <!--Select Department Snippet ENDS Here-->
+            <div class="w-1/2 pr-2"> <!--Role Snippet Starts Here-->
+              <label class="block mb-2 text-gray-700">Role</label>
+              <select class="w-full p-2 border rounded-lg">
+                <option>Select Role</option>
+                <!-- Add more options as needed -->
+              </select>
+            </div> <!--Role Snippet ENDS Here-->
+          </div>
+          <div>
+            <h3 class="text-xl font-bold mb-4">Access Rights</h3>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="flex items-center mb-2">
+                  <input type="checkbox" class="mr-2">
+                  <span>Employee records</span>
+                </label>
+                <!-- Repeat the checkbox as needed -->
+              </div>
+              <div>
+                <label class="flex items-center mb-2">
+                  <input type="checkbox" class="mr-2">
+                  <span>Employee records</span>
+                </label>
+                <!-- Repeat the checkbox as needed -->
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="flex justify-end space-x-2 mt-4">
+          <button (click)="toggleAccessRightsPopup()" class="px-4 py-2 bg-gray-200 text-gray-800 rounded">Cancel</button>
+          <button class="px-4 py-2 bg-yellow-500 text-white rounded">Save Changes</button>
+        </div>
+      </div>
+    </div>    
   </div>
 </main>
