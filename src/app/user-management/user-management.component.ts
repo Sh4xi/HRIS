@@ -173,6 +173,23 @@ export class UserManagementComponent implements OnInit {
     this.updatePagination();
   }
 
+  getContractType(position: string): string {
+    const positionLower = position.toLowerCase();
+    switch (positionLower) {
+      case 'manager':
+      case 'developer':
+        return 'Full-time';
+      case 'designer':
+        return 'Contract';
+      case 'analyst':
+        return 'Part-time';
+      case 'intern':
+        return 'Intern';
+      default:
+        return 'Part-time';
+    }
+  }
+
   // Function to add a role
   addRole() {
     console.log("Adding Role");

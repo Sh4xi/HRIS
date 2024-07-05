@@ -152,7 +152,7 @@
               <span class="bg-gray-200 text-gray-600 py-1 px-3 rounded-full text-xs">Hidden</span>
             </td>
             <td class="py-3 px-6 text-left">{{ user.department }}</td>
-            <td class="py-3 px-6 text-left">{{ user.position }}</td>
+            <td class="py-3 px-6 text-left">{{ user.position }}<br>{{ getContractType(user.position) }}</td>
             <td class="py-3 px-6 text-left">
               <span [ngClass]="{
                 'bg-green-200 text-green-600': user.status === 'Active',
