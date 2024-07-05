@@ -1,20 +1,22 @@
 /* You can add global styles to this file, and also import other style files */
 /* ./src/styles.css */
 
+@import url('https://fonts.cdnfonts.com/css/sf-pro-display');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+*{
+  font-family: 'SF Pro Display', sans-serif;
+}
 
 body {
-    background-color: #f3f4f6; /* Light gray background color */
-    background-image: url('assets/Background.png'); /* Path to your background image */
+    background-color: blue; /* Light gray background color */
+    background-image: url("https://i.imgur.com/MQj1oy4.jpg");/*background-image: url("background.png");/* Path to your background image */
     background-size: cover;
     background-position: center;
     margin: 0;
     padding: 0;
-    font-family: Arial, sans-serif;
+    font-family: 'SF Pro Display', sans-serif;
   }
-  
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

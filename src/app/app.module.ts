@@ -6,6 +6,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { UserManagementComponent } from './user-management/user-management.component';
 import { LoginFailedComponent } from '../app/login-failed/login-failed.component';
+import { AuditTrailComponent } from './audit-trail/audit-trail.component';
 
 @NgModule({
   imports: [
@@ -15,7 +16,11 @@ import { LoginFailedComponent } from '../app/login-failed/login-failed.component
     DashboardComponent,
     UserManagementComponent,
     LoginFailedComponent,
+<<<<<<< HEAD
     AppRoutingModule
+=======
+    AuditTrailComponent
+>>>>>>> fb7292f4a2245218d95c992a68e78a5ddf42983a
   ],
 })
 export class AppModule { }

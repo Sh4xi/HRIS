@@ -4,6 +4,7 @@ import { UserManagementComponent } from './user-management/user-management.compo
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { LoginFailedComponent } from './login-failed/login-failed.component';
 import { OtpPopupComponent } from './otp-popup/otp-popup.component';
+import { AuditTrailComponent } from './audit-trail/audit-trail.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -12,6 +13,7 @@ export const routes: Routes = [
   { path: 'dashboard', component: DashboardComponent },
   { path: 'login-failed', component: LoginFailedComponent },
   { path: 'otp-popup', component: OtpPopupComponent },
+  { path: 'audit-trail', component: AuditTrailComponent },
   // Add a wildcard route for any unmatched routes
   { path: '**', redirectTo: '/login' }
 ];
