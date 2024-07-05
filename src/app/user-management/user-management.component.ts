@@ -62,12 +62,15 @@ export class UserManagementComponent implements OnInit {
   }
 
   onSubmit() {
-    if (this.isFormValid()) {
-      this.createEmployee(this.employee);
-      this.toggleModal();
-    } else {
-      console.log('Please fill in all required fields');
-    }
+    console.log('Submitting form with employee data:', this.employee);
+    this.supabaseService.createEmployee(this.employee)
+      .then(response => {
+        if (response.error) {
+          console.error('Error creating employee:', response.error.message);
+        } else {
+          console.log('Employee created successfully:', response.data);
+        }
+      });
   }
 
   isFormValid(): boolean {
