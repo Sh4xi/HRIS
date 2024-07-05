@@ -54,12 +54,12 @@
                   </div>
                   <div class="grid grid-cols-3 gap-4">
                     <div>
-                      <label for="firstName" class="block mb-1 text-sm font-medium text-gray-900 dark:text-white">First name*</label>
-                      <input type="text" id="firstName" [(ngModel)]="employee.firstName" name="firstName" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required>
+                      <label for="firstname" class="block mb-1 text-sm font-medium text-gray-900 dark:text-white">First Name*</label>
+                      <input type="text" id="firstname" [(ngModel)]="employee.firstname" name="firstname" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required>
                     </div>
                     <div>
-                      <label for="middleName" class="block mb-1 text-sm font-medium text-gray-900 dark:text-white">Middle Name</label>
-                      <input type="text" id="middleName" [(ngModel)]="employee.middleName" name="middleName" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                      <label for="midname" class="block mb-1 text-sm font-medium text-gray-900 dark:text-white">Middle Name</label>
+                      <input type="text" id="midname" [(ngModel)]="employee.midname" name="midname" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                     </div>
                     <div>
                       <label for="surname" class="block mb-1 text-sm font-medium text-gray-900 dark:text-white">Last Name*</label>
@@ -73,30 +73,30 @@
                         <label for="position" class="block mb-1 text-sm font-medium text-gray-900 dark:text-white">Position*</label>
                         <select id="position" [(ngModel)]="employee.position" name="position" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required>
                           <option value="" disabled selected>Select a position</option>
-                          <option value="manager">Manager</option>
-                          <option value="developer">Developer</option>
-                          <option value="designer">Designer</option>
-                          <option value="analyst">Analyst</option>
+                          <option value="Manager">Manager</option>
+                          <option value="Developer">Developer</option>
+                          <option value="Designer">Designer</option>
+                          <option value="Analyst">Analyst</option>
                         </select>
                       </div>
                       <div>
                         <label for="department" class="block mb-1 text-sm font-medium text-gray-900 dark:text-white">Department*</label>
                         <select id="department" [(ngModel)]="employee.department" name="department" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required>
                           <option value="" disabled selected>Select a department</option>
-                          <option value="it">IT</option>
-                          <option value="hr">Human Resources</option>
-                          <option value="finance">Finance</option>
-                          <option value="marketing">Marketing</option>
+                          <option value="IT">IT</option>
+                          <option value="Human Resource">Human Resources</option>
+                          <option value="Finance">Finance</option>
+                          <option value="Marketing">Marketing</option>
                         </select>
                       </div>
                       <div>
                         <label for="type" class="block mb-1 text-sm font-medium text-gray-900 dark:text-white">Type*</label>
                         <select id="type" [(ngModel)]="employee.type" name="type" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required>
                           <option value="" disabled selected>Select a type</option>
-                          <option value="full-time">Full-time</option>
-                          <option value="part-time">Part-time</option>
-                          <option value="contract">Contract</option>
-                          <option value="intern">Intern</option>
+                          <option value="Full-Time">Full-time</option>
+                          <option value="Part-Time">Part-time</option>
+                          <option value="Contract">Contract</option>
+                          <option value="Intern">Intern</option>
                         </select>
                       </div>
                     </div>

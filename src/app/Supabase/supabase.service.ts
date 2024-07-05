@@ -20,13 +20,13 @@ export class SupabaseService {
     const response = await this.supabase.from('Profile').insert([
       {
         email: employee.email,
-        first_name: employee.firstName,
-        mid_name: employee.middleName,
+        first_name: employee.firstname,
+        mid_name: employee.midname,
         surname: employee.surname,
         password: 'hashed_password_placeholder', // Hash the password before storing
         department: employee.department,
         position: employee.position,
-        types: employee.type,
+        types: employee.type
       },
     ]);
 

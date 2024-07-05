@@ -14,7 +14,8 @@ import { LoginFailedComponent } from '../app/login-failed/login-failed.component
     CommonModule,
     DashboardComponent,
     UserManagementComponent,
-    LoginFailedComponent
+    LoginFailedComponent,
+    AppRoutingModule
   ],
 })
 export class AppModule { }

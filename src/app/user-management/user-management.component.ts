@@ -10,7 +10,7 @@ interface User {
   password: string;
   department: string;
   position: string;
-  term: string;
+  type: string;
   status: string;
   access: boolean;
 }
@@ -33,10 +33,11 @@ export class UserManagementComponent implements OnInit {
 
   showModal = false;
   photoPreviewUrl = 'https://via.placeholder.com/200x200';
+
   employee = {
     email: '',
-    firstName: '',
-    middleName: '',
+    firstname: '',
+    midname: '',
     surname: '',
     position: '',
     department: '',
@@ -70,15 +71,15 @@ export class UserManagementComponent implements OnInit {
   }
 
   isFormValid(): boolean {
-    return !!(this.employee.email && this.employee.firstName && this.employee.surname &&
+    return !!(this.employee.email && this.employee.firstname && this.employee.surname &&
               this.employee.position && this.employee.department && this.employee.type);
   }
 
   async createEmployee(employee: any) {
     const newUser = {
       email: employee.email,
-      first_name: employee.firstName,
-      mid_name: employee.middleName,
+      first_name: employee.firstname,
+      mid_name: employee.midname,
       surname: employee.surname,
       password: 'hashed_password_placeholder', // Hash the password before storing
       department: employee.department,
@@ -92,12 +93,12 @@ export class UserManagementComponent implements OnInit {
     } else {
       this.users.push({
         profile: this.photoPreviewUrl,
-        name: `${employee.firstName} ${employee.middleName ? employee.middleName + ' ' : ''}${employee.surname}`,
+        name: `${employee.firstname} ${employee.midname ? employee.midname + ' ' : ''}${employee.surname}`,
         email: employee.email,
         password: '***************',
         department: employee.department,
         position: employee.position,
-        term: employee.type,
+        type: employee.type,
         status: 'Active',
         access: true
       });
