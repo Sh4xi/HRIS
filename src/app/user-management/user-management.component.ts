@@ -69,8 +69,26 @@ export class UserManagementComponent implements OnInit {
           console.error('Error creating employee:', response.error.message);
         } else {
           console.log('Employee created successfully:', response.data);
+          
+          // Add these new lines
+          this.toggleModal(); // Close the modal
+          this.resetForm(); // Clear the form
         }
       });
+  }
+  
+  // Add this new method to reset the form
+  resetForm() {
+    this.employee = {
+      email: '',
+      firstname: '',
+      midname: '',
+      surname: '',
+      position: '',
+      department: '',
+      type: ''
+    };
+    this.photoPreviewUrl = 'https://via.placeholder.com/200x200';
   }
 
   isFormValid(): boolean {
