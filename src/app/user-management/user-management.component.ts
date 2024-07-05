@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { SupabaseService } from '../Supabase/supabase.service';
 
 interface User {
   profile: string;
@@ -41,6 +42,8 @@ export class UserManagementComponent implements OnInit {
     department: '',
     type: ''
   };
+
+  constructor(private supabaseService: SupabaseService) {}
   
   toggleModal() {
     this.showModal = !this.showModal;
@@ -71,174 +74,207 @@ export class UserManagementComponent implements OnInit {
               this.employee.position && this.employee.department && this.employee.type);
   }
 
+  async createEmployee(employee: any) {
+    const newUser = {
+      email: employee.email,
+      first_name: employee.firstName,
+      mid_name: employee.middleName,
+      surname: employee.surname,
+      password: 'hashed_password_placeholder', // Hash the password before storing
+      department: employee.department,
+      position: employee.position,
+      types: employee.type
+    };
+
+    const { data, error } = await this.supabaseService.createEmployee(newUser);
+    if (error) {
+      console.error('Error creating profile:', error);
+    } else {
+      this.users.push({
+        profile: this.photoPreviewUrl,
+        name: `${employee.firstName} ${employee.middleName ? employee.middleName + ' ' : ''}${employee.surname}`,
+        email: employee.email,
+        password: '***************',
+        department: employee.department,
+        position: employee.position,
+        term: employee.type,
+        status: 'Active',
+        access: true
+      });
+      this.filteredUsers = this.users;
+      this.updatePagination();
+    }
+  }
+
+
   ngOnInit() {
     this.users = [
-      {
-        profile: 'path_to_your_image1.jpg',
-        name: 'Mah Doe Rat\'on',
-        email: 'm.doerat@example.com',
-        password: '***************',
-        department: 'General Affairs',
-        position: 'Officer-In-Charge',
-        term: 'Full Time',
-        status: 'Active',
-        access: true
-      },
-      {
-        profile: 'path_to_your_image2.jpg',
-        name: 'John Doe',
-        email: 'john.doe@example.com',
-        password: '***************',
-        department: 'Human Resources',
-        position: 'HR Manager',
-        term: 'Part Time',
-        status: 'Active',
-        access: true
-      },
-      {
-        profile: 'path_to_your_image3.jpg',
-        name: 'Jane Smith',
-        email: 'jane.smith@example.com',
-        password: '***************',
-        department: 'Marketing',
-        position: 'Marketing Specialist',
-        term: 'Full Time',
-        status: 'Inactive',
-        access: false
-      },
-      {
-        profile: 'path_to_your_image4.jpg',
-        name: 'Anna Brown',
-        email: 'anna.brown@example.com',
-        password: '***************',
-        department: 'Finance',
-        position: 'Financial Analyst',
-        term: 'Full Time',
-        status: 'Active',
-        access: true
-      },
-      {
-        profile: 'path_to_your_image5.jpg',
-        name: 'Michael Johnson',
-        email: 'michael.johnson@example.com',
-        password: '***************',
-        department: 'Sales',
-        position: 'Sales Representative',
-        term: 'Full Time',
-        status: 'Active',
-        access: true
-      },
-      {
-        profile: 'path_to_your_image6.jpg',
-        name: 'Emily Davis',
-        email: 'emily.davis@example.com',
-        password: '***************',
-        department: 'Operations',
-        position: 'Operations Manager',
-        term: 'Full Time',
-        status: 'Active',
-        access: true
-      },
-      {
-        profile: 'path_to_your_image7.jpg',
-        name: 'David Wilson',
-        email: 'david.wilson@example.com',
-        password: '***************',
-        department: 'IT',
-        position: 'Software Engineer',
-        term: 'Full Time',
-        status: 'Active',
-        access: true
-      },
-      {
-        profile: 'path_to_your_image8.jpg',
-        name: 'Sophia Lee',
-        email: 'sophia.lee@example.com',
-        password: '***************',
-        department: 'Customer Support',
-        position: 'Customer Support Specialist',
-        term: 'Part Time',
-        status: 'Active',
-        access: true
-      },
-      {
-        profile: 'path_to_your_image9.jpg',
-        name: 'Daniel Martinez',
-        email: 'daniel.martinez@example.com',
-        password: '***************',
-        department: 'Research and Development',
-        position: 'Research Scientist',
-        term: 'Full Time',
-        status: 'Inactive',
-        access: false
-      },
-      {
-        profile: 'path_to_your_image10.jpg',
-        name: 'Olivia Thompson',
-        email: 'olivia.thompson@example.com',
-        password: '***************',
-        department: 'Legal',
-        position: 'Legal Counsel',
-        term: 'Full Time',
-        status: 'Active',
-        access: true
-      },
-      {
-        profile: 'path_to_your_image11.jpg',
-        name: 'William Harris',
-        email: 'william.harris@example.com',
-        password: '***************',
-        department: 'Human Resources',
-        position: 'Recruitment Specialist',
-        term: 'Full Time',
-        status: 'Active',
-        access: true
-      },
-      {
-        profile: 'path_to_your_image12.jpg',
-        name: 'Emma Clark',
-        email: 'emma.clark@example.com',
-        password: '***************',
-        department: 'Marketing',
-        position: 'Social Media Manager',
-        term: 'Part Time',
-        status: 'Active',
-        access: true
-      },
-      {
-        profile: 'path_to_your_image13.jpg',
-        name: 'Alexander White',
-        email: 'alexander.white@example.com',
-        password: '***************',
-        department: 'Finance',
-        position: 'Financial Controller',
-        term: 'Full Time',
-        status: 'Active',
-        access: true
-      },
-      {
-        profile: 'path_to_your_image14.jpg',
-        name: 'Sophie Robinson',
-        email: 'sophie.robinson@example.com',
-        password: '***************',
-        department: 'Operations',
-        position: 'Operations Coordinator',
-        term: 'Full Time',
-        status: 'Active',
-        access: true
-      },
-      {
-        profile: 'path_to_your_image15.jpg',
-        name: 'James Turner',
-        email: 'james.turner@example.com',
-        password: '***************',
-        department: 'IT',
-        position: 'System Administrator',
-        term: 'Full Time',
-        status: 'Active',
-        access: true
-      }
-      // Add more users as needed to reach the 2nd page
+      // {
+      //   profile: 'path_to_your_image1.jpg',
+      //   name: 'Mah Doe Rat\'on',
+      //   email: 'm.doerat@example.com',
+      //   password: '***************',
+      //   department: 'General Affairs',
+      //   position: 'Officer-In-Charge',
+      //   term: 'Full Time',
+      //   status: 'Active',
+      //   access: true
+      // },
+      // {
+      //   profile: 'path_to_your_image2.jpg',
+      //   name: 'John Doe',
+      //   email: 'john.doe@example.com',
+      //   password: '***************',
+      //   department: 'Human Resources',
+      //   position: 'HR Manager',
+      //   term: 'Part Time',
+      //   status: 'Active',
+      //   access: true
+      // },
+      // {
+      //   profile: 'path_to_your_image3.jpg',
+      //   name: 'Jane Smith',
+      //   email: 'jane.smith@example.com',
+      //   password: '***************',
+      //   department: 'Marketing',
+      //   position: 'Marketing Specialist',
+      //   term: 'Full Time',
+      //   status: 'Inactive',
+      //   access: false
+      // },
+      // {
+      //   profile: 'path_to_your_image4.jpg',
+      //   name: 'Anna Brown',
+      //   email: 'anna.brown@example.com',
+      //   password: '***************',
+      //   department: 'Finance',
+      //   position: 'Financial Analyst',
+      //   term: 'Full Time',
+      //   status: 'Active',
+      //   access: true
+      // },
+      // {
+      //   profile: 'path_to_your_image5.jpg',
+      //   name: 'Michael Johnson',
+      //   email: 'michael.johnson@example.com',
+      //   password: '***************',
+      //   department: 'Sales',
+      //   position: 'Sales Representative',
+      //   term: 'Full Time',
+      //   status: 'Active',
+      //   access: true
+      // },
+      // {
+      //   profile: 'path_to_your_image6.jpg',
+      //   name: 'Emily Davis',
+      //   email: 'emily.davis@example.com',
+      //   password: '***************',
+      //   department: 'Operations',
+      //   position: 'Operations Manager',
+      //   term: 'Full Time',
+      //   status: 'Active',
+      //   access: true
+      // },
+      // {
+      //   profile: 'path_to_your_image7.jpg',
+      //   name: 'David Wilson',
+      //   email: 'david.wilson@example.com',
+      //   password: '***************',
+      //   department: 'IT',
+      //   position: 'Software Engineer',
+      //   term: 'Full Time',
+      //   status: 'Active',
+      //   access: true
+      // },
+      // {
+      //   profile: 'path_to_your_image8.jpg',
+      //   name: 'Sophia Lee',
+      //   email: 'sophia.lee@example.com',
+      //   password: '***************',
+      //   department: 'Customer Support',
+      //   position: 'Customer Support Specialist',
+      //   term: 'Part Time',
+      //   status: 'Active',
+      //   access: true
+      // },
+      // {
+      //   profile: 'path_to_your_image9.jpg',
+      //   name: 'Daniel Martinez',
+      //   email: 'daniel.martinez@example.com',
+      //   password: '***************',
+      //   department: 'Research and Development',
+      //   position: 'Research Scientist',
+      //   term: 'Full Time',
+      //   status: 'Inactive',
+      //   access: false
+      // },
+      // {
+      //   profile: 'path_to_your_image10.jpg',
+      //   name: 'Olivia Thompson',
+      //   email: 'olivia.thompson@example.com',
+      //   password: '***************',
+      //   department: 'Legal',
+      //   position: 'Legal Counsel',
+      //   term: 'Full Time',
+      //   status: 'Active',
+      //   access: true
+      // },
+      // {
+      //   profile: 'path_to_your_image11.jpg',
+      //   name: 'William Harris',
+      //   email: 'william.harris@example.com',
+      //   password: '***************',
+      //   department: 'Human Resources',
+      //   position: 'Recruitment Specialist',
+      //   term: 'Full Time',
+      //   status: 'Active',
+      //   access: true
+      // },
+      // {
+      //   profile: 'path_to_your_image12.jpg',
+      //   name: 'Emma Clark',
+      //   email: 'emma.clark@example.com',
+      //   password: '***************',
+      //   department: 'Marketing',
+      //   position: 'Social Media Manager',
+      //   term: 'Part Time',
+      //   status: 'Active',
+      //   access: true
+      // },
+      // {
+      //   profile: 'path_to_your_image13.jpg',
+      //   name: 'Alexander White',
+      //   email: 'alexander.white@example.com',
+      //   password: '***************',
+      //   department: 'Finance',
+      //   position: 'Financial Controller',
+      //   term: 'Full Time',
+      //   status: 'Active',
+      //   access: true
+      // },
+      // {
+      //   profile: 'path_to_your_image14.jpg',
+      //   name: 'Sophie Robinson',
+      //   email: 'sophie.robinson@example.com',
+      //   password: '***************',
+      //   department: 'Operations',
+      //   position: 'Operations Coordinator',
+      //   term: 'Full Time',
+      //   status: 'Active',
+      //   access: true
+      // },
+      // {
+      //   profile: 'path_to_your_image15.jpg',
+      //   name: 'James Turner',
+      //   email: 'james.turner@example.com',
+      //   password: '***************',
+      //   department: 'IT',
+      //   position: 'System Administrator',
+      //   term: 'Full Time',
+      //   status: 'Active',
+      //   access: true
+      // }
+      // // Add more users as needed to reach the 2nd page
     ];
     this.filteredUsers = this.users;
     this.updatePagination();
@@ -258,27 +294,6 @@ export class UserManagementComponent implements OnInit {
   addRole() {
     // Implement your add role logic here
     console.log("Adding Role");
-  }
-
-  // Function to add a new employee (placeholder function)
-  createEmployee(employee: any) {
-    const newUser: User = {
-      profile: employee.photoPreviewUrl || 'assets/default-profile.jpg',
-      name: `${employee.firstName} ${employee.middleName ? employee.middleName + ' ' : ''}${employee.surname}`,
-      email: employee.email,
-      password: '***************',
-      department: employee.department,
-      position: employee.position,
-      term: employee.type,
-      status: 'Active',
-      access: true
-    };
-  
-    this.users.push(newUser);
-    this.filteredUsers = this.users;
-    this.updatePagination();
-  
-    console.log('New employee created:', newUser);
   }
 
   toggleUserAccess(user: User) {

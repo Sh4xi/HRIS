@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient, PostgrestSingleResponse } from '@supabase/supabase-js';
 import { environment } from '../environments/environment';
 
 @Injectable({
@@ -14,6 +14,29 @@ export class SupabaseService {
     const supabaseKey = environment.supabaseKey;
     this.supabase = createClient(supabaseUrl, supabaseKey);
     console.log('Supabase client initialized with URL:', supabaseUrl);
+  }
+
+  async createEmployee(employee: any): Promise<PostgrestSingleResponse<any>> {
+    const response = await this.supabase.from('Profile').insert([
+      {
+        email: employee.email,
+        first_name: employee.firstName,
+        mid_name: employee.middleName,
+        surname: employee.surname,
+        password: 'hashed_password_placeholder', // Hash the password before storing
+        department: employee.department,
+        position: employee.position,
+        types: employee.type,
+      },
+    ]);
+
+    if (response.error) {
+      console.error('Error creating employee:', response.error.message);
+    } else {
+      console.log('Employee created successfully:', response.data);
+    }
+
+    return response;
   }
 
   async acquireLock(): Promise<boolean> {

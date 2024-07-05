@@ -17,3 +17,9 @@ main.ts
 server.ts
 package.json
 tsconfig.json
+
+
+
+
+login form must be in auth folder
+components folder must include all page resources
