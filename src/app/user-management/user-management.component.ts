@@ -30,6 +30,11 @@ export class UserManagementComponent implements OnInit {
   currentPage: number = 1;
   itemsPerPage: number = 10;
   totalPages: number = 1;
+  activeTab: string = 'users';
+  showManagePopup = false;
+  showAddPopup = false;
+  showEditPopup = false;
+  showAccessRightsPopup = false;
 
   showModal = false;
   photoPreviewUrl = 'https://via.placeholder.com/200x200';
@@ -170,8 +175,8 @@ export class UserManagementComponent implements OnInit {
 
   // Function to add a role
   addRole() {
-    // Implement your add role logic here
     console.log("Adding Role");
+    // Implement your add role logic here
   }
 
   toggleUserAccess(user: User) {
@@ -179,8 +184,7 @@ export class UserManagementComponent implements OnInit {
   }
 
   deleteUsers() {
-    // Implement delete functionality
-    console.log("Deleting user");
+    console.log("Deleting all users");
     this.users = [];
     this.filteredUsers = [];
     this.updatePagination();
@@ -188,6 +192,7 @@ export class UserManagementComponent implements OnInit {
 
   updatePagination() {
     this.totalPages = Math.ceil(this.filteredUsers.length / this.itemsPerPage);
+    this.currentPage = 1; // Reset to first page when updating pagination
     this.paginate();
   }
 
@@ -210,4 +215,41 @@ export class UserManagementComponent implements OnInit {
       this.paginate();
     }
   }
+
+  setActiveTab(tab: string) {
+    this.activeTab = tab;
+  }
+
+  toggleManagePopup() {
+    this.showManagePopup = !this.showManagePopup;
+  }
+
+  toggleAddPopup(){
+    this.showAddPopup = !this.showAddPopup;
+  }
+
+  closeAddPopup() {
+    this.showAddPopup = false;
+  }
+
+  toggleEditPopup(){
+    this.showEditPopup = !this.showAddPopup;
+  }
+
+  closeEditPopup(){
+    this.showEditPopup = false;
+  }
+
+  toggleAccessRightsPopup(){
+    this.showAccessRightsPopup = !this.showAccessRightsPopup;
+  }
+
+  exitPopup(): void{
+    this.showManagePopup = false;
+  }
+
+  closePopupOutside(event: MouseEvent): void {
+    this.showManagePopup = false;
+  }
+
 }
