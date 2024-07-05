@@ -7,6 +7,9 @@
 @tailwind components;
 @tailwind utilities;
 
+*{
+  font-family: 'SF Pro Display', sans-serif;
+}
 
 body {
     background-color: blue; /* Light gray background color */

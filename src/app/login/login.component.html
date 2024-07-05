@@ -11,12 +11,12 @@
   </div>
 
   <!-- Container for the login box -->
-  <div class="flex bg-white shadow-lg rounded-lg overflow-hidden w-[70%]">
+  <div class="flex bg-white h-4/6 shadow-lg rounded-lg overflow-hidden w-[70%]">
 
     <!-- Left side for SVG illustration (hidden on small screens) -->
-    <div class="flex basis-[65%] justify-center align-center flex-col bg-[#E9ECF1]">
+    <div class="md:flex basis-[65%] justify-center align-center flex-col bg-[#E9ECF1]">
       <!-- SVG image centered within its container -->
-      <img src="assets/laptopgirl.svg" alt="laptopgirl" class="object-contain h-[70%] mx-auto">
+      <img src="assets/laptopgirl.svg" alt="laptopgirl" class="object-contain h-[60%] mx-10 ">
 
       <!-- Paragraph below the SVG image -->
       <p class="text-center p-5 text-gray-600 text-balance -mb-5">Kindly input your account credentials to access<br> the <strong>Human Resource Information System.</strong></p>
@@ -25,7 +25,7 @@
     <!-- Right side for the login form -->
     <div class="flex basis-[35%] justify-center align-center flex-col ml-9 mr-9 bg-white">
       <!-- Welcome text -->
-      <h1 class="text-3xl font-bold text-black text-center">Welcome Back!</h1>
+      <p class="text-3xl font-black text-black text-center">Welcome Back!</p>
 
       <!-- Error message alert -->
       <div *ngIf="errorMessage" class="mt-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
