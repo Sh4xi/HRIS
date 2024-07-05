@@ -130,176 +130,202 @@ export class UserManagementComponent implements OnInit {
 
 
   ngOnInit() {
-    this.users = [
-      // {
-      //   profile: 'path_to_your_image1.jpg',
-      //   name: 'Mah Doe Rat\'on',
-      //   email: 'm.doerat@example.com',
-      //   password: '***************',
-      //   department: 'General Affairs',
-      //   position: 'Officer-In-Charge',
-      //   term: 'Full Time',
-      //   status: 'Active',
-      //   access: true
-      // },
-      // {
-      //   profile: 'path_to_your_image2.jpg',
-      //   name: 'John Doe',
-      //   email: 'john.doe@example.com',
-      //   password: '***************',
-      //   department: 'Human Resources',
-      //   position: 'HR Manager',
-      //   term: 'Part Time',
-      //   status: 'Active',
-      //   access: true
-      // },
-      // {
-      //   profile: 'path_to_your_image3.jpg',
-      //   name: 'Jane Smith',
-      //   email: 'jane.smith@example.com',
-      //   password: '***************',
-      //   department: 'Marketing',
-      //   position: 'Marketing Specialist',
-      //   term: 'Full Time',
-      //   status: 'Inactive',
-      //   access: false
-      // },
-      // {
-      //   profile: 'path_to_your_image4.jpg',
-      //   name: 'Anna Brown',
-      //   email: 'anna.brown@example.com',
-      //   password: '***************',
-      //   department: 'Finance',
-      //   position: 'Financial Analyst',
-      //   term: 'Full Time',
-      //   status: 'Active',
-      //   access: true
-      // },
-      // {
-      //   profile: 'path_to_your_image5.jpg',
-      //   name: 'Michael Johnson',
-      //   email: 'michael.johnson@example.com',
-      //   password: '***************',
-      //   department: 'Sales',
-      //   position: 'Sales Representative',
-      //   term: 'Full Time',
-      //   status: 'Active',
-      //   access: true
-      // },
-      // {
-      //   profile: 'path_to_your_image6.jpg',
-      //   name: 'Emily Davis',
-      //   email: 'emily.davis@example.com',
-      //   password: '***************',
-      //   department: 'Operations',
-      //   position: 'Operations Manager',
-      //   term: 'Full Time',
-      //   status: 'Active',
-      //   access: true
-      // },
-      // {
-      //   profile: 'path_to_your_image7.jpg',
-      //   name: 'David Wilson',
-      //   email: 'david.wilson@example.com',
-      //   password: '***************',
-      //   department: 'IT',
-      //   position: 'Software Engineer',
-      //   term: 'Full Time',
-      //   status: 'Active',
-      //   access: true
-      // },
-      // {
-      //   profile: 'path_to_your_image8.jpg',
-      //   name: 'Sophia Lee',
-      //   email: 'sophia.lee@example.com',
-      //   password: '***************',
-      //   department: 'Customer Support',
-      //   position: 'Customer Support Specialist',
-      //   term: 'Part Time',
-      //   status: 'Active',
-      //   access: true
-      // },
-      // {
-      //   profile: 'path_to_your_image9.jpg',
-      //   name: 'Daniel Martinez',
-      //   email: 'daniel.martinez@example.com',
-      //   password: '***************',
-      //   department: 'Research and Development',
-      //   position: 'Research Scientist',
-      //   term: 'Full Time',
-      //   status: 'Inactive',
-      //   access: false
-      // },
-      // {
-      //   profile: 'path_to_your_image10.jpg',
-      //   name: 'Olivia Thompson',
-      //   email: 'olivia.thompson@example.com',
-      //   password: '***************',
-      //   department: 'Legal',
-      //   position: 'Legal Counsel',
-      //   term: 'Full Time',
-      //   status: 'Active',
-      //   access: true
-      // },
-      // {
-      //   profile: 'path_to_your_image11.jpg',
-      //   name: 'William Harris',
-      //   email: 'william.harris@example.com',
-      //   password: '***************',
-      //   department: 'Human Resources',
-      //   position: 'Recruitment Specialist',
-      //   term: 'Full Time',
-      //   status: 'Active',
-      //   access: true
-      // },
-      // {
-      //   profile: 'path_to_your_image12.jpg',
-      //   name: 'Emma Clark',
-      //   email: 'emma.clark@example.com',
-      //   password: '***************',
-      //   department: 'Marketing',
-      //   position: 'Social Media Manager',
-      //   term: 'Part Time',
-      //   status: 'Active',
-      //   access: true
-      // },
-      // {
-      //   profile: 'path_to_your_image13.jpg',
-      //   name: 'Alexander White',
-      //   email: 'alexander.white@example.com',
-      //   password: '***************',
-      //   department: 'Finance',
-      //   position: 'Financial Controller',
-      //   term: 'Full Time',
-      //   status: 'Active',
-      //   access: true
-      // },
-      // {
-      //   profile: 'path_to_your_image14.jpg',
-      //   name: 'Sophie Robinson',
-      //   email: 'sophie.robinson@example.com',
-      //   password: '***************',
-      //   department: 'Operations',
-      //   position: 'Operations Coordinator',
-      //   term: 'Full Time',
-      //   status: 'Active',
-      //   access: true
-      // },
-      // {
-      //   profile: 'path_to_your_image15.jpg',
-      //   name: 'James Turner',
-      //   email: 'james.turner@example.com',
-      //   password: '***************',
-      //   department: 'IT',
-      //   position: 'System Administrator',
-      //   term: 'Full Time',
-      //   status: 'Active',
-      //   access: true
-      // }
-      // // Add more users as needed to reach the 2nd page
-    ];
-    this.filteredUsers = this.users;
-    this.updatePagination();
+    this.loadEmployees();
+    // this.users = [
+    //   // {
+    //   //   profile: 'path_to_your_image1.jpg',
+    //   //   name: 'Mah Doe Rat\'on',
+    //   //   email: 'm.doerat@example.com',
+    //   //   password: '***************',
+    //   //   department: 'General Affairs',
+    //   //   position: 'Officer-In-Charge',
+    //   //   term: 'Full Time',
+    //   //   status: 'Active',
+    //   //   access: true
+    //   // },
+    //   // {
+    //   //   profile: 'path_to_your_image2.jpg',
+    //   //   name: 'John Doe',
+    //   //   email: 'john.doe@example.com',
+    //   //   password: '***************',
+    //   //   department: 'Human Resources',
+    //   //   position: 'HR Manager',
+    //   //   term: 'Part Time',
+    //   //   status: 'Active',
+    //   //   access: true
+    //   // },
+    //   // {
+    //   //   profile: 'path_to_your_image3.jpg',
+    //   //   name: 'Jane Smith',
+    //   //   email: 'jane.smith@example.com',
+    //   //   password: '***************',
+    //   //   department: 'Marketing',
+    //   //   position: 'Marketing Specialist',
+    //   //   term: 'Full Time',
+    //   //   status: 'Inactive',
+    //   //   access: false
+    //   // },
+    //   // {
+    //   //   profile: 'path_to_your_image4.jpg',
+    //   //   name: 'Anna Brown',
+    //   //   email: 'anna.brown@example.com',
+    //   //   password: '***************',
+    //   //   department: 'Finance',
+    //   //   position: 'Financial Analyst',
+    //   //   term: 'Full Time',
+    //   //   status: 'Active',
+    //   //   access: true
+    //   // },
+    //   // {
+    //   //   profile: 'path_to_your_image5.jpg',
+    //   //   name: 'Michael Johnson',
+    //   //   email: 'michael.johnson@example.com',
+    //   //   password: '***************',
+    //   //   department: 'Sales',
+    //   //   position: 'Sales Representative',
+    //   //   term: 'Full Time',
+    //   //   status: 'Active',
+    //   //   access: true
+    //   // },
+    //   // {
+    //   //   profile: 'path_to_your_image6.jpg',
+    //   //   name: 'Emily Davis',
+    //   //   email: 'emily.davis@example.com',
+    //   //   password: '***************',
+    //   //   department: 'Operations',
+    //   //   position: 'Operations Manager',
+    //   //   term: 'Full Time',
+    //   //   status: 'Active',
+    //   //   access: true
+    //   // },
+    //   // {
+    //   //   profile: 'path_to_your_image7.jpg',
+    //   //   name: 'David Wilson',
+    //   //   email: 'david.wilson@example.com',
+    //   //   password: '***************',
+    //   //   department: 'IT',
+    //   //   position: 'Software Engineer',
+    //   //   term: 'Full Time',
+    //   //   status: 'Active',
+    //   //   access: true
+    //   // },
+    //   // {
+    //   //   profile: 'path_to_your_image8.jpg',
+    //   //   name: 'Sophia Lee',
+    //   //   email: 'sophia.lee@example.com',
+    //   //   password: '***************',
+    //   //   department: 'Customer Support',
+    //   //   position: 'Customer Support Specialist',
+    //   //   term: 'Part Time',
+    //   //   status: 'Active',
+    //   //   access: true
+    //   // },
+    //   // {
+    //   //   profile: 'path_to_your_image9.jpg',
+    //   //   name: 'Daniel Martinez',
+    //   //   email: 'daniel.martinez@example.com',
+    //   //   password: '***************',
+    //   //   department: 'Research and Development',
+    //   //   position: 'Research Scientist',
+    //   //   term: 'Full Time',
+    //   //   status: 'Inactive',
+    //   //   access: false
+    //   // },
+    //   // {
+    //   //   profile: 'path_to_your_image10.jpg',
+    //   //   name: 'Olivia Thompson',
+    //   //   email: 'olivia.thompson@example.com',
+    //   //   password: '***************',
+    //   //   department: 'Legal',
+    //   //   position: 'Legal Counsel',
+    //   //   term: 'Full Time',
+    //   //   status: 'Active',
+    //   //   access: true
+    //   // },
+    //   // {
+    //   //   profile: 'path_to_your_image11.jpg',
+    //   //   name: 'William Harris',
+    //   //   email: 'william.harris@example.com',
+    //   //   password: '***************',
+    //   //   department: 'Human Resources',
+    //   //   position: 'Recruitment Specialist',
+    //   //   term: 'Full Time',
+    //   //   status: 'Active',
+    //   //   access: true
+    //   // },
+    //   // {
+    //   //   profile: 'path_to_your_image12.jpg',
+    //   //   name: 'Emma Clark',
+    //   //   email: 'emma.clark@example.com',
+    //   //   password: '***************',
+    //   //   department: 'Marketing',
+    //   //   position: 'Social Media Manager',
+    //   //   term: 'Part Time',
+    //   //   status: 'Active',
+    //   //   access: true
+    //   // },
+    //   // {
+    //   //   profile: 'path_to_your_image13.jpg',
+    //   //   name: 'Alexander White',
+    //   //   email: 'alexander.white@example.com',
+    //   //   password: '***************',
+    //   //   department: 'Finance',
+    //   //   position: 'Financial Controller',
+    //   //   term: 'Full Time',
+    //   //   status: 'Active',
+    //   //   access: true
+    //   // },
+    //   // {
+    //   //   profile: 'path_to_your_image14.jpg',
+    //   //   name: 'Sophie Robinson',
+    //   //   email: 'sophie.robinson@example.com',
+    //   //   password: '***************',
+    //   //   department: 'Operations',
+    //   //   position: 'Operations Coordinator',
+    //   //   term: 'Full Time',
+    //   //   status: 'Active',
+    //   //   access: true
+    //   // },
+    //   // {
+    //   //   profile: 'path_to_your_image15.jpg',
+    //   //   name: 'James Turner',
+    //   //   email: 'james.turner@example.com',
+    //   //   password: '***************',
+    //   //   department: 'IT',
+    //   //   position: 'System Administrator',
+    //   //   term: 'Full Time',
+    //   //   status: 'Active',
+    //   //   access: true
+    //   // }
+    //   // // Add more users as needed to reach the 2nd page
+    // ];
+    // this.filteredUsers = this.users;
+    // this.updatePagination();
+  }
+
+  async loadEmployees() {
+    try {
+      const { data, error } = await this.supabaseService.getEmployees();
+      if (error) {
+        console.error('Error fetching employees:', error.message);
+      } else {
+        this.users = data.map((employee: any) => ({
+          profile: 'https://via.placeholder.com/200x200', // Replace with actual profile image if available
+          name: `${employee.first_name} ${employee.mid_name ? employee.mid_name + ' ' : ''}${employee.surname}`,
+          email: employee.email,
+          password: '***************', // You may not want to expose passwords here
+          department: employee.department,
+          position: employee.position,
+          type: employee.types,
+          status: 'Active', // Assuming status is always active for fetched employees
+          access: true // Assuming all fetched employees have access
+        }));
+        this.filteredUsers = this.users;
+        this.updatePagination();
+      }
+    } catch (error) {
+      console.error('Error fetching employees:', error);
+    }
   }
 
   searchTable() {

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { createClient, SupabaseClient, PostgrestSingleResponse } from '@supabase/supabase-js';
+import { createClient, SupabaseClient, PostgrestSingleResponse,PostgrestResponse } from '@supabase/supabase-js';
 import { environment } from '../environments/environment';
 
 @Injectable({
@@ -36,6 +36,14 @@ export class SupabaseService {
       console.log('Employee created successfully:', response.data);
     }
 
+    return response;
+  }
+
+  async getEmployees(): Promise<PostgrestResponse<any>> {
+    const response = await this.supabase.from('Profile').select('*');
+    if (response.error) {
+      console.error('Error fetching employees:', response.error.message);
+    }
     return response;
   }
 
