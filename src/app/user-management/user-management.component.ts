@@ -35,6 +35,7 @@ export class UserManagementComponent implements OnInit {
   showAddPopup = false;
   showEditPopup = false;
   showAccessRightsPopup = false;
+  isEditing: boolean = false; // Flag to manage edit mode
 
   showModal = false;
   photoPreviewUrl = 'https://via.placeholder.com/200x200';
@@ -53,6 +54,9 @@ export class UserManagementComponent implements OnInit {
   
   toggleModal() {
     this.showModal = !this.showModal;
+    if (!this.showModal) {
+      this.resetForm();
+    }
   }
 
   onPhotoChange(event: any) {
@@ -74,15 +78,13 @@ export class UserManagementComponent implements OnInit {
           console.error('Error creating employee:', response.error.message);
         } else {
           console.log('Employee created successfully:', response.data);
-          
-          // Add these new lines
           this.toggleModal(); // Close the modal
           this.resetForm(); // Clear the form
+          this.loadEmployees(); // Reload employees
         }
       });
   }
   
-  // Add this new method to reset the form
   resetForm() {
     this.employee = {
       email: '',
@@ -133,7 +135,6 @@ export class UserManagementComponent implements OnInit {
     }
   }
 
-
   ngOnInit() {
     this.loadEmployees();
   }
@@ -172,7 +173,7 @@ export class UserManagementComponent implements OnInit {
     );
     this.updatePagination();
   }
-
+  
   getContractType(position: string): string {
     const positionLower = position.toLowerCase();
     switch (positionLower) {
@@ -189,8 +190,6 @@ export class UserManagementComponent implements OnInit {
         return 'Part-time';
     }
   }
-
-  // Function to add a role
   addRole() {
     console.log("Adding Role");
     // Implement your add role logic here
@@ -237,11 +236,21 @@ export class UserManagementComponent implements OnInit {
     this.activeTab = tab;
   }
 
+  toggleEditMode() {
+    this.isEditing = !this.isEditing;
+  }
+
+  editUser(user: User) {
+    // Logic to handle editing a user
+    console.log("Editing user:", user);
+    // Implement your edit user logic here
+  }
+
   toggleManagePopup() {
     this.showManagePopup = !this.showManagePopup;
   }
 
-  toggleAddPopup(){
+  toggleAddPopup() {
     this.showAddPopup = !this.showAddPopup;
   }
 
@@ -249,24 +258,23 @@ export class UserManagementComponent implements OnInit {
     this.showAddPopup = false;
   }
 
-  toggleEditPopup(){
-    this.showEditPopup = !this.showAddPopup;
+  toggleEditPopup() {
+    this.showEditPopup = !this.showEditPopup;
   }
 
-  closeEditPopup(){
+  closeEditPopup() {
     this.showEditPopup = false;
   }
 
-  toggleAccessRightsPopup(){
+  toggleAccessRightsPopup() {
     this.showAccessRightsPopup = !this.showAccessRightsPopup;
   }
 
-  exitPopup(): void{
+  exitPopup(): void {
     this.showManagePopup = false;
   }
 
   closePopupOutside(event: MouseEvent): void {
     this.showManagePopup = false;
   }
-
 }
