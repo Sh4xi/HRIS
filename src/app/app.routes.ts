@@ -5,10 +5,10 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import { LoginFailedComponent } from './login-failed/login-failed.component';
 import { OtpPopupComponent } from './otp-popup/otp-popup.component';
 import { AuditTrailComponent } from './audit-trail/audit-trail.component';
-import { AuthGuard } from './auth/auth.guard'; // Assuming you have an AuthGuard
+import { AuthGuard } from './auth/auth.guard';
 
 export const routes: Routes = [
-  { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
+  { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
   { 
     path: 'dashboard', 
@@ -27,6 +27,6 @@ export const routes: Routes = [
     component: AuditTrailComponent, 
     canActivate: [AuthGuard] 
   },
-  // wildcard
   { path: '**', redirectTo: '/login' }
 ];
+

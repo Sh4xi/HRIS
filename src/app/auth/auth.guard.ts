@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { CanActivate, Router } from '@angular/router';
-import { AuthService } from './auth.service'; // Make sure you have an AuthService
+import { AuthService } from '../auth/auth.service'; // Adjust the path accordingly
 
 @Injectable({
   providedIn: 'root'
@@ -18,3 +18,4 @@ export class AuthGuard implements CanActivate {
     }
   }
 }
+

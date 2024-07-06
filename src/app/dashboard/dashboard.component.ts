@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 
 interface SidebarItem {
   name: string;
@@ -17,12 +17,12 @@ interface DashboardCard {
   standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './dashboard.component.html',
-  styleUrl: './dashboard.component.css'
+  styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent implements OnInit {
   sidebarItems: SidebarItem[] = [
     { name: 'Overview', route: '/overview' },
-    { name: 'Employee Management', route: '/employee-management' },
+    { name: 'Employee Management', route: '/user-management' }, // Update the route to match the actual route
     { name: 'Attendance', route: '/attendance' },
     { name: 'Payroll', route: '/payroll' },
     { name: 'Performance', route: '/performance' },
@@ -35,6 +35,8 @@ export class DashboardComponent implements OnInit {
     { title: 'Leaves Pending', value: 5 },
     { title: 'New Applications', value: 8 }
   ];
+
+  constructor(private router: Router) {}
 
   ngOnInit() {
     this.fetchDashboardData();
@@ -50,4 +52,9 @@ export class DashboardComponent implements OnInit {
       ];
     }, 1000);
   }
+
+  navigateTo(route: string) {
+    this.router.navigate([route]);
+  }
 }
+
