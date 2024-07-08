@@ -48,6 +48,8 @@
                 <div class="grid grid-cols-4 gap-4">
                   <div class="md:col-span-1 col-span-4 flex flex-col items-center">
                     <img [src]="photoPreviewUrl" alt="Employee Photo" class="w-48 h-48 object-cover rounded-lg mb-2 mt-3">
+                    <p *ngIf="showFileTypeAlert" class="text-red-600 text-sm mb-2">Please select a PNG file.</p>
+                    <p *ngIf="showFileSizeAlert" class="text-red-600 text-sm mb-2">The photo you selected exceeds 2MB. Please try again.</p>
                     <input type="file" id="photoInput" accept="image/*" class="hidden" (change)="onPhotoChange($event)">
                     <label for="photoInput" class="w-48 text-center bg-blue-500 text-white py-2 px-4 rounded cursor-pointer hover:bg-blue-600 transition duration-300 mt-3">Choose Photo</label>
                   </div>
