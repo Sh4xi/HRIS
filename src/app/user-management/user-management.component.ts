@@ -36,10 +36,10 @@ export class UserManagementComponent implements OnInit {
   showAddPopup = false;
   showEditPopup = false;
   showAccessRightsPopup = false;
-  isEditing: boolean = false; // Flag to manage edit mode
-
+  isEditing: boolean = false;
   showModal = false;
   photoPreviewUrl = 'https://via.placeholder.com/200x200';
+  showPasswordGeneratedMessage: boolean = false;
 
   employee = {
     email: '',
@@ -56,11 +56,43 @@ export class UserManagementComponent implements OnInit {
   
   toggleModal() {
     this.showModal = !this.showModal;
-    if (!this.showModal) {
+    if (this.showModal) {
+      this.generateRandomPassword();
+    } else {
       this.resetForm();
     }
   }
 
+  generateRandomPassword(length: number = 8) {
+    const lowercase = 'abcdefghijklmnopqrstuvwxyz';
+    const uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const numbers = '0123456789';
+    const symbols = '!@#$%^&*()_+-=[]{}|;:,.<>?';
+    const allChars = lowercase + uppercase + numbers + symbols;
+
+    let password = '';
+    
+    // Ensure at least one character from each type
+    password += lowercase[Math.floor(Math.random() * lowercase.length)];
+    password += uppercase[Math.floor(Math.random() * uppercase.length)];
+    password += numbers[Math.floor(Math.random() * numbers.length)];
+    password += symbols[Math.floor(Math.random() * symbols.length)];
+
+    // Fill the rest of the password
+    for (let i = password.length; i < length; i++) {
+      const randomIndex = Math.floor(Math.random() * allChars.length);
+      password += allChars[randomIndex];
+    }
+
+    // Shuffle the password
+    password = password.split('').sort(() => Math.random() - 0.5).join('');
+
+    this.employee.password = password;
+    
+    // Provide visual feedback
+    this.showPasswordGeneratedMessage = true;
+    setTimeout(() => this.showPasswordGeneratedMessage = false, 3000);
+  }
 
   onPhotoChange(event: any) {
     const file = event.target.files[0];
@@ -73,7 +105,7 @@ export class UserManagementComponent implements OnInit {
     }
   }
 
-onSubmit() {
+  onSubmit() {
     console.log('Submitting form with employee data:', this.employee);
     this.supabaseService.createEmployee(this.employee)
       .then(response => {
@@ -81,9 +113,9 @@ onSubmit() {
           console.error('Error creating employee:', response.error.message);
         } else {
           console.log('Employee created successfully:', response.data);
-          this.toggleModal(); // Close the modal
-          this.resetForm(); // Clear the form
-          this.loadEmployees(); // Reload employees
+          this.toggleModal();
+          this.resetForm();
+          this.loadEmployees();
         }
       });
   }
@@ -95,7 +127,7 @@ onSubmit() {
   getSelectedUsers(): User[] {
     return this.users.filter(user => user.selected);
   }
-  
+
   updateEmployee(employee: any, index: number) {
     const updatedUser: User = {
       profile: this.photoPreviewUrl,
@@ -113,7 +145,6 @@ onSubmit() {
     this.filteredUsers = this.users;
     this.updatePagination();
   
-    // Call your Supabase service to update the employee in the database
     this.supabaseService.updateEmployee(employee).then(response => {
       if (response.error) {
         console.error('Error updating employee:', response.error.message);
@@ -148,7 +179,7 @@ onSubmit() {
       first_name: employee.firstname,
       mid_name: employee.midname,
       surname: employee.surname,
-      password: 'hashed_password_placeholder', // Hash the password before storing
+      password: 'hashed_password_placeholder',
       department: employee.department,
       position: employee.position,
       types: employee.type
@@ -185,15 +216,15 @@ onSubmit() {
         console.error('Error fetching employees:', error.message);
       } else {
         this.users = data.map((employee: any) => ({
-          profile: 'https://via.placeholder.com/200x200', // Replace with actual profile image if available
+          profile: 'https://via.placeholder.com/200x200',
           name: `${employee.first_name} ${employee.mid_name ? employee.mid_name + ' ' : ''}${employee.surname}`,
           email: employee.email,
-          password: '***************', // You may not want to expose passwords here
+          password: '***************',
           department: employee.department,
           position: employee.position,
           type: employee.types,
-          status: 'Active', // Assuming status is always active for fetched employees
-          access: true // Assuming all fetched employees have access
+          status: 'Active',
+          access: true
         }));
         this.filteredUsers = this.users;
         this.updatePagination();
@@ -229,16 +260,15 @@ onSubmit() {
         return 'Part-time';
     }
   }
+
   addRole() {
     console.log("Adding Role");
-    // Implement your add role logic here
   }
 
   toggleUserAccess(user: User) {
     user.access = !user.access;
   }
 
-  //DELETEEEE
   deleteUsers() {
     const selectedUsers = this.getSelectedUsers();
     if (selectedUsers.length === 0) {
@@ -259,18 +289,9 @@ onSubmit() {
     this.users.forEach(user => user.selected = false);
   }
 
-  toggleEditMode() {
-    this.isEditing = !this.isEditing;
-    if (!this.isEditing) {
-      this.clearSelections();
-    }
-  }
-
-  
-
   updatePagination() {
     this.totalPages = Math.ceil(this.filteredUsers.length / this.itemsPerPage);
-    this.currentPage = 1; // Reset to first page when updating pagination
+    this.currentPage = 1;
     this.paginate();
   }
 
@@ -298,12 +319,17 @@ onSubmit() {
     this.activeTab = tab;
   }
 
-  
-  //EDIT
+  toggleEditMode() {
+    this.isEditing = !this.isEditing;
+    if (!this.isEditing) {
+      this.clearSelections();
+    }
+  }
+
   editUser(user: User) {
     this.employee = {
       email: user.email,
-      password: '', // Don't populate the password for security reasons
+      password: '',
       firstname: user.name.split(' ')[0],
       midname: user.name.split(' ').length > 2 ? user.name.split(' ')[1] : '',
       surname: user.name.split(' ')[user.name.split(' ').length - 1],
