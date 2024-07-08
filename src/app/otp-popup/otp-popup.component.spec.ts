@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { OtpPopupComponent } from './otp-popup.component';
 
 describe('OtpPopupComponent', () => {
