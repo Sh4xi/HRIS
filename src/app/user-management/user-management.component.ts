@@ -42,6 +42,7 @@ export class UserManagementComponent implements OnInit {
 
   employee = {
     email: '',
+    password: '',
     firstname: '',
     midname: '',
     surname: '',
@@ -88,6 +89,7 @@ export class UserManagementComponent implements OnInit {
   resetForm() {
     this.employee = {
       email: '',
+      password: '',
       firstname: '',
       midname: '',
       surname: '',
