@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
+import { SupabaseService } from '../Supabase/supabase.service';
 
 interface SidebarItem {
   name: string;
@@ -22,7 +23,7 @@ interface DashboardCard {
 export class DashboardComponent implements OnInit {
   sidebarItems: SidebarItem[] = [
     { name: 'Overview', route: '/overview' },
-    { name: 'Employee Management', route: '/user-management' }, // Update the route to match the actual route
+    { name: 'Employee Management', route: '/user-management' },
     { name: 'Attendance', route: '/attendance' },
     { name: 'Payroll', route: '/payroll' },
     { name: 'Performance', route: '/performance' },
@@ -31,30 +32,38 @@ export class DashboardComponent implements OnInit {
   ];
 
   dashboardCards: DashboardCard[] = [
-    { title: 'Total Employees', value: 150 },
+    { title: 'Total Employees', value: 0 },
     { title: 'Leaves Pending', value: 5 },
     { title: 'New Applications', value: 8 }
   ];
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private supabaseService: SupabaseService) {}
 
   ngOnInit() {
     this.fetchDashboardData();
   }
 
-  fetchDashboardData() {
-    // Simulating an API call
-    setTimeout(() => {
-      this.dashboardCards = [
-        { title: 'Total Employees', value: 152 },
-        { title: 'Leaves Pending', value: 7 },
-        { title: 'New Applications', value: 10 }
-      ];
-    }, 1000);
+  async fetchDashboardData() {
+    try {
+      const response = await this.supabaseService.getEmployees();
+      if (!response.error) {
+        const totalEmployees = response.data.length;
+        this.dashboardCards = [
+          { title: 'Total Employees', value: totalEmployees },
+          { title: 'Leaves Pending', value: 7 },
+          { title: 'New Applications', value: 10 }
+        ];
+      } else {
+        console.error('Error fetching employees:', response.error.message);
+      }
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error);
+    }
   }
 
   navigateTo(route: string) {
     this.router.navigate([route]);
   }
 }
+
 
