@@ -13,6 +13,7 @@ interface User {
   type: string;
   status: string;
   access: boolean;
+  selected?: boolean;
 }
 
 @Component({
@@ -60,6 +61,7 @@ export class UserManagementComponent implements OnInit {
     }
   }
 
+
   onPhotoChange(event: any) {
     const file = event.target.files[0];
     if (file) {
@@ -71,7 +73,7 @@ export class UserManagementComponent implements OnInit {
     }
   }
 
-  onSubmit() {
+onSubmit() {
     console.log('Submitting form with employee data:', this.employee);
     this.supabaseService.createEmployee(this.employee)
       .then(response => {
@@ -84,6 +86,41 @@ export class UserManagementComponent implements OnInit {
           this.loadEmployees(); // Reload employees
         }
       });
+  }
+
+  toggleUserSelection(user: User) {
+    user.selected = !user.selected;
+  }
+
+  getSelectedUsers(): User[] {
+    return this.users.filter(user => user.selected);
+  }
+  
+  updateEmployee(employee: any, index: number) {
+    const updatedUser: User = {
+      profile: this.photoPreviewUrl,
+      name: `${employee.firstname} ${employee.midname ? employee.midname + ' ' : ''}${employee.surname}`,
+      email: employee.email,
+      password: '***************',
+      department: employee.department,
+      position: employee.position,
+      type: employee.type,
+      status: 'Active',
+      access: true
+    };
+  
+    this.users[index] = updatedUser;
+    this.filteredUsers = this.users;
+    this.updatePagination();
+  
+    // Call your Supabase service to update the employee in the database
+    this.supabaseService.updateEmployee(employee).then(response => {
+      if (response.error) {
+        console.error('Error updating employee:', response.error.message);
+      } else {
+        console.log('Employee updated successfully:', response.data);
+      }
+    });
   }
   
   resetForm() {
@@ -201,12 +238,35 @@ export class UserManagementComponent implements OnInit {
     user.access = !user.access;
   }
 
+  //DELETEEEE
   deleteUsers() {
-    console.log("Deleting all users");
-    this.users = [];
-    this.filteredUsers = [];
+    const selectedUsers = this.getSelectedUsers();
+    if (selectedUsers.length === 0) {
+      console.log("No users selected for deletion");
+      return;
+    }
+    
+    selectedUsers.forEach(selectedUser => {
+      this.users = this.users.filter(user => user !== selectedUser);
+      this.filteredUsers = this.filteredUsers.filter(user => user !== selectedUser);
+    });
+    
+    console.log(`Deleted ${selectedUsers.length} users`);
     this.updatePagination();
   }
+
+  clearSelections() {
+    this.users.forEach(user => user.selected = false);
+  }
+
+  toggleEditMode() {
+    this.isEditing = !this.isEditing;
+    if (!this.isEditing) {
+      this.clearSelections();
+    }
+  }
+
+  
 
   updatePagination() {
     this.totalPages = Math.ceil(this.filteredUsers.length / this.itemsPerPage);
@@ -238,14 +298,21 @@ export class UserManagementComponent implements OnInit {
     this.activeTab = tab;
   }
 
-  toggleEditMode() {
-    this.isEditing = !this.isEditing;
-  }
-
+  
+  //EDIT
   editUser(user: User) {
-    // Logic to handle editing a user
-    console.log("Editing user:", user);
-    // Implement your edit user logic here
+    this.employee = {
+      email: user.email,
+      password: '', // Don't populate the password for security reasons
+      firstname: user.name.split(' ')[0],
+      midname: user.name.split(' ').length > 2 ? user.name.split(' ')[1] : '',
+      surname: user.name.split(' ')[user.name.split(' ').length - 1],
+      position: user.position,
+      department: user.department,
+      type: user.type
+    };
+    this.photoPreviewUrl = user.profile;
+    this.showModal = true;
   }
 
   toggleManagePopup() {

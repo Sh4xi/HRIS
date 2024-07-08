@@ -84,4 +84,21 @@ export class SupabaseService {
 
     return { data, error };
   }
+
+  //update
+  async updateEmployee(employee: any) {
+    const { data, error } = await this.supabase
+      .from('employees')
+      .update({
+        first_name: employee.firstname,
+        mid_name: employee.midname,
+        surname: employee.surname,
+        department: employee.department,
+        position: employee.position,
+        types: employee.type
+      })
+      .eq('email', employee.email);
+  
+    return { data, error };
+  }
 }
