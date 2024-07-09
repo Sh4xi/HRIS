@@ -282,7 +282,8 @@
         <div class="bg-white rounded-lg p-8 max-w-md w-full" (click)="$event.stopPropagation()">
           <h2 class="text-2xl font-bold mb-4">Manage Roles and Departments</h2>
           <div class="space-y-4">
-            <button (click)="toggleAddPopup()" class="w-full px-4 py-2 bg-blue-500 text-white rounded">Add Role/Department</button>
+            <button (click)="toggleAddPopup()" class="w-full px-4 py-2 bg-blue-500 text-white rounded">Add Role</button>
+            <button (click)="toggleAddDepartmentPopup()" class="w-full px-4 py-2 bg-green-500 text-white rounded">Add Department</button>
             <button (click)="toggleEditPopup()" class="w-full px-4 py-2 bg-green-500 text-white rounded">Edit Role/Department</button>
             <button (click)="toggleAccessRightsPopup()" class="w-full px-4 py-2 bg-yellow-500 text-white rounded">Manage Access Rights</button>
           </div>
@@ -290,31 +291,117 @@
         </div>
       </div>
 
-      <!-- Add Role/Department Popup -->
-      <div *ngIf="showAddPopup" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-        <div class="bg-white rounded-lg p-8 max-w-md w-full">
-          <h2 class="text-2xl font-bold mb-4">Add Role/Department</h2>
-          <div class="flex flex-col space-y-4">
-            <div class="mb-4">
-              <label for="role" class="block text-sm font-medium text-gray-700">Role</label>
-              <input type="text" id="role" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
-            </div>
-            <div class="mb-4">
-              <label for="department" class="block text-sm font-medium text-gray-700">Department</label>
-              <input type="text" id="department" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
-            </div>
-          </div>
-          <div class="flex justify-end space-x-2 mt-4">
-            <button (click)="closeAddPopup()" class="mt-4 px-4 py-2 bg-gray-200 text-gray-800 rounded">Cancel</button>
-            <button class="mt-4 px-4 py-2 bg-green-500 text-white rounded">Add</button>
-          </div>
-          <button (click)="toggleAddPopup()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6L18 18"/>
-            </svg>
-          </button>
+      >
+      <!-- Add Role Popup -->
+    <div *ngIf="showAddPopup" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+      <div class="bg-white rounded-lg p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+        <h2 class="text-2xl font-bold mb-4">Create New Role</h2>
+        
+        <div class="mb-4">
+          <label for="role" class="block text-sm font-medium text-gray-700">Role Name</label>
+          <input type="text" id="role" [(ngModel)]="newRole" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
         </div>
+        
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700">Department</label>
+          <div class="mt-2">
+            <label class="inline-flex items-center">
+              <input type="radio" [(ngModel)]="departmentType" value="all" class="form-radio">
+              <span class="ml-2">All Departments</span>
+            </label>
+            <label class="inline-flex items-center ml-6">
+              <input type="radio" [(ngModel)]="departmentType" value="specific" class="form-radio">
+              <span class="ml-2">Specific Departments</span>
+            </label>
+            <label class="inline-flex items-center ml-6">
+              <input type="radio" [(ngModel)]="departmentType" value="multiple" class="form-radio">
+              <span class="ml-2">Multiple Departments</span>
+            </label>
+          </div>
+          <select *ngIf="departmentType === 'specific'" [(ngModel)]="selectedDepartment" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+            <option value="">Select Department</option>
+            <option *ngFor="let dept of departments" [value]="dept">{{ dept }}</option>
+          </select>
+          <select *ngIf="departmentType === 'multiple'" [(ngModel)]="selectedDepartments" multiple class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+            <option *ngFor="let dept of departments" [value]="dept">{{ dept }}</option>
+          </select>
+        </div>
+    
+        <div class="mb-4">
+          <h3 class="text-lg font-semibold mb-2">Modules Access</h3>
+          <div *ngFor="let module of modules" class="flex items-center mb-2">
+            <input type="checkbox" [id]="module" [(ngModel)]="moduleAccess[module]" class="mr-2">
+            <label [for]="module">{{ module }}</label>
+          </div>
+        </div>
+    
+        <div class="mb-4">
+          <h3 class="text-lg font-semibold mb-2">Reports Access</h3>
+          <div *ngFor="let report of reports" class="flex items-center mb-2">
+            <input type="checkbox" [id]="report" [(ngModel)]="reportAccess[report]" class="mr-2">
+            <label [for]="report">{{ report }}</label>
+          </div>
+        </div>
+    
+        <div class="mb-4">
+          <h3 class="text-lg font-semibold mb-2">Data Access</h3>
+          <div *ngFor="let data of dataAccess" class="flex items-center mb-2">
+            <input type="checkbox" [id]="data" [(ngModel)]="dataAccessRights[data]" class="mr-2">
+            <label [for]="data">{{ data }}</label>
+          </div>
+        </div>
+    
+        <div class="mb-4">
+          <h3 class="text-lg font-semibold mb-2">Privileges</h3>
+          <div *ngFor="let privilege of privileges" class="flex items-center mb-2">
+            <input type="checkbox" [id]="privilege" [(ngModel)]="privilegeRights[privilege]" class="mr-2">
+            <label [for]="privilege">{{ privilege }}</label>
+          </div>
+        </div>
+    
+        <div class="flex justify-end space-x-2 mt-4">
+          <button (click)="closeAddPopup()" class="mt-4 px-4 py-2 bg-gray-200 text-gray-800 rounded">Cancel</button>
+          <button (click)="saveRole()" class="mt-4 px-4 py-2 bg-green-500 text-white rounded">Save Role</button>
+        </div>
+        
+        <button (click)="closeAddPopup()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6L18 18"/>
+          </svg>
+        </button>
       </div>
+    </div>
+
+    <!-- Add Department Popup-->
+    <div *ngIf="showAddDepartmentPopup" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+      <div class="bg-white rounded-lg p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+        <h2 class="text-2xl font-bold mb-4">Add New Department</h2>
+        
+        <div class="mb-4">
+          <label for="department" class="block text-sm font-medium text-gray-700">Department Name</label>
+          <input type="text" id="department" [(ngModel)]="newDepartment" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+        </div>
+    
+        <div class="mb-4">
+          <h3 class="text-lg font-semibold mb-2">Department-specific Access Rights</h3>
+          <div *ngFor="let access of departmentAccessRights" class="flex items-center mb-2">
+            <input type="checkbox" [id]="access" [(ngModel)]="departmentAccess[access]" class="mr-2">
+            <label [for]="access">{{ access }}</label>
+          </div>
+        </div>
+    
+        <div class="flex justify-end space-x-2 mt-4">
+          <button (click)="closeAddDepartmentPopup()" class="mt-4 px-4 py-2 bg-gray-200 text-gray-800 rounded">Cancel</button>
+          <button (click)="saveDepartment()" class="mt-4 px-4 py-2 bg-green-500 text-white rounded">Save Department</button>
+        </div>
+        
+        <button (click)="closeAddDepartmentPopup()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6L18 18"/>
+          </svg>
+        </button>
+      </div>
+    </div>
 
       <!-- Edit Role/Department Popup -->
       <div *ngIf="showEditPopup" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
