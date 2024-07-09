@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
-import { createClient, SupabaseClient, PostgrestSingleResponse,PostgrestResponse } from '@supabase/supabase-js';
+import { createClient, SupabaseClient, PostgrestSingleResponse, PostgrestResponse } from '@supabase/supabase-js';
 import { environment } from '../environments/environment';
-import { access } from 'fs';
 
 @Injectable({
   providedIn: 'root',
@@ -24,13 +23,10 @@ export class SupabaseService {
         first_name: employee.firstname,
         mid_name: employee.midname,
         surname: employee.surname,
-        password: employee.password, // Hash the password before storing // eto yung sa password sa pag display sa supabase
+        password: employee.password, // Hash the password before storing
         department: employee.department,
         position: employee.position,
-        types: employee.type,
-        status: employee.status,
-        access: employee.access
-
+        types: employee.type
       },
     ]);
 
@@ -44,7 +40,7 @@ export class SupabaseService {
   }
 
   async getEmployees(): Promise<PostgrestResponse<any>> {
-    const response = await this.supabase.from('Profile').select('*');
+    const response = await this.supabase.from('Profile').select('');
     if (response.error) {
       console.error('Error fetching employees:', response.error.message);
     }
@@ -88,23 +84,29 @@ export class SupabaseService {
 
     return { data, error };
   }
+  
 
-  //update
-  async updateEmployee(employee: any) {
-    const { data, error } = await this.supabase
-      .from('employees')
+  async updateEmployee(employee: any): Promise<PostgrestSingleResponse<any>> {
+    const response = await this.supabase
+      .from('Profile')
       .update({
         first_name: employee.firstname,
         mid_name: employee.midname,
+        password: employee.password,
         surname: employee.surname,
         department: employee.department,
         position: employee.position,
-        types: employee.type,
-        status: employee.status, 
-        access: employee.access 
+        types: employee.type
       })
       .eq('email', employee.email);
-  
-    return { data, error };
+
+    if (response.error) {
+      console.error('Error updating employee:', response.error.message);
+    } else {
+      console.log('Employee updated successfully:', response.data);
+    }
+
+    return response;
   }
 }
+

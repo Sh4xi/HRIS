@@ -1,11 +1,7 @@
-import { booleanAttribute, Component, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SupabaseService } from '../Supabase/supabase.service';
-
-interface AccessRights {
-  [key: string]: boolean;
-}
 
 interface User {
   profile: string;
@@ -14,21 +10,10 @@ interface User {
   password: string;
   department: string;
   position: string;
-  term: string;
   type: string;
   status: string;
   access: boolean;
   selected?: boolean;
-}
-
-interface Employee {
-  email: string;
-  firstName: string;
-  middleName: string;
-  surname: string;
-  position: string;
-  department: string;
-  type: string;
 }
 
 @Component({
@@ -51,67 +36,10 @@ export class UserManagementComponent implements OnInit {
   showAddPopup = false;
   showEditPopup = false;
   showAccessRightsPopup = false;
-  showAddDepartmentPopup = false;
   isEditing: boolean = false;
   showModal = false;
   photoPreviewUrl = 'https://via.placeholder.com/200x200';
   showPasswordGeneratedMessage: boolean = false;
-  newRole = '';
-  newDepartment = '';
-  departmentType = 'all';
-  selectedDepartment = '';
-  selectedDepartments: string[] = [];
-  departments = ['HR', 'IT', 'Finance', 'Marketing'];
-
-  modules = [
-    'Personnel Information Management',
-    'Payroll Management',
-    'Employee Information Management',
-    'Time & Attendance Management',
-    'Online Job Application Portal',
-    'Recruitment, Selection and Placement',
-    'Learning and Development (L&D)',
-    'Rewards and Recognition',
-    'Performance Management',
-    'Health and Wellness',
-    'Forms and Workflow',
-    'Reports',
-    'Data Exchange (Export and Import)',
-    'Data Visualization'
-  ];
-  
-  reports = [
-    'Employee Performance Reports',
-    'Payroll Summaries',
-    'Recruitment Reports',
-    'Training Reports',
-    'No Access'
-  ];
-
-  dataAccess = [
-    'Employee Records',
-    'Financial Data',
-    'Attendance Records',
-    'Job Applications',
-    'Training Data',
-    'No Access'
-  ];
-
-  privileges = ['View', 'Edit', 'Delete', 'Approve'];
-
-  moduleAccess: AccessRights = {};
-  reportAccess: AccessRights = {};
-  dataAccessRights: AccessRights = {};
-  privilegeRights: AccessRights = {};
-
-  departmentAccessRights = [
-    'View Department Data',
-    'Edit Department Data',
-    'Manage Department Members',
-    'Approve Department Requests'
-  ];
-
-  departmentAccess: AccessRights = {};
 
   showPhotoMessage = true; // Property to control the visibility of the message
   showFileTypeAlert = false;
@@ -125,9 +53,7 @@ export class UserManagementComponent implements OnInit {
     surname: '',
     position: '',
     department: '',
-    type: '',
-    status: 'Pending',
-    access: true
+    type: ''
   };
 
   constructor(private supabaseService: SupabaseService) {}
@@ -202,20 +128,35 @@ export class UserManagementComponent implements OnInit {
   }
 
   onSubmit() {
-    console.log('Submitting form with employee data:', this.employee);
-    this.supabaseService.createEmployee(this.employee)
-      .then(response => {
-        if (response.error) {
-          console.error('Error creating employee:', response.error.message);
-        } else {
-          console.log('Employee created successfully:', response.data);
-          this.toggleModal();
-          this.resetForm();
-          this.loadEmployees();
-        }
-      });
+    if (this.isEditing) {
+      console.log('Updating employee:', this.employee);
+      this.supabaseService.updateEmployee(this.employee)
+        .then(response => {
+          if (response.error) {
+            console.error('Error updating employee:', response.error.message);
+          } else {
+            console.log('Employee updated successfully:', response.data);
+            this.toggleModal();
+            this.resetForm();
+            this.loadEmployees();
+          }
+        });
+    } else {
+      console.log('Creating employee:', this.employee);
+      this.supabaseService.createEmployee(this.employee)
+        .then(response => {
+          if (response.error) {
+            console.error('Error creating employee:', response.error.message);
+          } else {
+            console.log('Employee created successfully:', response.data);
+            this.toggleModal();
+            this.resetForm();
+            this.loadEmployees();
+          }
+        });
+    }
   }
-
+  
   toggleUserSelection(user: User) {
     user.selected = !user.selected;
   }
@@ -224,30 +165,38 @@ export class UserManagementComponent implements OnInit {
     return this.users.filter(user => user.selected);
   }
 
-  updateEmployee(employee: any, index: number) {
-    const updatedUser: Partial<User> = {
+  async updateEmployee(employee: any) {
+    const updatedUser: User = {
       profile: this.photoPreviewUrl,
       name: `${employee.firstname} ${employee.midname ? employee.midname + ' ' : ''}${employee.surname}`,
       email: employee.email,
-      password: '***************',
+      password: employee.password,
       department: employee.department,
       position: employee.position,
       type: employee.type,
-      status: 'Pending',
+      status: 'Active',
       access: true
+
     };
   
-    this.users[index] = updatedUser as User;
+    // Update user locally
+    const index = this.users.findIndex(user => user.email === employee.email);
+    if (index !== -1) {
+      this.users[index] = updatedUser;
+    }
     this.filteredUsers = this.users;
     this.updatePagination();
   
-    this.supabaseService.updateEmployee(employee).then(response => {
-      if (response.error) {
-        console.error('Error updating employee:', response.error.message);
-      } else {
-        console.log('Employee updated successfully:', response.data);
-      }
-    });
+    // Update user in the database
+    const { data, error } = await this.supabaseService.updateEmployee(employee);
+    if (error) {
+      console.error('Error updating employee:', error.message);
+    } else {
+      console.log('Employee updated successfully:', data);
+      this.toggleModal();
+      this.resetForm();
+      this.loadEmployees(); //added feature
+    }
   }
   
   resetForm() {
@@ -259,9 +208,7 @@ export class UserManagementComponent implements OnInit {
       surname: '',
       position: '',
       department: '',
-      type: '',
-      status: 'Pending',
-      access: true
+      type: ''
     };
     this.photoPreviewUrl = 'https://via.placeholder.com/200x200';
   }
@@ -272,62 +219,61 @@ export class UserManagementComponent implements OnInit {
   }
 
   async createEmployee(employee: any) {
-    const newUser = {
+  const newUser = {
+    email: employee.email,
+    first_name: employee.firstname,
+    mid_name: employee.midname,
+    surname: employee.surname,
+    password: this.generateRandomPassword(8), // Use the generated password //edited
+    department: employee.department,
+    position: employee.position,
+    types: employee.type
+  };
+
+  const { data, error } = await this.supabaseService.createEmployee(newUser);
+  if (error) {
+    console.error('Error creating profile:', error.message);
+  } else {
+    this.users.push({
+      profile: this.photoPreviewUrl, //optional ('https://via.placeholder.com/200x200') //edited
+      name: `${employee.firstname} ${employee.midname ? employee.midname + ' ' : ''}${employee.surname}`,
       email: employee.email,
-      first_name: employee.firstname,
-      mid_name: employee.midname,
-      surname: employee.surname,
-      password: employee.password,
+      password: '***************',
       department: employee.department,
       position: employee.position,
-      types: employee.type,
-      status: 'Pending',
-      access: 'True'
-    };
-
-    const { data, error } = await this.supabaseService.createEmployee(newUser);
-    if (error) {
-      console.error('Error creating profile:', error);
-    } else if (data) {
-      const newUser: User = {
-        profile: this.photoPreviewUrl,
-        name: `${employee.firstname} ${employee.midname ? employee.midname + ' ' : ''}${employee.surname}`,
-        email: employee.email,
-        password: '***************',
-        department: employee.department,
-        position: employee.position,
-        type: employee.type,
-        status: 'Active',
-        access: true,
-        term: '' // Add this property to match the User interface
-      };
-      this.users.push(newUser);
-      this.filteredUsers = this.users;
-      this.updatePagination();
-    }
+      type: employee.type,
+      status: 'Active',
+      access: true
+    });
+    this.filteredUsers = this.users;
+    this.updatePagination();
+    this.toggleModal();
+    this.resetForm();
   }
+}
 
   ngOnInit() {
     this.loadEmployees();
   }
+  showPassword: boolean = false;
 
+  
   async loadEmployees() {
     try {
       const { data, error } = await this.supabaseService.getEmployees();
       if (error) {
         console.error('Error fetching employees:', error.message);
-      } else if (data) {
-        this.users = data.map((employee: any): User => ({
+      } else {
+        this.users = data.map((employee: any) => ({
           profile: 'https://via.placeholder.com/200x200',
           name: `${employee.first_name} ${employee.mid_name ? employee.mid_name + ' ' : ''}${employee.surname}`,
           email: employee.email,
-          password: '***************',
+          password: employee.password, // Make sure this line is present
           department: employee.department,
           position: employee.position,
           type: employee.types,
           status: 'Active',
-          access: true,
-          term: '' // Add this property to match the User interface
+          access: true
         }));
         this.filteredUsers = this.users;
         this.updatePagination();
@@ -371,7 +317,9 @@ export class UserManagementComponent implements OnInit {
   toggleUserAccess(user: User) {
     user.access = !user.access;
   }
-
+  togglePasswordVisibility() {
+    this.showPassword = !this.showPassword;
+  }
   deleteUsers() {
     const selectedUsers = this.getSelectedUsers();
     if (selectedUsers.length === 0) {
@@ -432,53 +380,17 @@ export class UserManagementComponent implements OnInit {
   editUser(user: User) {
     this.employee = {
       email: user.email,
-      password: '',
+      password: user.password, // Change this line to use the user's password
       firstname: user.name.split(' ')[0],
       midname: user.name.split(' ').length > 2 ? user.name.split(' ')[1] : '',
       surname: user.name.split(' ')[user.name.split(' ').length - 1],
       position: user.position,
       department: user.department,
-      type: user.type,
-      status: user.status,
-      access: true
+      type: user.type
     };
     this.photoPreviewUrl = user.profile;
     this.showModal = true;
-  }
-
-  saveRole() {
-    if (!this.newRole) {
-      alert('Please enter a role name');
-      return;
-    }
-
-    if (this.departmentType === 'specific' && !this.selectedDepartment) {
-      alert('Please select a department');
-      return;
-    }
-
-    const roleData = {
-      role: this.newRole,
-      department: this.departmentType === 'all' ? 'All Departments' : this.selectedDepartment === 'specific' ? this.selectedDepartment : this.selectedDepartments,
-      moduleAccess: this.moduleAccess,
-      reportAccess: this.reportAccess,
-      dataAccess: this.dataAccessRights,
-      privileges: this.privilegeRights
-    };
-
-    console.log('Saving Role: ', roleData);
-
-    this.closeAddPopup();
-  }
-
-  resetAccessForm() {
-    this.newRole = '';
-    this.departmentType = 'all';
-    this.selectedDepartment = '';
-    this.moduleAccess = {};
-    this.reportAccess = {};
-    this.dataAccessRights = {};
-    this.privilegeRights = {};
+    this.isEditing = true;
   }
 
   toggleManagePopup() {
@@ -487,14 +399,10 @@ export class UserManagementComponent implements OnInit {
 
   toggleAddPopup() {
     this.showAddPopup = !this.showAddPopup;
-    if (this.showAddPopup){
-      this.resetAccessForm();
-    }
   }
 
   closeAddPopup() {
     this.showAddPopup = false;
-    this.resetAccessForm();
   }
 
   toggleEditPopup() {
@@ -516,38 +424,4 @@ export class UserManagementComponent implements OnInit {
   closePopupOutside(event: MouseEvent): void {
     this.showManagePopup = false;
   }
-  toggleAddDepartmentPopup() {
-    this.showAddDepartmentPopup = !this.showAddDepartmentPopup;
-    if (this.showAddDepartmentPopup) {
-      this.resetDepartmentForm();
-    }
-  }
-
-  closeAddDepartmentPopup() {
-    this.showAddDepartmentPopup = false;
-    this.resetDepartmentForm();
-  }
-
-  resetDepartmentForm() {
-    this.newDepartment = '';
-    this.departmentAccessRights.forEach(access => this.departmentAccess[access] = false);
-  }
-
-  saveDepartment() {
-    if (!this.newDepartment) {
-      alert('Please enter a department name');
-      return;
-    }
-
-    const departmentData = {
-      department: this.newDepartment,
-      accessRights: this.departmentAccess
-    };
-
-    console.log('Saving department:', departmentData);
-    // Implement your logic to save the department data
-
-    this.closeAddDepartmentPopup();
-  }
-  
 }
