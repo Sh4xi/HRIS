@@ -320,30 +320,40 @@ export class UserManagementComponent implements OnInit {
   togglePasswordVisibility() {
     this.showPassword = !this.showPassword;
   }
-  //delete user
-  deleteUsers() {
-    const selectedUsers = this.getSelectedUsers();
-    if (selectedUsers.length === 0) {
-      console.log("No users selected for deletion");
-      return;
-    }
-
+  // Delete user
+deleteUsers() {
+  const selectedUsers = this.getSelectedUsers();
+  if (selectedUsers.length === 0) {
+    console.log("No users selected for deletion");
+    return;
+  }
 
   // Selecting users to delete
   selectedUsers.forEach(selectedUser => {
-    this.supabaseService.deleteUser(selectedUser.email); // Edited // If not working try deleteEmployee
-    this.users = this.users.filter(user => user !== selectedUser);
-    this.filteredUsers = this.filteredUsers.filter(user => user !== selectedUser);
+    this.supabaseService.deleteUser(selectedUser.email)
+      .then(response => {
+        if (response.error) {
+          console.error('Error deleting user:', response.error.message);
+        } else {
+          console.log(`User ${selectedUser.email} deleted successfully`);
+        }
+      })
+      .catch(error => console.error('Error deleting user:', error));
   });
 
-  console.log(`Deleted ${selectedUsers.length} users`);
+  // Remove users locally
   this.users = this.users.filter(user => !selectedUsers.includes(user));
   this.filteredUsers = this.filteredUsers.filter(user => !selectedUsers.includes(user));
 
-  return; // Edited
+  console.log(`Deleted ${selectedUsers.length} users`);
 
-    this.updatePagination();
-  }
+  // Update pagination
+  this.updatePagination();
+
+  // Refresh the page
+  window.location.reload();
+}
+
 
   clearSelections() {
     this.users.forEach(user => user.selected = false);
