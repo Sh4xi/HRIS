@@ -5,6 +5,7 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import { LoginFailedComponent } from './login-failed/login-failed.component';
 import { OtpPopupComponent } from './otp-popup/otp-popup.component';
 import { AuditTrailComponent } from './audit-trail/audit-trail.component';
+import { SystemManagementComponent} from './system-management/system-management.component'
 import { AuthGuard } from './auth/auth.guard';
 
 export const routes: Routes = [
@@ -22,6 +23,12 @@ export const routes: Routes = [
   },
   { path: 'login-failed', component: LoginFailedComponent },
   { path: 'otp-popup', component: OtpPopupComponent },
+
+  {path: 'system-management',
+    component: SystemManagementComponent,
+    canActivate: [AuthGuard]
+  },
+
   { 
     path: 'audit-trail', 
     component: AuditTrailComponent, 
