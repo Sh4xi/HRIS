@@ -24,7 +24,7 @@ export class DashboardComponent implements OnInit {
   sidebarItems: SidebarItem[] = [
     { name: 'Overview', route: '/overview' },
     { name: 'Employee Management', route: '/user-management' },
-    { name: 'Attendance', route: '/attendance' },
+    { name: 'System Management', route: '/system-management' },
     { name: 'Payroll', route: '/payroll' },
     { name: 'Performance', route: '/performance' },
     { name: 'Recruitment', route: '/recruitment' },
