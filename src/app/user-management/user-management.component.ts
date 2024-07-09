@@ -320,19 +320,28 @@ export class UserManagementComponent implements OnInit {
   togglePasswordVisibility() {
     this.showPassword = !this.showPassword;
   }
+  //delete user
   deleteUsers() {
     const selectedUsers = this.getSelectedUsers();
     if (selectedUsers.length === 0) {
       console.log("No users selected for deletion");
       return;
     }
-    
-    selectedUsers.forEach(selectedUser => {
-      this.users = this.users.filter(user => user !== selectedUser);
-      this.filteredUsers = this.filteredUsers.filter(user => user !== selectedUser);
-    });
-    
-    console.log(`Deleted ${selectedUsers.length} users`);
+
+
+  // Selecting users to delete
+  selectedUsers.forEach(selectedUser => {
+    this.supabaseService.deleteUser(selectedUser.email); // Edited // If not working try deleteEmployee
+    this.users = this.users.filter(user => user !== selectedUser);
+    this.filteredUsers = this.filteredUsers.filter(user => user !== selectedUser);
+  });
+
+  console.log(`Deleted ${selectedUsers.length} users`);
+  this.users = this.users.filter(user => !selectedUsers.includes(user));
+  this.filteredUsers = this.filteredUsers.filter(user => !selectedUsers.includes(user));
+
+  return; // Edited
+
     this.updatePagination();
   }
 

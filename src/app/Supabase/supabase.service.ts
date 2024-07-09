@@ -6,6 +6,20 @@ import { environment } from '../environments/environment';
   providedIn: 'root',
 })
 export class SupabaseService {
+  async deleteUser(email: string): Promise<PostgrestSingleResponse<any>> {
+  const response = await this.supabase
+    .from('Profile')
+    .delete()
+    .eq('email', email);
+
+  if (response.error) {
+    console.error('Error deleting user:', response.error.message);
+  } else {
+    console.log('User deleted successfully:', response.data);
+  }
+
+  return response;
+}
   private supabase: SupabaseClient;
   private isLockAcquired = false;
 
