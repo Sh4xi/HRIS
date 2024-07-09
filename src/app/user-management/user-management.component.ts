@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { booleanAttribute, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SupabaseService } from '../Supabase/supabase.service';
@@ -53,7 +53,9 @@ export class UserManagementComponent implements OnInit {
     surname: '',
     position: '',
     department: '',
-    type: ''
+    type: '',
+    status: 'Pending',
+    access: true
   };
 
   constructor(private supabaseService: SupabaseService) {}
@@ -159,7 +161,7 @@ export class UserManagementComponent implements OnInit {
       department: employee.department,
       position: employee.position,
       type: employee.type,
-      status: 'Active',
+      status: 'Pending',
       access: true
     };
   
@@ -185,7 +187,9 @@ export class UserManagementComponent implements OnInit {
       surname: '',
       position: '',
       department: '',
-      type: ''
+      type: '',
+      status: 'Pending',
+      access: true
     };
     this.photoPreviewUrl = 'https://via.placeholder.com/200x200';
   }
@@ -201,10 +205,12 @@ export class UserManagementComponent implements OnInit {
       first_name: employee.firstname,
       mid_name: employee.midname,
       surname: employee.surname,
-      password: 'hashed_password_placeholder',
+      password: employee.password,
       department: employee.department,
       position: employee.position,
-      types: employee.type
+      types: employee.type,
+      status: 'Pending',
+      access: 'True'
     };
 
     const { data, error } = await this.supabaseService.createEmployee(newUser);
@@ -219,7 +225,7 @@ export class UserManagementComponent implements OnInit {
         department: employee.department,
         position: employee.position,
         type: employee.type,
-        status: 'Active',
+        status: 'Pending',
         access: true
       });
       this.filteredUsers = this.users;
@@ -357,7 +363,9 @@ export class UserManagementComponent implements OnInit {
       surname: user.name.split(' ')[user.name.split(' ').length - 1],
       position: user.position,
       department: user.department,
-      type: user.type
+      type: user.type,
+      status: user.status,
+      access: true
     };
     this.photoPreviewUrl = user.profile;
     this.showModal = true;
