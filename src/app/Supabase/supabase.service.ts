@@ -6,6 +6,7 @@ import { environment } from '../environments/environment';
   providedIn: 'root',
 })
 export class SupabaseService {
+  
   async deleteUser(email: string): Promise<PostgrestSingleResponse<any>> {
   const response = await this.supabase
     .from('Profile')
@@ -27,7 +28,7 @@ export class SupabaseService {
     const supabaseUrl = environment.supabaseUrl;
     const supabaseKey = environment.supabaseKey;
     this.supabase = createClient(supabaseUrl, supabaseKey);
-    console.log('Supabase client initialized with URL:', supabaseUrl);
+    console.log('Supabase client initialized with URL:svf', supabaseUrl);
   }
 
   async createEmployee(employee: any): Promise<PostgrestSingleResponse<any>> {
