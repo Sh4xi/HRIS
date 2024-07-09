@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { createClient, SupabaseClient, PostgrestSingleResponse,PostgrestResponse } from '@supabase/supabase-js';
 import { environment } from '../environments/environment';
+import { access } from 'fs';
 
 @Injectable({
   providedIn: 'root',
@@ -26,7 +27,10 @@ export class SupabaseService {
         password: employee.password, // Hash the password before storing // eto yung sa password sa pag display sa supabase
         department: employee.department,
         position: employee.position,
-        types: employee.type
+        types: employee.type,
+        status: employee.status,
+        access: employee.access
+
       },
     ]);
 
@@ -95,7 +99,9 @@ export class SupabaseService {
         surname: employee.surname,
         department: employee.department,
         position: employee.position,
-        types: employee.type
+        types: employee.type,
+        status: employee.status, 
+        access: employee.access 
       })
       .eq('email', employee.email);
   
