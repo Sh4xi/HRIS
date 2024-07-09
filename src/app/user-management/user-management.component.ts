@@ -41,6 +41,10 @@ export class UserManagementComponent implements OnInit {
   photoPreviewUrl = 'https://via.placeholder.com/200x200';
   showPasswordGeneratedMessage: boolean = false;
 
+  showPhotoMessage = true; // Property to control the visibility of the message
+  showFileTypeAlert = false;
+  showFileSizeAlert = false;
+
   employee = {
     email: '',
     password: '',
@@ -96,7 +100,25 @@ export class UserManagementComponent implements OnInit {
 
   onPhotoChange(event: any) {
     const file = event.target.files[0];
+    const maxSizeInBytes = 2 * 1024 * 1024; // 2MB
+
+    // Reset alerts
+    this.showFileTypeAlert = false;
+    this.showFileSizeAlert = false;
+
     if (file) {
+      if (file.size > maxSizeInBytes) {
+        this.showFileSizeAlert = true;
+        event.target.value = ''; // Clear the file input
+        return;
+      }
+
+      if (file.type !== 'image/png') {
+        this.showFileTypeAlert = true;
+        event.target.value = ''; // Clear the file input
+        return;
+      }
+
       const reader = new FileReader();
       reader.onload = (e: any) => {
         this.photoPreviewUrl = e.target.result;
