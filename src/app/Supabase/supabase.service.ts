@@ -23,7 +23,7 @@ export class SupabaseService {
         first_name: employee.firstname,
         mid_name: employee.midname,
         surname: employee.surname,
-        password: employee.password, // Hash the password before storing // eto yung sa password sa pag display sa supabase
+        password: employee.passwrod, // Hash the password before storing
         department: employee.department,
         position: employee.position,
         types: employee.type
