@@ -45,4 +45,9 @@ export class SystemManagementComponent {
   goToAuditTrail() {
     this.router.navigate(['/audit-trail']);
   }
+
+
+  goToDTR() {
+    this.router.navigate(['/dtr']);
+  }
 }

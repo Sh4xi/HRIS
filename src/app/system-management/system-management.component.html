@@ -22,18 +22,24 @@
             <!-- Other quick action buttons... -->
           </div>
         </div>
-        <div class="mt-11 text-2xl font-bold leading-7 text-neutral-900 mb-10 max-md:mt-10 max-md:max-w-full">Navigation</div>
-        <div class="flex gap-5 max-md:flex-col max-md:gap-0">
-          <div class="flex flex-row w-auto mt-max-md:ml-0 max-md:w-full">
-            <button class="flex flex-col grow self-stretch p-4 w-60 bg-white rounded-lg border border-solid border-zinc-200 max-md:mt-3 text-left mr-5" (click)="goToAuditTrail()"> <!--ito yung button para sa audit-->
-              <img loading="lazy" src="https://i.ibb.co/C02Hjsd/Group-27.png" class="w-6 aspect-square" />
-              <div class="mt-3 text-base font-bold text-neutral-900">Audit Trail</div>
-              <div class="mt-1 text-sm leading-5 text-slate-500">Access change logs within the HRIS.</div>
-            </button>
+        <div class="mt-11 text-2xl font-bold leading-7 text-neutral-900 max-md:mt-10 max-md:max-w-full">Navigation</div>
+        <div class="mt-7 max-md:pr-5 max-md:max-w-full">
+          <div class="flex gap-5 max-md:flex-col max-md:gap-0">
+            <div class="flex flex-row w-auto max-md:ml-0 max-md:w-full">
+              <button class="flex flex-col grow self-stretch p-4 w-60 bg-white rounded-lg border border-solid border-zinc-200 max-md:mt-3 text-left mr-5" (click)="goToAuditTrail()"> 
+                <img loading="lazy" src="https://i.ibb.co/C02Hjsd/Group-27.png" class="w-6 aspect-square" />
+                <div class="mt-3 text-base font-bold text-neutral-900">Audit Trail</div>
+                <div class="mt-1 text-sm leading-5 text-slate-500">Access change logs within the HRIS</div>
+              </button> 
+              <button class="flex flex-col grow self-stretch p-4 w-60 bg-white rounded-lg border border-solid border-zinc-200 max-md:mt-3 text-left mr-5" (click)="goToDTR()"> 
+                  <img loading="lazy" src="https://i.ibb.co/C02Hjsd/Group-27.png" class="w-6 aspect-square" />
+                  <div class="mt-3 text-base font-bold text-neutral-900">DTR</div>
+                  <div class="mt-1 text-sm leading-5 text-slate-500">View schedule time tables and employee records</div>
+                </button> 
+            </div>
+            <!-- Other quick action buttons... -->
           </div>
-          <!-- Other quick action buttons... -->
         </div>
-      </div>
     </div>
   </div>
 

@@ -20,8 +20,8 @@ export class SupabaseService {
   // Automatically reload when the Supabase is updated
   private setupRealtimeSubscription(): void {
     this.supabase
-      .channel('public:Profile')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'Profile' }, payload => {
+      .channel('public:profile')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'profile' }, payload => {
         console.log('Change received!', payload);
         this.handleDatabaseChange();
       })
@@ -35,7 +35,7 @@ export class SupabaseService {
 
   async checkEmailExists(email: string): Promise<boolean> {
     const { data, error } = await this.supabase
-      .from('Profile')
+      .from('profile')
       .select('email')
       .eq('email', email);
 
@@ -48,7 +48,7 @@ export class SupabaseService {
   }
 
   async createEmployee(employee: any): Promise<PostgrestSingleResponse<any>> {
-    const response = await this.supabase.from('Profile').insert([
+    const response = await this.supabase.from('profile').insert([
       {
         email: employee.email,
         first_name: employee.firstname,
@@ -92,7 +92,7 @@ export class SupabaseService {
   }
 
   async getEmployees(): Promise<PostgrestResponse<any>> {
-    const response = await this.supabase.from('Profile').select('');
+    const response = await this.supabase.from('profile').select('');
     if (response.error) {
       console.error('Error fetching employees:', response.error.message);
     }
@@ -101,7 +101,7 @@ export class SupabaseService {
 
   async deleteUser(email: string): Promise<PostgrestSingleResponse<any>> {
     const response = await this.supabase
-      .from('Profile')
+      .from('profile')
       .delete()
       .eq('email', email);
 
@@ -154,7 +154,7 @@ export class SupabaseService {
 
   async updateEmployee(employee: any): Promise<PostgrestSingleResponse<any>> {
     const response = await this.supabase
-      .from('Profile')
+      .from('profile')
       .update({
         first_name: employee.firstname,
         mid_name: employee.midname,

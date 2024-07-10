@@ -8,9 +8,89 @@
 
     <div class="flex mb-6">
       <button (click)="setActiveTab('users')" [ngClass]="activeTab === 'users' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-500'" class="mr-4">Users</button>
-      <button (click)="setActiveTab('roles')" [ngClass]="activeTab === 'roles' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-500'">Roles</button>
+      <button (click)="setActiveTab('roles')" [ngClass]="activeTab === 'roles' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-500'" class="mr-4">Roles</button>
+      <button (click)="setActiveTab('support tickets')" [ngClass]="activeTab === 'support tickets' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-500'">Support Tickets</button>
     </div>
 
+    <!-- Support tickets -->
+    <div *ngIf="activeTab === 'support tickets'">
+      <section id="ticket-list">
+        <div class="mb-4 flex justify-between items-center">
+          <div class="w-1/2">
+            <input type="text" [(ngModel)]="searchTicketTerm" (input)="searchTicketTable()" placeholder="Search..." class="w-full p-2 border rounded-lg">
+          </div>
+          <div class="flex items-center">
+            <div class="relative ml-4">
+              <select class="bg-blue-500 hover:bg-blue-600 text-white py-2 pl-3 pr-10 rounded-lg appearance-none" [(ngModel)]="filterOption" (change)="filterTickets()">
+                <option value="all">All</option>
+                <option value="read">Read</option>
+                <option value="unread">Unread</option>
+              </select>
+              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-white">
+                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                  <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 1 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/>
+                </svg>
+              </div>
+            </div>
+            <button class="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg ml-4" (click)="deleteSelectedTickets()">Delete</button>
+          </div>
+        </div>
+        <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+          <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+            <tr>
+              <th scope="col" class="p-4"><input type="checkbox" (click)="toggleAllTickets()"></th>
+              <th scope="col" class="px-6 py-3">Ticket ID</th>
+              <th scope="col" class="px-6 py-3">Title</th>
+              <th scope="col" class="px-6 py-3">Email</th>
+              <th scope="col" class="px-6 py-3">Description</th>
+              <th scope="col" class="px-6 py-3">Status</th>
+              <th scope="col" class="px-6 py-3">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let ticket of filteredTickets; let i = index" class="border-b border-gray-200 hover:bg-gray-100" (click)="openTicketDetails(ticket)">
+              <td class="p-4">
+                <input type="checkbox" [(ngModel)]="selectedTickets[i]" (click)="$event.stopPropagation()">
+              </td>
+              <td class="px-6 py-3">{{ ticket.id }}</td>
+              <td class="px-6 py-3">{{ ticket.title }}</td>
+              <td class="px-6 py-3">{{ ticket.email }}</td>
+              <td class="px-6 py-3">{{ ticket.description }}</td>
+              <td class="px-6 py-3">{{ ticket.status }}</td>
+              <td class="px-6 py-3">
+                <button class="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded-lg" (click)="deleteTicket(ticket.id); $event.stopPropagation()">Delete</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+      <div class="flex justify-between items-center mt-4">
+        <button class="bg-gray-500 text-white px-4 py-2 rounded" (click)="prevPage()" [disabled]="currentPage === 1">Previous</button>
+        <span class="text-gray-600">Page {{ currentPage }} of {{ totalPages }}</span>
+        <button class="bg-gray-500 text-white px-4 py-2 rounded" (click)="nextPage()" [disabled]="currentPage === totalPages">Next</button>
+      </div>
+    </div>
+    
+    <!-- Ticket Details Modal -->
+    <div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50" *ngIf="isModalVisible">
+      <div class="bg-white rounded-lg p-4 max-w-md w-full">
+        <div class="flex justify-between items-center border-b pb-2">
+          <h2 class="text-xl font-semibold">Ticket Details</h2>
+          <button class="text-gray-500 hover:text-gray-700" (click)="closeModal()">X</button>
+        </div>
+        <div class="mt-4">
+          <p><strong>Title:</strong> {{ selectedTicket?.title }}</p>
+          <p><strong>Description:</strong> {{ selectedTicket?.description }}</p>
+          <p><strong>Email:</strong> {{ selectedTicket?.email }}</p>
+          <p><strong>Status:</strong> {{ selectedTicket?.status }}</p>
+        </div>
+        <div class="mt-4 flex justify-end">
+          <button class="bg-gray-500 text-white px-4 py-2 rounded" (click)="closeModal()">Close</button>
+        </div>
+      </div>
+    </div>
+
+<!-- Users active tab -->
     <div *ngIf="activeTab === 'users'" class="flex flex-col h-screen">
       <section id="user-list">
         <div class="mb-4 flex justify-between items-center">
@@ -394,6 +474,38 @@
             <label [for]="access">{{ access }}</label>
           </div>
         </div>
+
+        <div class="mb-4">
+          <h3 class="text-lg font-semibold mb-2">Modules Access</h3>
+          <div *ngFor="let module of modules" class="flex items-center mb-2">
+            <input type="checkbox" [id]="module" [value]="module" (change)="updateSelectedModules($event)" class="mr-2">
+            <label [for]="module">{{ module }}</label>
+          </div>
+        </div>
+    
+        <div class="mb-4">
+          <h3 class="text-lg font-semibold mb-2">Reports Access</h3>
+          <div *ngFor="let report of reports" class="flex items-center mb-2">
+            <input type="checkbox" [id]="report" [value]="report" (change)="updateSelectedReports($event)" class="mr-2">
+            <label [for]="report">{{ report }}</label>
+          </div>
+        </div>
+    
+        <div class="mb-4">
+          <h3 class="text-lg font-semibold mb-2">Data Access</h3>
+          <div *ngFor="let data of dataAccess" class="flex items-center mb-2">
+            <input type="checkbox" [id]="data" [value]="data" (change)="updateSelectedDataAccess($event)" class="mr-2">
+            <label [for]="data">{{ data }}</label>
+          </div>
+        </div>
+    
+        <div class="mb-4">
+          <h3 class="text-lg font-semibold mb-2">Privileges</h3>
+          <div *ngFor="let privilege of privileges" class="flex items-center mb-2">
+            <input type="checkbox" [id]="privilege" [value]="privilege" (change)="updateSelectedPrivileges($event)" class="mr-2">
+            <label [for]="privilege">{{ privilege }}</label>
+          </div>
+        </div>
     
         <div class="flex justify-end space-x-2 mt-4">
           <button (click)="closeAddDepartmentPopup()" class="mt-4 px-4 py-2 bg-gray-200 text-gray-800 rounded">Cancel</button>
@@ -408,30 +520,75 @@
       </div>
     </div>
 
+  
       <!-- Edit Role/Department Popup -->
       <div *ngIf="showEditPopup" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-        <div class="bg-white rounded-lg p-8 max-w-md w-full">
-          <h2 class="text-2xl font-bold mb-4">Edit Role/Department</h2>
-          <!-- Add form fields here -->
+        <div class="bg-white rounded-lg p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+          <h2 class="text-2xl font-bold mb-4">Edit Department / Roles</h2>
+      
+          <div class="flex space-x-4 mb-4">
+            <div class="w-1/2">
+              <select id="department" [(ngModel)]="selectedDepartments" class="w-full border rounded p-2">
+                <option value="" disabled selected>Department</option>
+                <option *ngFor="let department of departments" [value]="department">{{ department }}</option>
+              </select>
+            </div>
+      
+            <div class="w-1/2">
+              <select id="department" [(ngModel)]="selectedDepartments" class="w-full border rounded p-2">
+                <option value="" disabled selected>Department</option>
+                <option *ngFor="let department of departments" [value]="department">{{ department }}</option>
+              </select>
+            </div>
+          </div>
+      
+          <div class="mb-4">
+            <h3 class="text-lg font-semibold mb-2">Department-specific Access Rights</h3>
+            <div *ngFor="let access of departmentAccessRights" class="flex items-center mb-2">
+              <input type="checkbox" [id]="access" [(ngModel)]="departmentAccess[access]" class="mr-2">
+              <label [for]="access">{{ access }}</label>
+            </div>
+          </div>
+      
+          <div class="mb-4">
+            <h3 class="text-lg font-semibold mb-2">Modules Access</h3>
+            <div *ngFor="let module of modules" class="flex items-center mb-2">
+              <input type="checkbox" [id]="module" [value]="module" (change)="updateSelectedModules($event)" class="mr-2">
+              <label [for]="module">{{ module }}</label>
+            </div>
+          </div>
+      
+          <div class="mb-4">
+            <h3 class="text-lg font-semibold mb-2">Reports Access</h3>
+            <div *ngFor="let report of reports" class="flex items-center mb-2">
+              <input type="checkbox" [id]="report" [value]="report" (change)="updateSelectedReports($event)" class="mr-2">
+              <label [for]="report">{{ report }}</label>
+            </div>
+          </div>
+      
+          <div class="mb-4">
+            <h3 class="text-lg font-semibold mb-2">Data Access</h3>
+            <div *ngFor="let data of dataAccess" class="flex items-center mb-2">
+              <input type="checkbox" [id]="data" [value]="data" (change)="updateSelectedDataAccess($event)" class="mr-2">
+              <label [for]="data">{{ data }}</label>
+            </div>
+          </div>
+      
+          <div class="mb-4">
+            <h3 class="text-lg font-semibold mb-2">Privileges</h3>
+            <div *ngFor="let privilege of privileges" class="flex items-center mb-2">
+              <input type="checkbox" [id]="privilege" [value]="privilege" (change)="updateSelectedPrivileges($event)" class="mr-2">
+              <label [for]="privilege">{{ privilege }}</label>
+            </div>
+          </div>
+      
           <div class="flex justify-end space-x-2 mt-4">
             <button (click)="closeEditPopup()" class="mt-4 px-4 py-2 bg-gray-200 text-gray-800 rounded">Cancel</button>
             <button class="mt-4 px-4 py-2 bg-green-500 text-white rounded">Update</button>
           </div>
         </div>
       </div>
-  
-      <!-- Edit Role/Department Popup -->
-      <div *ngIf="showEditPopup" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-        <div class="bg-white rounded-lg p-8 max-w-md w-full">
-          <h2 class="text-2xl font-bold mb-4">Edit Role/Department</h2>
-          <!-- Add form fields here -->
-          <div class="flex justify-end space-x-2 mt-4">
-            <button (click)="closeEditPopup()" class="mt-4 px-4 py-2 bg-gray-200 text-gray-800 rounded">Cancel</button>
-            <button class="mt-4 px-4 py-2 bg-green-500 text-white rounded">Update</button>
-          </div>
-        </div>
-      </div>
-  
+      
   
       <!-- Manage Access Rights Popup -->
       <div *ngIf="showAccessRightsPopup" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
