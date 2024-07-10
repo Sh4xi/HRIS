@@ -92,7 +92,7 @@ export class SupabaseService {
   }
 
   async getEmployees(): Promise<PostgrestResponse<any>> {
-    const response = await this.supabase.from('Profile').select('');
+    const response = await this.supabase.from('profile').select('');
     if (response.error) {
       console.error('Error fetching employees:', response.error.message);
     }
@@ -154,7 +154,7 @@ export class SupabaseService {
 
   async updateEmployee(employee: any): Promise<PostgrestSingleResponse<any>> {
     const response = await this.supabase
-      .from('Profile')
+      .from('profile')
       .update({
         first_name: employee.firstname,
         mid_name: employee.midname,

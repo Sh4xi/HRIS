@@ -6,6 +6,7 @@ import { LoginFailedComponent } from './login-failed/login-failed.component';
 import { OtpPopupComponent } from './otp-popup/otp-popup.component';
 import { AuditTrailComponent } from './audit-trail/audit-trail.component';
 import { SystemManagementComponent} from './system-management/system-management.component'
+import { DtrComponent} from './dtr/dtr.component'
 import { AuthGuard } from './auth/auth.guard';
 
 export const routes: Routes = [
@@ -26,6 +27,11 @@ export const routes: Routes = [
 
   {path: 'system-management',
     component: SystemManagementComponent,
+    canActivate: [AuthGuard]
+  },
+
+  {path: 'dtr',
+    component: DtrComponent,
     canActivate: [AuthGuard]
   },
 
