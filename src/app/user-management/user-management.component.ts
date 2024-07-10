@@ -197,33 +197,36 @@ export class UserManagementComponent implements OnInit {
     }
   }
 
-  onSubmit() {
+async onSubmit() {
     if (this.isEditing) {
       console.log('Updating employee:', this.employee);
-      this.supabaseService.updateEmployee(this.employee)
-        .then(response => {
-          if (response.error) {
-            console.error('Error updating employee:', response.error.message);
-          } else {
-            console.log('Employee updated successfully:', response.data);
-            this.toggleModal();
-            this.resetForm();
-            this.loadEmployees();
-          }
-        });
+      const response = await this.supabaseService.updateEmployee(this.employee);
+      if (response.error) {
+        console.error('Error updating employee:', response.error.message);
+      } else {
+        console.log('Employee updated successfully:', response.data);
+        this.toggleModal();
+        this.resetForm();
+        this.loadEmployees();
+      }
     } else {
+      const emailExists = await this.supabaseService.checkEmailExists(this.employee.email);
+      if (emailExists) {
+        console.error('Email already exists. Please use a different email.');
+        alert('Email already exists. Please use a different email.');
+        return;
+      }
+
       console.log('Creating employee:', this.employee);
-      this.supabaseService.createEmployee(this.employee)
-        .then(response => {
-          if (response.error) {
-            console.error('Error creating employee:', response.error.message);
-          } else {
-            console.log('Employee created successfully:', response.data);
-            this.toggleModal();
-            this.resetForm();
-            this.loadEmployees();
-          }
-        });
+      const response = await this.supabaseService.createEmployee(this.employee);
+      if (response.error) {
+        console.error('Error creating employee:', response.error.message);
+      } else {
+        console.log('Employee created successfully:', response.data);
+        this.toggleModal();
+        this.resetForm();
+        this.loadEmployees();
+      }
     }
   }
 
