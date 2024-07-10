@@ -30,6 +30,14 @@ interface Employee {
   type: string;
 }
 
+interface Ticket {
+  id: number;
+  title: string;
+  email: string;
+  description: string;
+  status: string;
+}
+
 @Component({
   selector: 'app-user-management',
   standalone: true,
@@ -38,6 +46,7 @@ interface Employee {
   styleUrls: ['./user-management.component.css']
 })
 export class UserManagementComponent implements OnInit {
+  // Functions for users tab
   users: User[] = [];
   filteredUsers: User[] = [];
   paginatedUsers: User[] = [];
@@ -49,6 +58,7 @@ export class UserManagementComponent implements OnInit {
   showManagePopup = false;
   showAddPopup = false;
   showEditPopup = false;
+
   showAccessRightsPopup = false;
   showAddDepartmentPopup = false;
   isEditing: boolean = false;
@@ -64,6 +74,20 @@ export class UserManagementComponent implements OnInit {
   showPhotoMessage = true; // Property to control the visibility of the message
   showFileTypeAlert = false;
   showFileSizeAlert = false;
+
+  // Functions for Support tickets tab
+  paginatedTickets: Ticket[] = [];
+  searchTicketTerm: string  = '';
+  ticket_currentPage: number = 1;
+  ticket_itemsPerPage: number = 10;
+
+  filteredTickets: Ticket[] = [];
+  selectedTickets: boolean[] = [];
+  filterOption: string = 'all'; // Default filter option
+
+  selectedTicket: any = null;
+  isModalVisible = false;
+  showTicketModal = false;
 
   employee = {
     email: '',
@@ -108,6 +132,20 @@ export class UserManagementComponent implements OnInit {
     'Job Applications',
     'Training Data',
     'No Access'
+  ];
+
+  // Mockdata for Tickets
+  tickets: Ticket[] = [
+    { id: 1, title: 'Issue with login', email: 'user1@example.com', description: 'Cannot login to the system', status: 'read' },
+    { id: 2, title: 'Page not loading', email: 'user1@example.com', description: 'Homepage takes too long to load', status: 'unread' },
+    { id: 3, title: 'Error 404', email: 'user1@example.com', description: 'Page not found error when navigating to profile', status: 'read' },
+    { id: 4, title: 'Feature request', email: 'user2@example.com', description: 'Request for a new feature in the system', status: 'read' },
+    { id: 5, title: 'Bug in form submission', email: 'user2@example.com', description: 'Form does not submit properly', status: 'unread' },
+    { id: 6, title: 'Crash on startup', email: 'user3@example.com', description: 'Application crashes on startup', status: 'unread' },
+    { id: 7, title: 'Performance issue', email: 'user4@example.com', description: 'System performance is slow', status: 'read' },
+    { id: 8, title: 'UI glitch', email: 'user5@example.com', description: 'Minor UI glitch in dashboard', status: 'unread' },
+    { id: 9, title: 'Security vulnerability', email: 'user6@example.com', description: 'Potential security vulnerability reported', status: 'read' },
+    { id: 10, title: 'Database error', email: 'user7@example.com', description: 'Error connecting to database', status: 'unread' },
   ];
 
   privileges = ['View', 'Edit', 'Delete', 'Approve'];
@@ -371,6 +409,8 @@ async onSubmit() {
 
   ngOnInit() {
     this.loadEmployees();
+    this.filteredTickets = this.tickets;
+    this.selectedTickets = new Array(this.tickets.length).fill(false);
   }
   showPassword: boolean = false;
 
@@ -427,8 +467,6 @@ async onSubmit() {
         return 'Part-time';
     }
   }
-
-
 
   toggleUserAccess(user: User) {
     user.access = !user.access;
@@ -644,6 +682,143 @@ deleteUsers() {
     } else {
       this.selectedPrivileges = this.selectedPrivileges.filter(privilege => privilege !== value);
     }
+  }
+
+  // Method to search tickets
+searchTicketTable() {
+  const searchTerm = this.searchTicketTerm.toLowerCase();
+  this.filteredTickets = this.tickets.filter(ticket => 
+    ticket.title.toLowerCase().includes(searchTerm) ||
+    ticket.description.toLowerCase().includes(searchTerm) ||
+    ticket.status.toLowerCase().includes(searchTerm)
+    );
+    this.ticketUpdatePagination();
+  }
+
+// Method to toggle all tickets selection
+toggleAllTickets() {
+    const selectAll = this.selectedTickets.every(selected => selected);
+    this.selectedTickets.fill(!selectAll);
+  }
+
+// Method to get selected tickets
+getSelectedTickets(): Ticket[] {
+    return this.tickets.filter((ticket, index) => this.selectedTickets[index]);
+  }
+
+// Method to update a ticket
+updateTicket(updatedTicket: Ticket) {
+  const index = this.tickets.findIndex(ticket => ticket.id === updatedTicket.id);
+  if (index !== -1) {
+    this.tickets[index] = updatedTicket;
+    this.filteredTickets = [...this.tickets];
+    this.ticketUpdatePagination();
+    }
+  }
+
+// Method to delete a ticket
+deleteTicket(ticketId: number) {
+  const index = this.tickets.findIndex(ticket => ticket.id === ticketId);
+  if (index !== -1) {
+    this.tickets.splice(index, 1);
+    this.filteredTickets = [...this.tickets];
+    this.selectedTickets.splice(index, 1);
+    this.ticketUpdatePagination();
+    }
+  }
+
+// Method to delete selected tickets
+deleteSelectedTickets() {
+  const selectedIndexes = this.selectedTickets
+    .map((selected, index) => selected ? index : -1)
+    .filter(index => index !== -1);
+
+  for (let i = selectedIndexes.length - 1; i >= 0; i--) {
+    const index = selectedIndexes[i];
+    this.tickets.splice(index, 1);
+    this.selectedTickets.splice(index, 1);
+    }
+    this.filteredTickets = [...this.tickets];
+    this.ticketUpdatePagination();
+  }
+
+// Method to prompt user for filter options
+promptFilterOptions() {
+  const markAsRead = confirm("Mark all tickets as read? Click 'Cancel' to mark all as unread.");
+  if (markAsRead) {
+    this.markAllAsRead();
+    } else {
+    this.markAllAsUnread();
+    }
+  }
+
+// Method to mark all tickets as read
+markAllAsRead() {
+    this.tickets.forEach(ticket => ticket.status = 'Read');
+    this.filteredTickets = [...this.tickets];
+    this.ticketUpdatePagination();
+  }
+
+// Method to mark all tickets as unread
+markAllAsUnread() {
+    this.tickets.forEach(ticket => ticket.status = 'Unread');
+    this.filteredTickets = [...this.tickets];
+    this.ticketUpdatePagination();
+  }
+
+// Method to filter tickets based on selected option
+filterTickets() {
+  switch (this.filterOption) {
+    case 'read':
+      this.filteredTickets = this.tickets.filter(ticket => ticket.status.toLowerCase() === 'read');
+      break;
+    case 'unread':
+      this.filteredTickets = this.tickets.filter(ticket => ticket.status.toLowerCase() === 'unread');
+      break;
+    default:
+      this.filteredTickets = [...this.tickets];
+      break;
+    }
+    this.ticketUpdatePagination();
+  }
+
+// Pagination Methods for Support Tickets
+ticketTotalPages(): number {
+    return Math.ceil(this.filteredTickets.length / this.ticket_itemsPerPage);
+  }
+
+ticketUpdatePagination() {
+    this.ticket_currentPage = 1;
+    this.ticketPaginate();
+  }
+
+ticketPaginate(): Ticket[] {
+    const start = (this.ticket_currentPage - 1) * this.ticket_itemsPerPage;
+    const end = start + this.ticket_itemsPerPage;
+    return this.filteredTickets.slice(start, end);
+  }
+
+ticketPrevPage() {
+  if (this.ticket_currentPage > 1) {
+    this.ticket_currentPage--;
+    this.ticketPaginate();
+    }
+  }
+
+ticketNextPage() {
+  if (this.ticket_currentPage < this.ticketTotalPages()) {
+    this.ticket_currentPage++;
+    this.ticketPaginate();
+    }
+  }
+
+  openTicketDetails(ticket: any) {
+    this.selectedTicket = ticket;
+    this.isModalVisible = true;
+  }
+
+  closeModal() {
+    this.isModalVisible = false;
   }
 }
 
