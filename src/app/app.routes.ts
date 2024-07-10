@@ -8,6 +8,8 @@ import { AuditTrailComponent } from './audit-trail/audit-trail.component';
 import { SystemManagementComponent} from './system-management/system-management.component'
 import { DtrComponent} from './dtr/dtr.component'
 import { AuthGuard } from './auth/auth.guard';
+import { WorkflowComponent } from './workflow-approval/workflow-approval.component';
+
 
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -40,6 +42,14 @@ export const routes: Routes = [
     component: AuditTrailComponent, 
     canActivate: [AuthGuard] 
   },
+
+  { 
+    path: 'workflow-approval', 
+    component: WorkflowComponent, 
+    canActivate: [AuthGuard] 
+  },
+
+
   { path: '**', redirectTo: '/login' }
 ];
 
