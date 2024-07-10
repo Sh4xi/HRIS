@@ -1,5 +1,5 @@
 <div class="flex flex-col items-center px-16 pt-5 pb-20 w-full bg-white max-md:px-5 max-md:max-w-full">
-  <div class="flex flex-col p-4 mb-96 w-full max-w-[960px] max-md:mb-10 max-md:max-w-full">
+  <div *ngIf="!showTable" class="flex flex-col p-4 mb-96 w-full max-w-[960px] max-md:mb-10 max-md:max-w-full">
     <div class="flex flex-col items-center px-16 pt-5 pb-20 w-full bg-white max-md:px-5 max-md:max-w-full">
       <div class="flex flex-col p-4 mb-96 w-full max-w-[960px] max-md:mb-10 max-md:max-w-full">
         <div class="self-start text-3xl font-bold text-neutral-900 max-md:max-w-full">System Management</div>
@@ -13,7 +13,7 @@
                 <div class="mt-3 text-base font-bold text-neutral-900">Create new</div>
                 <div class="mt-1 text-sm leading-5 text-slate-500">Create new configuration or parameter</div>
               </button> 
-              <button class="flex flex-col grow self-stretch p-4 w-60 bg-white rounded-lg border border-solid border-zinc-200 max-md:mt-3 text-left" (click)="openPopup()"> 
+              <button class="flex flex-col grow self-stretch p-4 w-60 bg-white rounded-lg border border-solid border-zinc-200 max-md:mt-3 text-left" (click)="openTable()"> 
                   <img loading="lazy" src="https://i.ibb.co/XZjqLvk/Group-26.png" class="w-6 aspect-square" />
                   <div class="mt-3 text-base font-bold text-neutral-900">View Parameters</div>
                   <div class="mt-1 text-sm leading-5 text-slate-500">Create new configuration or parameter</div>
@@ -75,4 +75,30 @@
         </div>
       </div>
     </div>
+  </div>
 
+  <div *ngIf="showTable" class="flex justify-center items-center min-h-screen bg-white">
+    <div class="flex flex-col px-4 py-3 text-sm">
+      <button (click)="closeTable()" class="mt-4 px-4 py-2 bg-blue-500 text-white rounded self-start absolute bottom-20">Back</button>
+      <div class="overflow-x-auto bg-slate-50 border border-slate-300 rounded-xl">
+        <table class="w-full text-left">
+          <thead class="bg-slate-50">
+            <tr>
+              <th class="px-4 py-3">Name</th>
+              <th class="px-4 py-3">Type</th>
+              <th class="px-4 py-3" *ngIf="hasHolidayParameter">Date</th>
+            </tr>
+          </thead>
+          <tbody class="text-slate-500">
+            <tr *ngFor="let param of parameters" class="border-t border-gray-200">
+              <td class="px-4 py-2">{{ param.name }}</td>
+              <td class="px-4 py-2">{{ param.type }}</td>
+              <td class="px-4 py-2" *ngIf="param.type === 'Holiday'">{{ param.date }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  
+  
