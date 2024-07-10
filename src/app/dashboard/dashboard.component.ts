@@ -21,6 +21,8 @@ interface DashboardCard {
   styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent implements OnInit {
+  isExpanded = false;
+
   sidebarItems: SidebarItem[] = [
     { name: 'Overview', route: '/overview' },
     { name: 'Employee Management', route: '/user-management' },
@@ -64,6 +66,28 @@ export class DashboardComponent implements OnInit {
   navigateTo(route: string) {
     this.router.navigate([route]);
   }
+  expandSidebar() {
+    setTimeout(() => {
+      this.isExpanded = true;
+    }, 100);
+  }
+
+  collapseSidebar() {
+    setTimeout(() => {
+      this.isExpanded = false;
+    }, 300);
+  }
+
+  getIconForRoute(route: string): string {
+    switch (route) {
+      case '/overview': return 'dashboard';
+      case '/user-management': return 'group';
+      case '/system-management': return 'settings';
+      case '/payroll': return 'attach_money';
+      case '/performance': return 'trending_up';
+      case '/recruitment': return 'person_add';
+      case '/reports': return 'assessment';
+      default: return 'circle';
+    }
+  }
 }
-
-
