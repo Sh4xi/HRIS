@@ -481,9 +481,12 @@ async onSubmit() {
     }
   }
 
+
   toggleUserAccess(user: User) {
     user.access = !user.access;
+    user.status = user.access ? 'Active' : 'Inactive';
   }
+
   togglePasswordVisibility() {
     this.showPassword = !this.showPassword;
   }
