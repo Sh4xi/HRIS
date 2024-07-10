@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { createClient, SupabaseClient, PostgrestSingleResponse, PostgrestResponse } from '@supabase/supabase-js';
 import { environment } from '../environments/environment';
 
+
+
 @Injectable({
   providedIn: 'root',
 })
@@ -29,7 +31,24 @@ export class SupabaseService {
     const supabaseKey = environment.supabaseKey;
     this.supabase = createClient(supabaseUrl, supabaseKey);
     console.log('Supabase client initialized with URL:svf', supabaseUrl);
+    this.setupRealtimeSubscription(); // Setup the real-time subscription
   }
+// automatically reload when the supabase is updated
+  private setupRealtimeSubscription(): void {
+    this.supabase
+      .channel('public:Profile')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'Profile' }, payload => {
+        console.log('Change received!', payload);
+        this.handleDatabaseChange();
+      })
+      .subscribe();
+  }
+
+  private handleDatabaseChange(): void {
+    // Handle the change (e.g., reload the page)
+    window.location.reload();
+  }
+  
 
   async createEmployee(employee: any): Promise<PostgrestSingleResponse<any>> {
     const response = await this.supabase.from('Profile').insert([
@@ -53,6 +72,7 @@ export class SupabaseService {
 
     return response;
   }
+  
 
   async getEmployees(): Promise<PostgrestResponse<any>> {
     const response = await this.supabase.from('Profile').select('');
