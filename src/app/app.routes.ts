@@ -21,5 +21,4 @@ export const routes: Routes = [
   { path: 'dtr', component: DtrComponent, canActivate: [authGuard] },
   { path: 'audit-trail', component: AuditTrailComponent, canActivate: [authGuard] },
   { path: 'workflow-approval', component: WorkflowComponent, canActivate: [authGuard] },
-  { path: '**', redirectTo: '/login' }
 ];

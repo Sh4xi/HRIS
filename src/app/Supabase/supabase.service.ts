@@ -1,8 +1,8 @@
 import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { createClient, SupabaseClient, User, PostgrestSingleResponse, PostgrestResponse } from '@supabase/supabase-js';
+import { createClient, SupabaseClient, User, Session, PostgrestSingleResponse, PostgrestResponse } from '@supabase/supabase-js';
 import { environment } from '../environments/environment';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -11,6 +11,7 @@ export class SupabaseService {
   private supabase: SupabaseClient;
   private isLockAcquired = false;
   private currentUser = new BehaviorSubject<User | null>(null);
+  private currentSession = new BehaviorSubject<Session | null>(null);
 
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {
     const supabaseUrl = environment.supabaseUrl;
@@ -19,17 +20,36 @@ export class SupabaseService {
     console.log('Supabase client initialized with URL:', supabaseUrl);
     if (isPlatformBrowser(this.platformId)) {
       this.setupRealtimeSubscription();
-      this.loadUser();
+      this.loadUserAndSession();
     }
   }
 
-  private async loadUser() {
-    const { data } = await this.supabase.auth.getUser();
-    this.currentUser.next(data.user);
+  private async loadUserAndSession() {
+    const { data: { user }, error: userError } = await this.supabase.auth.getUser();
+    if (!userError && user) {
+      this.currentUser.next(user);
+      const { data: { session }, error: sessionError } = await this.supabase.auth.getSession();
+      if (!sessionError && session) {
+        this.currentSession.next(session);
+      }
+    }
   }
 
-  isAuthenticated(): boolean {
-    return this.currentUser.getValue() !== null;
+  getCurrentUser(): Observable<User | null> {
+    return this.currentUser.asObservable();
+  }
+
+  getCurrentSession(): Observable<Session | null> {
+    return this.currentSession.asObservable();
+  }
+
+  isAuthenticated(): Observable<boolean> {
+    return new Observable<boolean>(observer => {
+      this.getCurrentSession().subscribe(session => {
+        observer.next(!!session);
+        observer.complete();
+      });
+    });
   }
 
   async signIn(email: string, password: string): Promise<boolean> {
@@ -39,12 +59,24 @@ export class SupabaseService {
       return false;
     }
     this.currentUser.next(data.user);
+    this.currentSession.next(data.session);
     return true;
   }
 
   async signOut(): Promise<void> {
     await this.supabase.auth.signOut();
     this.currentUser.next(null);
+    this.currentSession.next(null);
+  }
+
+  async refreshSession(): Promise<void> {
+    const { data, error } = await this.supabase.auth.refreshSession();
+    if (error) {
+      console.error('Failed to refresh session:', error);
+    } else if (data.session) {
+      this.currentSession.next(data.session);
+      this.currentUser.next(data.session.user);
+    }
   }
 
   private setupRealtimeSubscription(): void {
@@ -97,6 +129,7 @@ export class SupabaseService {
       console.error('Error creating employee:', response.error.message);
     } else {
       console.log('Employee created successfully:', response.data);
+      await this.refreshSession();
     }
 
     return response;
@@ -118,6 +151,7 @@ export class SupabaseService {
       console.error('Error creating role:', response.error.message);
     } else {
       console.log('Role created successfully:', response.data);
+      await this.refreshSession();
     }
 
     return response;
@@ -132,18 +166,32 @@ export class SupabaseService {
   }
 
   async deleteUser(email: string): Promise<PostgrestSingleResponse<any>> {
-    const response = await this.supabase
-      .from('profile')
-      .delete()
-      .eq('email', email);
-
-    if (response.error) {
-      console.error('Error deleting user:', response.error.message);
-    } else {
-      console.log('User deleted successfully:', response.data);
+    try {
+      const response = await this.supabase
+        .from('profile')
+        .delete()
+        .eq('email', email);
+  
+      if (response.error) {
+        console.error('Error deleting user:', response.error.message);
+      } else {
+        console.log('User deleted successfully:', response.data);
+        // Refresh the session after the delete operation
+        await this.refreshSession();
+      }
+  
+      return response;
+    } catch (error) {
+      console.error('Unexpected error deleting user:', error);
+      // Create a PostgrestSingleResponse-like object for unexpected errors
+      return {
+        data: null,
+        error: error as any,
+        count: null,
+        status: 500,
+        statusText: 'Internal Server Error'
+      };
     }
-
-    return response;
   }
 
   async acquireLock(): Promise<boolean> {
@@ -202,6 +250,7 @@ export class SupabaseService {
       console.error('Error updating employee:', response.error.message);
     } else {
       console.log('Employee updated successfully:', response.data);
+      await this.refreshSession();
     }
 
     return response;
