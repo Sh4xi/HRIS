@@ -7,6 +7,7 @@ import { LoginFailedComponent } from './login-failed/login-failed.component';
 import { OtpPopupComponent } from './otp-popup/otp-popup.component';
 import { SystemManagementComponent } from './system-management/system-management.component';
 import { AuditTrailComponent } from './audit-trail/audit-trail.component';
+import { WorkflowComponent } from './workflow-approval/workflow-approval.component';
 import { AuthGuard } from './auth/auth.guard';
 
 const routes: Routes = [
@@ -18,6 +19,7 @@ const routes: Routes = [
   { path: 'otp-popup', component: OtpPopupComponent },
   { path: 'system-management', component: SystemManagementComponent },
   { path: 'audit-trail', component: AuditTrailComponent },
+  { path: 'workflow-approval', component: WorkflowComponent },
   { path: '**', redirectTo: '/login' } // Wildcard route for a 404 page
 ];
 
