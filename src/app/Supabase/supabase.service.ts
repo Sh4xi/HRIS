@@ -174,4 +174,19 @@ export class SupabaseService {
 
     return response;
   }
+
+  async getWorkflows() {
+    const { data, error } = await this.supabase
+      .from('workflow')
+      .select('*');
+
+    if (error) {
+      console.error('Error fetching workflows:', error);
+      return [];
+    }
+
+    return data;
+  }
 }
+  
+
