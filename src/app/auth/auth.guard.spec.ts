@@ -1,38 +1,39 @@
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
-import { AuthGuard } from './auth.guard';
-import { AuthService } from './auth.service';
-import { RouterTestingModule } from '@angular/router/testing';
-import { of } from 'rxjs';
+import { AuthService } from '../auth/auth.service'; // Adjust the path if necessary
+import { authGuard } from './auth.guard';
 
-describe('AuthGuard', () => {
-  let authGuard: AuthGuard;
-  let authService: AuthService;
-  let router: Router;
+describe('authGuard', () => {
+  let authService: jasmine.SpyObj<AuthService>;
+  let router: jasmine.SpyObj<Router>;
 
   beforeEach(() => {
+    authService = jasmine.createSpyObj('AuthService', ['isLoggedIn']);
+    router = jasmine.createSpyObj('Router', ['navigate']);
+
     TestBed.configureTestingModule({
-      imports: [RouterTestingModule],
       providers: [
-        AuthGuard,
-        { provide: AuthService, useValue: { isLoggedIn: jest.fn() } }
+        { provide: AuthService, useValue: authService },
+        { provide: Router, useValue: router }
       ]
     });
-
-    authGuard = TestBed.inject(AuthGuard);
-    authService = TestBed.inject(AuthService);
-    router = TestBed.inject(Router);
   });
 
-  it('should allow the authenticated user to access app', () => {
-    jest.spyOn(authService, 'isLoggedIn').mockReturnValue(true);
-    expect(authGuard.canActivate()).toBe(true);
+  it('should allow access when user is logged in', () => {
+    authService.isLoggedIn.and.returnValue(true);
+    
+    const result = TestBed.runInInjectionContext(authGuard);
+    
+    expect(result).toBe(true);
+    expect(router.navigate).not.toHaveBeenCalled();
   });
 
-  it('should redirect an unauthenticated user to the login route', () => {
-    const navigateSpy = jest.spyOn(router, 'navigate');
-    jest.spyOn(authService, 'isLoggedIn').mockReturnValue(false);
-    expect(authGuard.canActivate()).toBe(false);
-    expect(navigateSpy).toHaveBeenCalledWith(['/login']);
+  it('should redirect to login when user is not logged in', () => {
+    authService.isLoggedIn.and.returnValue(false);
+    
+    const result = TestBed.runInInjectionContext(authGuard);
+    
+    expect(result).toBe(false);
+    expect(router.navigate).toHaveBeenCalledWith(['/login']);
   });
 });

@@ -1,6 +1,8 @@
-import { Injectable } from '@angular/core';
-import { createClient, SupabaseClient, PostgrestSingleResponse, PostgrestResponse } from '@supabase/supabase-js';
+import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { createClient, SupabaseClient, User, PostgrestSingleResponse, PostgrestResponse } from '@supabase/supabase-js';
 import { environment } from '../environments/environment';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -8,16 +10,43 @@ import { environment } from '../environments/environment';
 export class SupabaseService {
   private supabase: SupabaseClient;
   private isLockAcquired = false;
+  private currentUser = new BehaviorSubject<User | null>(null);
 
-  constructor() {
+  constructor(@Inject(PLATFORM_ID) private platformId: Object) {
     const supabaseUrl = environment.supabaseUrl;
     const supabaseKey = environment.supabaseKey;
     this.supabase = createClient(supabaseUrl, supabaseKey);
     console.log('Supabase client initialized with URL:', supabaseUrl);
-    this.setupRealtimeSubscription(); // Setup the real-time subscription
+    if (isPlatformBrowser(this.platformId)) {
+      this.setupRealtimeSubscription();
+      this.loadUser();
+    }
   }
 
-  // Automatically reload when the Supabase is updated
+  private async loadUser() {
+    const { data } = await this.supabase.auth.getUser();
+    this.currentUser.next(data.user);
+  }
+
+  isAuthenticated(): boolean {
+    return this.currentUser.getValue() !== null;
+  }
+
+  async signIn(email: string, password: string): Promise<boolean> {
+    const { data, error } = await this.supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      console.error('Sign in error:', error);
+      return false;
+    }
+    this.currentUser.next(data.user);
+    return true;
+  }
+
+  async signOut(): Promise<void> {
+    await this.supabase.auth.signOut();
+    this.currentUser.next(null);
+  }
+
   private setupRealtimeSubscription(): void {
     this.supabase
       .channel('public:profile')
@@ -29,8 +58,11 @@ export class SupabaseService {
   }
 
   private handleDatabaseChange(): void {
-    // Handle the change (e.g., reload the page)
-    window.location.reload();
+    if (isPlatformBrowser(this.platformId)) {
+      window.location.reload();
+    } else {
+      console.log('Database change detected, but not in browser environment');
+    }
   }
 
   async checkEmailExists(email: string): Promise<boolean> {
