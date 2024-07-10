@@ -91,6 +91,26 @@ export class SupabaseService {
     return response;
   }
 
+  async createDepartment(departmentData: any): Promise<PostgrestSingleResponse<any>> {
+    const response = await this.supabase.from('department').insert([
+      {
+        department_name: departmentData.department_name,
+        mod_access: departmentData.mod_access,
+        rep_access: departmentData.rep_access,
+        data_access: departmentData.data_access,
+        privileges: departmentData.privileges
+      },
+    ]);
+
+    if (response.error) {
+      console.error('Error creating department:', response.error.message);
+    } else {
+      console.log('Department created successfully:', response.data);
+    }
+
+    return response;
+  }
+
   async getEmployees(): Promise<PostgrestResponse<any>> {
     const response = await this.supabase.from('profile').select('');
     if (response.error) {

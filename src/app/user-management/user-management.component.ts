@@ -645,14 +645,26 @@ deleteUsers() {
     }
 
     const departmentData = {
-      department: this.newDepartment,
-      accessRights: this.departmentAccess
+      department_name: this.newDepartment,
+      mod_access: this.selectedModules.length > 0 ? this.selectedModules : [],
+      rep_access: this.selectedReports.length > 0 ? this.selectedReports : [],
+      data_access: this.selectedDataAccess.length > 0 ? this.selectedDataAccess : [],
+      privileges: this.selectedPrivileges.length > 0 ? this.selectedPrivileges : [],
     };
-
-    console.log('Saving department:', departmentData);
-    // Implement your logic to save the department data
-
-    this.closeAddDepartmentPopup();
+  
+    this.supabaseService.createDepartment(departmentData)
+    .then(response => {
+      if (response.error) {
+        console.error('Error creating department:', response.error.message);
+      } else {
+        if (response.data) {
+          console.log('Department created successfully:', response.data);
+        } else {
+          console.log('Department created successfully, but no data returned.');
+        }
+        this.closeAddDepartmentPopup();
+      }
+    });
   }
 
   updateSelectedModules(event: any) {
