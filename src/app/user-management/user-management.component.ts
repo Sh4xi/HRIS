@@ -36,6 +36,7 @@ interface Ticket {
   email: string;
   description: string;
   status: string;
+  dateTime: Date;
 }
 
 @Component({
@@ -136,16 +137,16 @@ export class UserManagementComponent implements OnInit {
 
   // Mockdata for Tickets
   tickets: Ticket[] = [
-    { id: 1, title: 'Issue with login', email: 'user1@example.com', description: 'Cannot login to the system', status: 'read' },
-    { id: 2, title: 'Page not loading', email: 'user1@example.com', description: 'Homepage takes too long to load', status: 'unread' },
-    { id: 3, title: 'Error 404', email: 'user1@example.com', description: 'Page not found error when navigating to profile', status: 'read' },
-    { id: 4, title: 'Feature request', email: 'user2@example.com', description: 'Request for a new feature in the system', status: 'read' },
-    { id: 5, title: 'Bug in form submission', email: 'user2@example.com', description: 'Form does not submit properly', status: 'unread' },
-    { id: 6, title: 'Crash on startup', email: 'user3@example.com', description: 'Application crashes on startup', status: 'unread' },
-    { id: 7, title: 'Performance issue', email: 'user4@example.com', description: 'System performance is slow', status: 'read' },
-    { id: 8, title: 'UI glitch', email: 'user5@example.com', description: 'Minor UI glitch in dashboard', status: 'unread' },
-    { id: 9, title: 'Security vulnerability', email: 'user6@example.com', description: 'Potential security vulnerability reported', status: 'read' },
-    { id: 10, title: 'Database error', email: 'user7@example.com', description: 'Error connecting to database', status: 'unread' },
+    { id: 1, title: 'Issue with login', email: 'user1@example.com', description: 'Cannot login to the system', status: 'read', dateTime: new Date('2024-07-11T10:30:00') },
+    { id: 2, title: 'Page not loading', email: 'user1@example.com', description: 'Homepage takes too long to load', status: 'unread', dateTime: new Date('2024-07-11T10:30:00') },
+    { id: 3, title: 'Error 404', email: 'user1@example.com', description: 'Page not found error when navigating to profile', status: 'read', dateTime: new Date('2024-07-11T10:30:00') },
+    { id: 4, title: 'Feature request', email: 'user2@example.com', description: 'Request for a new feature in the system', status: 'read', dateTime: new Date('2024-07-11T10:30:00') },
+    { id: 5, title: 'Bug in form submission', email: 'user2@example.com', description: 'Form does not submit properly', status: 'unread', dateTime: new Date('2024-07-11T10:30:00')},
+    { id: 6, title: 'Crash on startup', email: 'user3@example.com', description: 'Application crashes on startup', status: 'unread', dateTime: new Date('2024-07-11T10:30:00')},
+    { id: 7, title: 'Performance issue', email: 'user4@example.com', description: 'System performance is slow', status: 'read', dateTime: new Date('2024-07-11T10:30:00')},
+    { id: 8, title: 'UI glitch', email: 'user5@example.com', description: 'Minor UI glitch in dashboard', status: 'unread', dateTime: new Date('2024-07-11T10:30:00')},
+    { id: 9, title: 'Security vulnerability', email: 'user6@example.com', description: 'Potential security vulnerability reported', status: 'read', dateTime: new Date('2024-07-11T10:30:00')},
+    { id: 10, title: 'Database error', email: 'user7@example.com', description: 'Error connecting to database', status: 'unread', dateTime: new Date('2024-07-11T10:30:00')},
   ];
 
   privileges = ['View', 'Edit', 'Delete', 'Approve'];
@@ -411,6 +412,7 @@ async onSubmit() {
     this.loadEmployees();
     this.filteredTickets = this.tickets;
     this.selectedTickets = new Array(this.tickets.length).fill(false);
+    this.updateDateTimeForTickets();
   }
   showPassword: boolean = false;
 
@@ -812,6 +814,13 @@ ticketNextPage() {
     }
   }
 
+  updateDateTimeForTickets() {
+    // Update dateTime property for each ticket
+    this.tickets.forEach(ticket => {
+      ticket.dateTime = new Date(); // Assign current date and time
+    });
+  }
+  
   openTicketDetails(ticket: any) {
     this.selectedTicket = ticket;
     this.isModalVisible = true;

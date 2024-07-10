@@ -44,6 +44,7 @@
               <th scope="col" class="px-6 py-3">Email</th>
               <th scope="col" class="px-6 py-3">Description</th>
               <th scope="col" class="px-6 py-3">Status</th>
+              <th scope="col" class="px-6 py-3">Date</th>
               <th scope="col" class="px-6 py-3">Actions</th>
             </tr>
           </thead>
@@ -57,6 +58,7 @@
               <td class="px-6 py-3">{{ ticket.email }}</td>
               <td class="px-6 py-3">{{ ticket.description }}</td>
               <td class="px-6 py-3">{{ ticket.status }}</td>
+              <td class="px-6 py-3">{{ ticket.dateTime | date:'short' }}</td> <!-- Adjust this line to format the date and time -->
               <td class="px-6 py-3">
                 <button class="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded-lg" (click)="deleteTicket(ticket.id); $event.stopPropagation()">Delete</button>
               </td>
