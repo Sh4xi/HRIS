@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { createClient, SupabaseClient, PostgrestSingleResponse, PostgrestResponse } from '@supabase/supabase-js';
 import { environment } from '../environments/environment';
+// import { access } from 'fs';
 
 @Injectable({
   providedIn: 'root',
@@ -49,6 +50,27 @@ export class SupabaseService {
       console.error('Error creating employee:', response.error.message);
     } else {
       console.log('Employee created successfully:', response.data);
+    }
+
+    return response;
+  }
+
+  async createRole(roleData: any): Promise<PostgrestSingleResponse<any>> {
+    const response = await this.supabase.from('roles').insert([
+      {
+        role_name: roleData.role_name,
+        department: roleData.department,
+        mod_access: roleData.mod_access,
+        rep_access: roleData.rep_access,
+        data_access: roleData.data_access,
+        privileges: roleData.privileges
+      },
+    ]);
+
+    if (response.error) {
+      console.error('Error creating role:', response.error.message);
+    } else {
+      console.log('Role created successfully:', response.data);
     }
 
     return response;
