@@ -16,17 +16,22 @@
         <div class="mb-4 flex justify-between items-center">
           <input type="text" [(ngModel)]="searchTerm" (input)="searchTable()" placeholder="Search..." class="w-half p-2 border rounded-lg">
           <div class="space-x-4">
-            <button class="bg-red-500 text-white px-4 py-2 rounded-lg" (click)="deleteUsers()">
-              {{ isEditing ? 'Delete Selected' : 'Delete All' }}
+            <!-- Delete button only displayed when in editing mode -->
+            <button *ngIf="isEditing" class="bg-red-500 text-white px-4 py-2 rounded-lg" (click)="deleteUsers()">
+              Delete
             </button>
+            <!-- Manage User button -->
             <button [ngClass]="{ 'bg-green-500 hover:bg-green-600': !isEditing, 'bg-pink-500 hover:bg-pink-600': isEditing }"
                 class="text-white px-4 py-2 rounded-lg transition duration-300 ease-in-out" (click)="toggleEditMode()">
               {{ isEditing ? 'Stop Managing' : 'Manage User' }}
             </button>
+            <!-- New Employee button, disabled when isEditing is true -->
             <button (click)="toggleModal()"
-              class="text-white bg-blue-500 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300
-              font-medium rounded-lg text-sm px-4 py-2 text-center dark:bg-blue-500 dark:hover:bg-blue-700
-              dark:focus:ring-blue-800" type="button">+ New Employee</button>
+              [ngClass]="{ 'bg-blue-500': !isEditing, 'bg-gray-500 cursor-not-allowed': isEditing }"
+              [disabled]="isEditing"
+              class="text-white hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300
+              font-medium rounded-lg text-sm px-4 py-2 text-center dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+              type="button">+ New Employee</button>
           </div>
         </div>
 
