@@ -93,29 +93,29 @@
     </div>
 
 <!-- Users active tab -->
-    <div *ngIf="activeTab === 'users'" class="flex flex-col h-screen">
-      <section id="user-list">
-        <div class="mb-4 flex justify-between items-center">
-          <input type="text" [(ngModel)]="searchTerm" (input)="searchTable()" placeholder="Search..." class="w-half p-2 border rounded-lg">
-          <div class="space-x-4">
-            <!-- Delete button only displayed when in editing mode -->
-            <button *ngIf="isEditing" class="bg-red-500 text-white px-4 py-2 rounded-lg" (click)="deleteUsers()">
-              Delete
-            </button>
-            <!-- Manage User button -->
-            <button [ngClass]="{ 'bg-green-500 hover:bg-green-600': !isEditing, 'bg-pink-500 hover:bg-pink-600': isEditing }"
-                class="text-white px-4 py-2 rounded-lg transition duration-300 ease-in-out" (click)="toggleEditMode()">
-              {{ isEditing ? 'Stop Managing' : 'Manage User' }}
-            </button>
-            <!-- New Employee button, disabled when isEditing is true -->
-            <button (click)="toggleModal()"
-              [ngClass]="{ 'bg-blue-500': !isEditing, 'bg-gray-500 cursor-not-allowed': isEditing }"
-              [disabled]="isEditing"
-              class="text-white hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300
-              font-medium rounded-lg text-sm px-4 py-2 text-center dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-              type="button">+ New Employee</button>
-          </div>
-        </div>
+<div *ngIf="activeTab === 'users'" class="flex flex-col h-screen">
+  <section id="user-list" class="flex flex-col h-full">
+    <div class="mb-4 flex flex-col md:flex-row md:justify-between md:items-center">
+      <input type="text" [(ngModel)]="searchTerm" (input)="searchTable()" placeholder="Search..." class="w-full md:w-1/2 p-2 border rounded-lg mb-2 md:mb-0">
+      <div class="flex space-x-4">
+        <!-- Delete button only displayed when in editing mode -->
+        <button *ngIf="isEditing" class="bg-red-500 text-white px-4 py-2 rounded-lg" (click)="deleteUsers()">
+          Delete
+        </button>
+        <!-- Manage User button -->
+        <button [ngClass]="{ 'bg-green-500 hover:bg-green-600': !isEditing, 'bg-pink-500 hover:bg-pink-600': isEditing }"
+            class="text-white px-4 py-2 rounded-lg transition duration-300 ease-in-out" (click)="toggleEditMode()">
+          {{ isEditing ? 'Stop Managing' : 'Manage User' }}
+        </button>
+        <!-- New Employee button, disabled when isEditing is true -->
+        <button (click)="toggleModal()"
+          [ngClass]="{ 'bg-blue-500': !isEditing, 'bg-gray-500 cursor-not-allowed': isEditing }"
+          [disabled]="isEditing"
+          class="text-white hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300
+          font-medium rounded-lg text-sm px-4 py-2 text-center dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+          type="button">+ New Employee</button>
+      </div>
+    </div>
 
         <div *ngIf="showModal" class="fixed inset-0 bg-black bg-opacity-50 overflow-y-auto h-full w-full flex justify-center items-center"
         (click)="toggleModal()">
@@ -137,9 +137,9 @@
                     <img [src]="photoPreviewUrl" alt="Employee Photo" class="w-48 h-48 object-cover rounded-lg mb-2 mt-3">
                     <p *ngIf="showFileTypeAlert" class="text-red-600 text-sm mb-2">Please select a PNG file.</p>
                     <p *ngIf="showFileSizeAlert" class="text-red-600 text-sm mb-2">The photo you selected exceeds 2MB. Please try again.</p>
-                    <input type="file" id="photoInput" accept="image/*" class="hidden" (change)="onPhotoChange($event)">
+                    <input type="file" id="photoInput" accept="image/png,image/jpeg" class="hidden" (change)="onPhotoChange($event)">
                     <label for="photoInput" class="w-48 text-center bg-blue-500 text-white py-2 px-4 rounded cursor-pointer hover:bg-blue-600 transition duration-300 mt-3">Choose Photo</label>
-                  </div>
+                  </div>                  
                   <div class="md:col-span-3 col-span-4 space-y-4">
                     <div class="grid grid-cols-2 gap-4">
                       <div class="flex flex-col">
@@ -238,66 +238,66 @@
         </div>
       </div>
     
-        <div *ngIf="filteredUsers.length > 0" class="p-4 rounded-lg shadow-lg bg-white">
-          <table class="w-full border-collapse">
-            <thead>
-              <tr class="bg-gray-100 text-gray-700 uppercase text-sm leading-normal">
-                <th *ngIf="isEditing" class="py-3 px-6 text-center">Select</th>
-                <th class="py-3 px-6 text-left">Profile</th>
-                <th class="py-3 px-6 text-left">Name</th>
-                <th class="py-3 px-6 text-left">Email</th> 
-                <th class="py-3 px-6 text-left">Password</th>
-                <th class="py-3 px-6 text-left">Department</th>
-                <th class="py-3 px-6 text-left">Role</th>
-                <th class="py-3 px-6 text-left">Status</th>
-                <th class="py-3 px-6 text-center">Access</th>
-                <th *ngIf="isEditing" class="py-3 px-6 text-center">Edit</th>
-              </tr>
-            </thead>
-            <tbody class="text-gray-600 text-sm font-light">
-              <tr *ngFor="let user of paginatedUsers; let i = index" class="border-b border-gray-200 hover:bg-gray-100">
-                <td *ngIf="isEditing" class="py-3 px-6 text-center">
-                  <input type="checkbox" 
-                         [checked]="user.selected"
-                         (change)="toggleUserSelection(user)">
-                </td>
-                <td class="py-3 px-6 text-left whitespace-nowrap">
-                  <div class="flex items-center">
-                    <img [src]="user.profile" alt="Profile Picture" class="w-10 h-10 rounded-full border-2 border-gray-200">
-                  </div>
-                </td>
-                <td class="py-3 px-6 text-left">{{ user.name }}</td>
-                <td class="py-3 px-6 text-left">{{ user.email }}</td>
-                <td class="py-3 px-6 text-left">
-                  <span class="bg-gray-200 text-gray-600 py-1 px-3 rounded-full text-xs">Hidden</span>
-                </td>
-                <td class="py-3 px-6 text-left">{{ user.department }}</td>
-                <td class="py-3 px-6 text-left">{{ user.position }}<br>{{ getContractType(user.position) }}</td>
-                <td class="py-3 px-6 text-left">
-                  <span [ngClass]="{
-                    'bg-green-200 text-green-600': user.status === 'Active',
-                    'bg-red-200 text-red-600': user.status === 'Inactive'
-                  }" class="py-1 px-3 rounded-full text-xs">
-                    {{ user.status }}
-                  </span>
-                </td>
-                <td class="py-3 px-6 text-center">
-                  <label class="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" class="sr-only peer" [(ngModel)]="user.access" (change)="toggleUserAccess(user)">
-                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                  </label>
-                </td>
-                <td *ngIf="isEditing" class="py-3 px-6 text-center">
-                  <button (click)="editUser(user)" class="text-blue-500 hover:text-blue-700">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-1.5a2.5 2.5 0 113.536-3.536L15.232 5.232zM4 13.5V21h7.5l11-11.5a2.5 2.5 0 00-3.5-3.5L4 13.5z"/>
-                    </svg>
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+      <div *ngIf="filteredUsers.length > 0" class="p-4 rounded-lg shadow-lg bg-white overflow-x-auto">
+        <table class="w-full md:min-w-full border-collapse">
+          <thead>
+            <tr class="bg-gray-100 text-gray-700 uppercase text-sm leading-normal">
+              <th *ngIf="isEditing" class="py-3 px-6 text-center">Select</th>
+              <th class="py-3 px-6 text-left">Profile</th>
+              <th class="py-3 px-6 text-left">Name</th>
+              <th class="py-3 px-6 text-left">Email</th> 
+              <th class="py-3 px-6 text-left">Password</th>
+              <th class="py-3 px-6 text-left">Department</th>
+              <th class="py-3 px-6 text-left">Role</th>
+              <th class="py-3 px-6 text-left">Status</th>
+              <th class="py-3 px-6 text-center">Access</th>
+              <th *ngIf="isEditing" class="py-3 px-6 text-center">Edit</th>
+            </tr>
+          </thead>
+          <tbody class="text-gray-600 text-sm font-light">
+            <tr *ngFor="let user of paginatedUsers; let i = index" class="border-b border-gray-200 hover:bg-gray-100">
+              <td *ngIf="isEditing" class="py-3 px-6 text-center">
+                <input type="checkbox" 
+                       [checked]="user.selected"
+                       (change)="toggleUserSelection(user)">
+              </td>
+              <td class="py-3 px-6 text-left whitespace-nowrap">
+                <div class="flex items-center">
+                  <img [src]="user.profile" alt="Profile Picture" class="w-10 h-10 rounded-full border-2 border-gray-200">
+                </div>
+              </td>
+              <td class="py-3 px-6 text-left">{{ user.name }}</td>
+              <td class="py-3 px-6 text-left">{{ user.email }}</td>
+              <td class="py-3 px-6 text-left">
+                <span class="bg-gray-200 text-gray-600 py-1 px-3 rounded-full text-xs">Hidden</span>
+              </td>
+              <td class="py-3 px-6 text-left">{{ user.department }}</td>
+              <td class="py-3 px-6 text-left">{{ user.position }}<br>{{ getContractType(user.position) }}</td>
+              <td class="py-3 px-6 text-left">
+                <span [ngClass]="{
+                  'bg-green-200 text-green-600': user.status === 'Active',
+                  'bg-red-200 text-red-600': user.status === 'Inactive'
+                }" class="py-1 px-3 rounded-full text-xs">
+                  {{ user.status }}
+                </span>
+              </td>
+              <td class="py-3 px-6 text-center">
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" class="sr-only peer" [(ngModel)]="user.access" (change)="toggleUserAccess(user)">
+                  <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
+              </td>
+              <td *ngIf="isEditing" class="py-3 px-6 text-center">
+                <button (click)="editUser(user)" class="text-blue-500 hover:text-blue-700">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-1.5a2.5 2.5 0 113.536-3.536L15.232 5.232zM4 13.5V21h7.5l11-11.5a2.5 2.5 0 00-3.5-3.5L4 13.5z"/>
+                  </svg>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>      
       </section>
 
       <div class="flex justify-between items-center mt-4">

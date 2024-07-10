@@ -28,6 +28,7 @@ interface Employee {
   position: string;
   department: string;
   type: string;
+  photoUrl?: string; // Add a new property for photo URL
 }
 
 interface Ticket {
@@ -209,25 +210,28 @@ export class UserManagementComponent implements OnInit {
 
   onPhotoChange(event: any) {
     const file = event.target.files[0];
-    const maxSizeInBytes = 2 * 1024 * 1024; // 2MB
-
+    const maxSizeInBytes = 50 * 1024 * 1024; // 2MB
+  
     // Reset alerts
     this.showFileTypeAlert = false;
     this.showFileSizeAlert = false;
-
+  
     if (file) {
       if (file.size > maxSizeInBytes) {
+        // Display size alert if the file exceeds 2MB
         this.showFileSizeAlert = true;
         event.target.value = ''; // Clear the file input
         return;
       }
-
+  
       if (file.type !== 'image/png') {
+        // Display type alert if the file is not a PNG
         this.showFileTypeAlert = true;
         event.target.value = ''; // Clear the file input
         return;
       }
-
+  
+      // Read and display the selected image file
       const reader = new FileReader();
       reader.onload = (e: any) => {
         this.photoPreviewUrl = e.target.result;
@@ -235,6 +239,7 @@ export class UserManagementComponent implements OnInit {
       reader.readAsDataURL(file);
     }
   }
+  
 
 async onSubmit() {
     if (this.isEditing) {
