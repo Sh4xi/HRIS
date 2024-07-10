@@ -6,21 +6,6 @@ import { environment } from '../environments/environment';
   providedIn: 'root',
 })
 export class SupabaseService {
-  
-  async deleteUser(email: string): Promise<PostgrestSingleResponse<any>> {
-  const response = await this.supabase
-    .from('Profile')
-    .delete()
-    .eq('email', email);
-
-  if (response.error) {
-    console.error('Error deleting user:', response.error.message);
-  } else {
-    console.log('User deleted successfully:', response.data);
-  }
-
-  return response;
-}
   private supabase: SupabaseClient;
   private isLockAcquired = false;
 
@@ -28,7 +13,38 @@ export class SupabaseService {
     const supabaseUrl = environment.supabaseUrl;
     const supabaseKey = environment.supabaseKey;
     this.supabase = createClient(supabaseUrl, supabaseKey);
-    console.log('Supabase client initialized with URL:svf', supabaseUrl);
+    console.log('Supabase client initialized with URL:', supabaseUrl);
+    this.setupRealtimeSubscription(); // Setup the real-time subscription
+  }
+
+  // Automatically reload when the Supabase is updated
+  private setupRealtimeSubscription(): void {
+    this.supabase
+      .channel('public:Profile')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'Profile' }, payload => {
+        console.log('Change received!', payload);
+        this.handleDatabaseChange();
+      })
+      .subscribe();
+  }
+
+  private handleDatabaseChange(): void {
+    // Handle the change (e.g., reload the page)
+    window.location.reload();
+  }
+
+  async checkEmailExists(email: string): Promise<boolean> {
+    const { data, error } = await this.supabase
+      .from('Profile')
+      .select('email')
+      .eq('email', email);
+
+    if (error) {
+      console.error('Error checking email:', error.message);
+      return false;
+    }
+
+    return data.length > 0;
   }
 
   async createEmployee(employee: any): Promise<PostgrestSingleResponse<any>> {
@@ -54,11 +70,47 @@ export class SupabaseService {
     return response;
   }
 
+  async createRole(roleData: any): Promise<PostgrestSingleResponse<any>> {
+    const response = await this.supabase.from('roles').insert([
+      {
+        role_name: roleData.role_name,
+        department: roleData.department,
+        mod_access: roleData.mod_access,
+        rep_access: roleData.rep_access,
+        data_access: roleData.data_access,
+        privileges: roleData.privileges
+      },
+    ]);
+
+    if (response.error) {
+      console.error('Error creating role:', response.error.message);
+    } else {
+      console.log('Role created successfully:', response.data);
+    }
+
+    return response;
+  }
+
   async getEmployees(): Promise<PostgrestResponse<any>> {
     const response = await this.supabase.from('profile').select('');
     if (response.error) {
       console.error('Error fetching employees:', response.error.message);
     }
+    return response;
+  }
+
+  async deleteUser(email: string): Promise<PostgrestSingleResponse<any>> {
+    const response = await this.supabase
+      .from('Profile')
+      .delete()
+      .eq('email', email);
+
+    if (response.error) {
+      console.error('Error deleting user:', response.error.message);
+    } else {
+      console.log('User deleted successfully:', response.data);
+    }
+
     return response;
   }
 
@@ -99,7 +151,6 @@ export class SupabaseService {
 
     return { data, error };
   }
-  
 
   async updateEmployee(employee: any): Promise<PostgrestSingleResponse<any>> {
     const response = await this.supabase
@@ -124,4 +175,3 @@ export class SupabaseService {
     return response;
   }
 }
-
