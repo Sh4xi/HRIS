@@ -207,6 +207,21 @@ export class SupabaseService {
 
     return data;
   }
-}
+
+    // Fetch tickets from the database
+    async getTickets() {
+      const { data, error } = await this.supabase
+        .from('ticket')
+        .select('*')
+        .order('dateTime', { ascending: false });
+      if (error) {
+        console.error('Error fetching tickets:', error);
+        return { data: [], error };
+      }
+      return { data, error };
+    }
+  }
+
+
   
 
