@@ -58,7 +58,6 @@ export class UserManagementComponent implements OnInit {
   newRole = '';
   newDepartment = '';
   departmentType = 'all';
-  selectedDepartment = '';
   selectedDepartments: string[] = [];
   departments = ['HR', 'IT', 'Finance', 'Marketing'];
 
@@ -113,10 +112,10 @@ export class UserManagementComponent implements OnInit {
 
   privileges = ['View', 'Edit', 'Delete', 'Approve'];
 
-  moduleAccess: AccessRights = {};
-  reportAccess: AccessRights = {};
-  dataAccessRights: AccessRights = {};
-  privilegeRights: AccessRights = {};
+  selectedModules: string[] = [];
+  selectedReports: string[] = [];
+  selectedDataAccess: string[] = [];
+  selectedPrivileges: string[] = [];
 
   departmentAccessRights = [
     'View Department Data',
@@ -227,7 +226,49 @@ export class UserManagementComponent implements OnInit {
         });
     }
   }
+
+  addRole() {
+    if (!this.newRole) {
+      alert('Please enter a role name');
+      return;
+    }
   
+    if (this.departmentType === 'specific' && !this.selectedDepartments) {
+      alert('Please select a department');
+      return;
+    }
+  
+    const roleData = {
+      role_name: this.newRole,
+      mod_access: this.selectedModules.length > 0 ? this.selectedModules : [],
+      rep_access: this.selectedReports.length > 0 ? this.selectedReports : [],
+      data_access: this.selectedDataAccess.length > 0 ? this.selectedDataAccess : [],
+      privileges: this.selectedPrivileges.length > 0 ? this.selectedPrivileges : [],
+      department: this.departmentType === 'all'
+        ? ['All Departments']
+        : this.departmentType === 'specific'
+        ? this.selectedDepartments
+        : this.selectedDepartments.length > 0
+        ? this.selectedDepartments
+        : []
+    };
+  
+    this.supabaseService.createRole(roleData)
+    .then(response => {
+      if (response.error) {
+        console.error('Error creating role:', response.error.message);
+      } else {
+        if (response.data) {
+          console.log('Role created successfully:', response.data);
+        } else {
+          console.log('Role created successfully, but no data returned.');
+        }
+        this.closeAddPopup();
+      }
+    });
+  }
+  
+
   toggleUserSelection(user: User) {
     user.selected = !user.selected;
   }
@@ -384,9 +425,7 @@ export class UserManagementComponent implements OnInit {
     }
   }
 
-  addRole() {
-    console.log("Adding Role");
-  }
+
 
   toggleUserAccess(user: User) {
     user.access = !user.access;
@@ -486,39 +525,14 @@ deleteUsers() {
     this.isEditing = true;
   }
 
-  saveRole() {
-    if (!this.newRole) {
-      alert('Please enter a role name');
-      return;
-    }
-
-    if (this.departmentType === 'specific' && !this.selectedDepartment) {
-      alert('Please select a department');
-      return;
-    }
-
-    const roleData = {
-      role: this.newRole,
-      department: this.departmentType === 'all' ? 'All Departments' : this.selectedDepartment === 'specific' ? this.selectedDepartment : this.selectedDepartments,
-      moduleAccess: this.moduleAccess,
-      reportAccess: this.reportAccess,
-      dataAccess: this.dataAccessRights,
-      privileges: this.privilegeRights
-    };
-
-    console.log('Saving Role: ', roleData);
-
-    this.closeAddPopup();
-  }
-
   resetAccessForm() {
     this.newRole = '';
     this.departmentType = 'all';
-    this.selectedDepartment = '';
-    this.moduleAccess = {};
-    this.reportAccess = {};
-    this.dataAccessRights = {};
-    this.privilegeRights = {};
+    this.selectedDepartments = [];
+    this.selectedModules = [];
+    this.selectedReports = [];
+    this.selectedDataAccess = [];
+    this.selectedPrivileges = [];
   }
 
 
@@ -593,5 +607,40 @@ deleteUsers() {
     this.closeAddDepartmentPopup();
   }
 
+  updateSelectedModules(event: any) {
+    const value = event.target.value;
+    if (event.target.checked) {
+      this.selectedModules.push(value);
+    } else {
+      this.selectedModules = this.selectedModules.filter(module => module !== value);
+    }
+  }
+  
+  updateSelectedReports(event: any) {
+    const value = event.target.value;
+    if (event.target.checked) {
+      this.selectedReports.push(value);
+    } else {
+      this.selectedReports = this.selectedReports.filter(report => report !== value);
+    }
+  }
+  
+  updateSelectedDataAccess(event: any) {
+    const value = event.target.value;
+    if (event.target.checked) {
+      this.selectedDataAccess.push(value);
+    } else {
+      this.selectedDataAccess = this.selectedDataAccess.filter(data => data !== value);
+    }
+  }
+  
+  updateSelectedPrivileges(event: any) {
+    const value = event.target.value;
+    if (event.target.checked) {
+      this.selectedPrivileges.push(value);
+    } else {
+      this.selectedPrivileges = this.selectedPrivileges.filter(privilege => privilege !== value);
+    }
+  }
 }
 
