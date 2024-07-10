@@ -35,12 +35,12 @@
   <section class="mt-10 ml-5 w-full rounded-xl bg-zinc-300 max-md:max-w-full">
     <table class="w-full">
       <thead>
-        <tr class="text-3xl font-medium text-center text-black">
-          <th class="p-2.5">Status</th>
-          <th class="p-2.5">Submitted for</th>
-          <th class="p-2.5">Reviewer</th>
-          <th class="p-2.5">Request</th>
-          <th class="p-2.5">Requested by</th>
+        <tr class="text-3xl font-medium text-black">
+          <th class="p-2.5 text-center">Status</th>
+          <th class="p-2.5 text-center">Submitted for</th>
+          <th class="p-2.5 text-center">Reviewer</th>
+          <th class="p-2.5 text-center">Request</th>
+          <th class="p-2.5 text-center">Requested by</th>
         </tr>
       </thead>
       <tbody>
@@ -56,7 +56,7 @@
               </span>
             </td>            
             <td class="p-2.5">
-              <div class="flex gap-5 items-center">
+              <div class="flex gap-5 items-center justify-center">
                 <img [src]="'https://api.dicebear.com/7.x/initials/svg?seed=' + workflow.submitted_for" [alt]="workflow.submitted_for" class="w-[45px] h-[45px] rounded-full" />
                 <div>
                   <div class="text-xl text-neutral-800">{{ workflow.submitted_for }}</div>
@@ -64,12 +64,12 @@
                 </div>
               </div>
             </td>
-            <td class="p-2.5 text-xl text-neutral-800">{{ workflow.reviewer }}</td>
-            <td class="p-2.5">
+            <td class="p-2.5 text-xl text-neutral-800 text-center">{{ workflow.reviewer }}</td>
+            <td class="p-2.5 text-center">
               <div class="text-xl text-neutral-800">{{ workflow.request }}</div>
               <a href="#" class="text-lg text-sky-700 underline">View</a>
             </td>
-            <td class="p-2.5">
+            <td class="p-2.5 text-center">
               <div class="text-xl text-neutral-800">{{ workflow.requested_by }}</div>
               <div class="text-base text-neutral-800 text-opacity-70">{{ workflow.requested_by_role }}</div>
             </td>
