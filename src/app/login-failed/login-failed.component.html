@@ -8,12 +8,14 @@
           </p>
           <form *ngIf="!ticketSubmitted" (ngSubmit)="onSubmit()" #ticketForm="ngForm" class="space-y-4">
             <input type="email" [(ngModel)]="ticket.email" name="email" placeholder="Email" required class="w-full p-2 border border-gray-300 rounded bg-gray-100">
+            <h3 class="text-black flex justify-start" style="font-size: 12px; font-weight: bold;">CHOOSE A REQUEST TYPE</h3>
             <select [(ngModel)]="ticket.title" name="title" required class="w-full p-2 border border-gray-300 rounded bg-gray-100">
-              <option value="" disabled selected>Select Title</option>
-              <option value="Password Forgotten">Password Forgotten</option>
-              <option value="Technical Issues">Technical Issues</option>
-              <option value="Report an Employee">Report an Employee</option>
-              <option value="Other Matters">Other Matters</option>
+              <!-- <option value="" disabled selected>Choose a Request type</option> -->
+              <option value="Account Login">Login Issues</option>
+              <option value="Password Forgotten">Recover my Account</option>
+              <option value="Technical Issues">Technical Issues: Bugs, lag, or crashes</option>
+              <option value="Epmployee Request">Employee Assistance Program Request</option>
+              <option value="Other Matters">Others</option>
             </select>
             <textarea [(ngModel)]="ticket.description" name="description" placeholder="Description of the issue" rows="3" required class="w-full p-2 border border-gray-300 rounded bg-gray-100"></textarea>
             <button type="submit" [disabled]="!ticketForm.form.valid || ticketForm.form.pristine" class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition duration-300 disabled:bg-blue-300">
