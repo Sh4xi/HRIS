@@ -28,6 +28,7 @@ interface Employee {
   position: string;
   department: string;
   type: string;
+  photoUrl?: string; // Add a new property for photo URL
 }
 
 interface Ticket {
@@ -36,6 +37,7 @@ interface Ticket {
   email: string;
   description: string;
   status: string;
+  dateTime: Date;
 }
 
 @Component({
@@ -77,7 +79,7 @@ export class UserManagementComponent implements OnInit {
 
   // Functions for Support tickets tab
   paginatedTickets: Ticket[] = [];
-  searchTicketTerm: string  = '';
+  searchTicketTerm: string = '';
   ticket_currentPage: number = 1;
   ticket_itemsPerPage: number = 10;
 
@@ -87,7 +89,6 @@ export class UserManagementComponent implements OnInit {
 
   selectedTicket: any = null;
   isModalVisible = false;
-  showTicketModal = false;
 
   employee = {
     email: '',
@@ -135,18 +136,7 @@ export class UserManagementComponent implements OnInit {
   ];
 
   // Mockdata for Tickets
-  tickets: Ticket[] = [
-    { id: 1, title: 'Issue with login', email: 'user1@example.com', description: 'Cannot login to the system', status: 'read' },
-    { id: 2, title: 'Page not loading', email: 'user1@example.com', description: 'Homepage takes too long to load', status: 'unread' },
-    { id: 3, title: 'Error 404', email: 'user1@example.com', description: 'Page not found error when navigating to profile', status: 'read' },
-    { id: 4, title: 'Feature request', email: 'user2@example.com', description: 'Request for a new feature in the system', status: 'read' },
-    { id: 5, title: 'Bug in form submission', email: 'user2@example.com', description: 'Form does not submit properly', status: 'unread' },
-    { id: 6, title: 'Crash on startup', email: 'user3@example.com', description: 'Application crashes on startup', status: 'unread' },
-    { id: 7, title: 'Performance issue', email: 'user4@example.com', description: 'System performance is slow', status: 'read' },
-    { id: 8, title: 'UI glitch', email: 'user5@example.com', description: 'Minor UI glitch in dashboard', status: 'unread' },
-    { id: 9, title: 'Security vulnerability', email: 'user6@example.com', description: 'Potential security vulnerability reported', status: 'read' },
-    { id: 10, title: 'Database error', email: 'user7@example.com', description: 'Error connecting to database', status: 'unread' },
-  ];
+  tickets: Ticket[] = [];
 
   privileges = ['View', 'Edit', 'Delete', 'Approve'];
 
@@ -163,9 +153,10 @@ export class UserManagementComponent implements OnInit {
   ];
 
   departmentAccess: AccessRights = {};
+  showPassword: any;
 
   constructor(private supabaseService: SupabaseService) {}
-  
+
   toggleModal() {
     this.showModal = !this.showModal;
     if (this.showModal) {
@@ -208,25 +199,28 @@ export class UserManagementComponent implements OnInit {
 
   onPhotoChange(event: any) {
     const file = event.target.files[0];
-    const maxSizeInBytes = 2 * 1024 * 1024; // 2MB
-
+    const maxSizeInBytes = 50 * 1024 * 1024; // 2MB
+  
     // Reset alerts
     this.showFileTypeAlert = false;
     this.showFileSizeAlert = false;
-
+  
     if (file) {
       if (file.size > maxSizeInBytes) {
+        // Display size alert if the file exceeds 2MB
         this.showFileSizeAlert = true;
         event.target.value = ''; // Clear the file input
         return;
       }
-
+  
       if (file.type !== 'image/png') {
+        // Display type alert if the file is not a PNG
         this.showFileTypeAlert = true;
         event.target.value = ''; // Clear the file input
         return;
       }
-
+  
+      // Read and display the selected image file
       const reader = new FileReader();
       reader.onload = (e: any) => {
         this.photoPreviewUrl = e.target.result;
@@ -234,6 +228,7 @@ export class UserManagementComponent implements OnInit {
       reader.readAsDataURL(file);
     }
   }
+  
 
 async onSubmit() {
     if (this.isEditing) {
@@ -411,8 +406,26 @@ async onSubmit() {
     this.loadEmployees();
     this.filteredTickets = this.tickets;
     this.selectedTickets = new Array(this.tickets.length).fill(false);
+    this.updateDateTimeForTickets();
+    this.loadTickets();
+
+  } 
+  // Fetch tickets from the database
+  async loadTickets() {
+    try {
+      const { data, error } = await this.supabaseService.getTickets();
+      if (error) {
+        console.error('Error fetching tickets:', error.message);
+      } else if (data) {
+        this.tickets = data;
+        this.filteredTickets = this.tickets;
+        this.selectedTickets = new Array(this.tickets.length).fill(false);
+        this.ticketUpdatePagination();
+      }
+    } catch (error) {
+      console.error('Error fetching tickets:', error);
+    }
   }
-  showPassword: boolean = false;
 
   
   async loadEmployees() {
@@ -468,9 +481,12 @@ async onSubmit() {
     }
   }
 
+
   toggleUserAccess(user: User) {
     user.access = !user.access;
+    user.status = user.access ? 'Active' : 'Inactive';
   }
+
   togglePasswordVisibility() {
     this.showPassword = !this.showPassword;
   }
@@ -638,14 +654,26 @@ deleteUsers() {
     }
 
     const departmentData = {
-      department: this.newDepartment,
-      accessRights: this.departmentAccess
+      department_name: this.newDepartment,
+      mod_access: this.selectedModules.length > 0 ? this.selectedModules : [],
+      rep_access: this.selectedReports.length > 0 ? this.selectedReports : [],
+      data_access: this.selectedDataAccess.length > 0 ? this.selectedDataAccess : [],
+      privileges: this.selectedPrivileges.length > 0 ? this.selectedPrivileges : [],
     };
-
-    console.log('Saving department:', departmentData);
-    // Implement your logic to save the department data
-
-    this.closeAddDepartmentPopup();
+  
+    this.supabaseService.createDepartment(departmentData)
+    .then(response => {
+      if (response.error) {
+        console.error('Error creating department:', response.error.message);
+      } else {
+        if (response.data) {
+          console.log('Department created successfully:', response.data);
+        } else {
+          console.log('Department created successfully, but no data returned.');
+        }
+        this.closeAddDepartmentPopup();
+      }
+    });
   }
 
   updateSelectedModules(event: any) {
@@ -684,13 +712,13 @@ deleteUsers() {
     }
   }
 
-  // Method to search tickets
-searchTicketTable() {
-  const searchTerm = this.searchTicketTerm.toLowerCase();
-  this.filteredTickets = this.tickets.filter(ticket => 
-    ticket.title.toLowerCase().includes(searchTerm) ||
-    ticket.description.toLowerCase().includes(searchTerm) ||
-    ticket.status.toLowerCase().includes(searchTerm)
+ // Method to search tickets
+  searchTicketTable() {
+    const searchTerm = this.searchTicketTerm.toLowerCase();
+    this.filteredTickets = this.tickets.filter(ticket =>
+      ticket.title.toLowerCase().includes(searchTerm) ||
+      ticket.description.toLowerCase().includes(searchTerm) ||
+      ticket.status.toLowerCase().includes(searchTerm)
     );
     this.ticketUpdatePagination();
   }
@@ -812,6 +840,13 @@ ticketNextPage() {
     }
   }
 
+  updateDateTimeForTickets() {
+    // Update dateTime property for each ticket
+    this.tickets.forEach(ticket => {
+      ticket.dateTime = new Date(); // Assign current date and time
+    });
+  }
+  
   openTicketDetails(ticket: any) {
     this.selectedTicket = ticket;
     this.isModalVisible = true;
