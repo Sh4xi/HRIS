@@ -8,6 +8,8 @@ interface Parameter {
   name: string;
   type: string;
   date?: string;
+  startTime?: string;
+  endTime?: string;
 }
 
 @Component({
@@ -15,7 +17,7 @@ interface Parameter {
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule, SidebarNavigationModule],
   templateUrl: './system-management.component.html',
-  styleUrl: './system-management.component.css'
+  styleUrls: ['./system-management.component.css']
 })
 export class SystemManagementComponent {
   showPopup = false;
@@ -26,9 +28,21 @@ export class SystemManagementComponent {
   types: string[] = ['Holiday', 'OT Type', 'Schedule', 'Leave'];
   holidayDate: string = '';
   parameters: Parameter[] = [];
-  hasHolidayParameter: boolean = false;
+  scheduleStartTime: string = '';
+  scheduleEndTime: string = '';
+
+  // Define auditTrailData property
+  auditTrailData: Parameter[] = [];
 
   constructor(private router: Router) {}
+
+  get hasHolidayParameter(): boolean {
+    return this.parameters.some(p => p.type === 'Holiday');
+  }
+
+  get hasScheduleParameter(): boolean {
+    return this.parameters.some(p => p.type === 'Schedule');
+  }
 
   openPopup() {
     this.showPopup = true;
@@ -42,11 +56,19 @@ export class SystemManagementComponent {
   saveParameter() {
     const newParameter: Parameter = {
       name: this.parameterName,
-      type: this.selectedType,
-      date: this.selectedType === 'Holiday' ? this.holidayDate : undefined
+      type: this.selectedType
     };
+
+    if (this.selectedType === 'Holiday') {
+      newParameter.date = this.holidayDate;
+    } else if (this.selectedType === 'Schedule') {
+      newParameter.startTime = this.scheduleStartTime;
+      newParameter.endTime = this.scheduleEndTime;
+    }
+
     this.parameters.push(newParameter);
-    this.hasHolidayParameter = this.parameters.some(p => p.type === 'Holiday');
+    console.log('New parameter saved:', newParameter);
+    console.log('Current parameters:', this.parameters);
     this.closePopup();
   }
 
@@ -54,6 +76,8 @@ export class SystemManagementComponent {
     this.parameterName = '';
     this.selectedType = '';
     this.holidayDate = '';
+    this.scheduleStartTime = '';
+    this.scheduleEndTime = '';
   }
 
   goToAuditTrail() {
@@ -65,6 +89,9 @@ export class SystemManagementComponent {
   }
 
   openTable() {
+    // Populate auditTrailData with existing parameters
+    this.auditTrailData = [...this.parameters];
+    console.log('Audit Trail Data:', this.auditTrailData);
     this.showAll = false;
     this.showTable = true;
   }
