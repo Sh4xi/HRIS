@@ -43,13 +43,9 @@ export class SupabaseService {
     return this.currentSession.asObservable();
   }
 
-  isAuthenticated(): Observable<boolean> {
-    return new Observable<boolean>(observer => {
-      this.getCurrentSession().subscribe(session => {
-        observer.next(!!session);
-        observer.complete();
-      });
-    });
+  async isAuthenticated(): Promise<boolean> {
+    const session = await this.supabase.auth.getSession();
+    return !!session.data.session;
   }
 
   async signIn(email: string, password: string): Promise<boolean> {
@@ -63,10 +59,8 @@ export class SupabaseService {
     return true;
   }
 
-  async signOut(): Promise<void> {
+  async signOut() {
     await this.supabase.auth.signOut();
-    this.currentUser.next(null);
-    this.currentSession.next(null);
   }
 
   async refreshSession(): Promise<void> {
