@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SupabaseService } from '../Supabase/supabase.service';
+import { SidebarNavigationModule } from './../sidebar-navigation/sidebar-navigation.module';
 
 interface AccessRights {
   [key: string]: boolean;
@@ -43,7 +44,7 @@ interface Ticket {
 @Component({
   selector: 'app-user-management',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, SidebarNavigationModule],
   templateUrl: './user-management.component.html',
   styleUrls: ['./user-management.component.css']
 })
@@ -481,9 +482,12 @@ async onSubmit() {
     }
   }
 
+
   toggleUserAccess(user: User) {
     user.access = !user.access;
+    user.status = user.access ? 'Active' : 'Inactive';
   }
+
   togglePasswordVisibility() {
     this.showPassword = !this.showPassword;
   }
@@ -721,7 +725,7 @@ deleteUsers() {
   }
 
 // Method to toggle all tickets selection
-toggleAllTickets() {
+toggleAllTickets() { 
     const selectAll = this.selectedTickets.every(selected => selected);
     this.selectedTickets.fill(!selectAll);
   }
@@ -732,7 +736,7 @@ getSelectedTickets(): Ticket[] {
   }
 
 // Method to update a ticket
-updateTicket(updatedTicket: Ticket) {
+updateTicket(updatedTicket: Ticket) {             // Neeed to fix
   const index = this.tickets.findIndex(ticket => ticket.id === updatedTicket.id);
   if (index !== -1) {
     this.tickets[index] = updatedTicket;
@@ -742,7 +746,7 @@ updateTicket(updatedTicket: Ticket) {
   }
 
 // Method to delete a ticket
-deleteTicket(ticketId: number) {
+deleteTicket(ticketId: number) {           // Need to Fix
   const index = this.tickets.findIndex(ticket => ticket.id === ticketId);
   if (index !== -1) {
     this.tickets.splice(index, 1);
@@ -753,7 +757,7 @@ deleteTicket(ticketId: number) {
   }
 
 // Method to delete selected tickets
-deleteSelectedTickets() {
+deleteSelectedTickets() {               // Need to fix
   const selectedIndexes = this.selectedTickets
     .map((selected, index) => selected ? index : -1)
     .filter(index => index !== -1);
@@ -778,21 +782,21 @@ promptFilterOptions() {
   }
 
 // Method to mark all tickets as read
-markAllAsRead() {
+markAllAsRead() {                   // Need to Fix
     this.tickets.forEach(ticket => ticket.status = 'Read');
     this.filteredTickets = [...this.tickets];
     this.ticketUpdatePagination();
   }
 
 // Method to mark all tickets as unread
-markAllAsUnread() {
+markAllAsUnread() {                 // Need to Fix
     this.tickets.forEach(ticket => ticket.status = 'Unread');
     this.filteredTickets = [...this.tickets];
     this.ticketUpdatePagination();
   }
 
 // Method to filter tickets based on selected option
-filterTickets() {
+filterTickets() {                   // Need to Fix
   switch (this.filterOption) {
     case 'read':
       this.filteredTickets = this.tickets.filter(ticket => ticket.status.toLowerCase() === 'read');
@@ -823,28 +827,28 @@ ticketPaginate(): Ticket[] {
     return this.filteredTickets.slice(start, end);
   }
 
-ticketPrevPage() {
+ticketPrevPage() {                      // Need to Fix
   if (this.ticket_currentPage > 1) {
     this.ticket_currentPage--;
     this.ticketPaginate();
     }
   }
 
-ticketNextPage() {
+ticketNextPage() {                        // Need to fix
   if (this.ticket_currentPage < this.ticketTotalPages()) {
     this.ticket_currentPage++;
     this.ticketPaginate();
     }
   }
 
-  updateDateTimeForTickets() {
+updateDateTimeForTickets() {
     // Update dateTime property for each ticket
     this.tickets.forEach(ticket => {
       ticket.dateTime = new Date(); // Assign current date and time
     });
   }
   
-  openTicketDetails(ticket: any) {
+openTicketDetails(ticket: any) {
     this.selectedTicket = ticket;
     this.isModalVisible = true;
   }

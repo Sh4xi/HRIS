@@ -1,6 +1,16 @@
-<div class="bg-white">
-  <main class="p-6 bg-white">
-    <h1 class="text-white">Employees</h1>
+<!-- Flexible container that holds a sidebar navigation component and user-management area -->
+<div class="flex">
+  <app-sidebar-navigation></app-sidebar-navigation>
+  <div class="flex-grow"> 
+
+
+    <!-- Main componenet -->
+<div class="bg-white min-h-screen">
+  <header class="bg-white text-center py-4 px-4 sm:px-6">
+    <h1 class="text-m sm:text-2xl">User Management System</h1>
+  </header>
+
+  <main class="p-6">
 
     <div class="flex mb-6">
       <button (click)="setActiveTab('users')" [ngClass]="activeTab === 'users' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-500'" class="mr-4">Users</button>
@@ -286,10 +296,24 @@
                 </span>
               </td>
               <td class="py-3 px-6 text-center">
-                <label class="relative inline-flex items-center cursor-pointer">
-                  <input type="checkbox" class="sr-only peer" [(ngModel)]="user.access" (change)="toggleUserAccess(user)">
-                  <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                </label>
+                <button 
+                  (click)="!showModal && toggleUserAccess(user)"
+                  class="relative inline-flex items-center w-11 h-6 rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  [ngClass]="{
+                    'bg-blue-600': user.access && !showModal,
+                    'bg-gray-200': !user.access && !showModal,
+                    'bg-[#0D47A1]': user.access && showModal,
+                    'bg-gray-300': !user.access && showModal,
+                    'cursor-not-allowed': showModal
+                  }"
+                  [attr.disabled]="showModal ? '' : null"
+                  aria-label="Toggle user access"
+                >
+                  <span 
+                    class="inline-block w-5 h-5 transform transition-transform duration-200 ease-in-out bg-white rounded-full"
+                    [ngClass]="{'translate-x-6': user.access, 'translate-x-1': !user.access}"
+                  ></span>
+                </button>
               </td>
               <td *ngIf="isEditing" class="py-3 px-6 text-center">
                 <button (click)="editUser(user)" class="text-blue-500 hover:text-blue-700">

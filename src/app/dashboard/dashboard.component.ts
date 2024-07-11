@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { SupabaseService } from '../Supabase/supabase.service';
+import { SidebarNavigationModule } from '../sidebar-navigation/sidebar-navigation.module';
 
 interface SidebarItem {
   name: string;
@@ -16,23 +17,13 @@ interface DashboardCard {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule,SidebarNavigationModule],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent implements OnInit {
   isExpanded = false;
-
-  sidebarItems: SidebarItem[] = [
-    { name: 'Overview', route: '/overview' },
-    { name: 'Employee Management', route: '/user-management' },
-    { name: 'System Management', route: '/system-management' },
-    { name: 'Payroll', route: '/payroll' },
-    { name: 'Performance', route: '/performance' },
-    { name: 'Recruitment', route: '/recruitment' },
-    { name: 'Reports', route: '/reports' }
-  ];
-
+  
   dashboardCards: DashboardCard[] = [
     { title: 'Total Employees', value: 0 },
     { title: 'Leaves Pending', value: 5 },
@@ -80,7 +71,7 @@ export class DashboardComponent implements OnInit {
 
   getIconForRoute(route: string): string {
     switch (route) {
-      case '/overview': return 'dashboard';
+      case '/dashboard': return 'dashboard';
       case '/user-management': return 'group';
       case '/system-management': return 'settings';
       case '/payroll': return 'attach_money';
