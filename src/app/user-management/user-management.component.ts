@@ -271,8 +271,18 @@ export class UserManagementComponent implements OnInit {
     }
   }
   
+  isValidEmail(email: string): boolean {
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return emailRegex.test(email);
+  }
 
-async onSubmit() {
+  async onSubmit() {
+    if (!this.isValidEmail(this.employee.email)) {
+      console.error('Invalid email format');
+      alert('Please enter a valid email address.');
+      return;
+    }
+  
     if (this.isEditing) {
       console.log('Updating employee:', this.employee);
       const response = await this.supabaseService.updateEmployee(this.employee);
@@ -291,7 +301,7 @@ async onSubmit() {
         alert('Email already exists. Please use a different email.');
         return;
       }
-
+  
       console.log('Creating employee:', this.employee);
       const response = await this.supabaseService.createEmployee(this.employee);
       if (response.error) {
@@ -409,40 +419,45 @@ async onSubmit() {
   }
 
   async createEmployee(employee: any) {
-  const newUser = {
-    email: employee.email,
-    first_name: employee.firstname,
-    mid_name: employee.midname,
-    surname: employee.surname,
-    password: this.generateRandomPassword(8), // Use the generated password //edited
-    department: employee.department,
-    position: employee.position,
-    types: employee.type
-  };
-
-  const { data, error } = await this.supabaseService.createEmployee(newUser);
-  if (error) {
-    console.error('Error creating profile:', error.message);
-  } else if (data) {
-    const newUser: User = {
-      profile: this.photoPreviewUrl, //optional ('https://via.placeholder.com/200x200') //edited
-      name: `${employee.firstname} ${employee.midname ? employee.midname + ' ' : ''}${employee.surname}`,
+    if (!this.isValidEmail(employee.email)) {
+      console.error('Invalid email format');
+      alert('Please enter a valid email address.');
+      return;
+    }
+  
+    const newUser = {
       email: employee.email,
-      password: '***************',
+      first_name: employee.firstname,
+      mid_name: employee.midname,
+      surname: employee.surname,
+      password: this.generateRandomPassword(8), // Use the generated password
       department: employee.department,
       position: employee.position,
-      type: employee.type,
-      status: 'Active',
-      access: true
-      //term: '' // Add this property to match the User interface
+      types: employee.type
     };
-    this.users.push(newUser);
-    this.filteredUsers = this.users;
-    this.updatePagination();
-    this.toggleModal();
-    this.resetForm();
+  
+    const { data, error } = await this.supabaseService.createEmployee(newUser);
+    if (error) {
+      console.error('Error creating profile:', error.message);
+    } else if (data) {
+      const newUser: User = {
+        profile: this.photoPreviewUrl,
+        name: `${employee.firstname} ${employee.midname ? employee.midname + ' ' : ''}${employee.surname}`,
+        email: employee.email,
+        password: '***************',
+        department: employee.department,
+        position: employee.position,
+        type: employee.type,
+        status: 'Active',
+        access: true
+      };
+      this.users.push(newUser);
+      this.filteredUsers = this.users;
+      this.updatePagination();
+      this.toggleModal();
+      this.resetForm();
+    }
   }
-}
 
   ngOnInit() {
     this.loadEmployees();
