@@ -32,6 +32,8 @@ interface Employee {
   photoUrl?: string; // Add a new property for photo URL
 }
 
+
+
 interface Ticket {
   id: number;
   title: string;
@@ -108,7 +110,7 @@ export class UserManagementComponent implements OnInit {
     'Employee Information Management',
     'Time & Attendance Management',
     'Online Job Application Portal',
-    'Recruitment, Selection and Placement',
+    'Recruitment, Selection and PlaFrcement',
     'Learning and Development (L&D)',
     'Rewards and Recognition',
     'Performance Management',
@@ -136,11 +138,43 @@ export class UserManagementComponent implements OnInit {
     'No Access'
   ];
 
+  assignedEmployees: string[] = ['Kobe Bryant', 'Alice Guo', 'Carlo Sotto', 'Harry Roque'];
   employees: string[] = ['Kobe Bryant', 'Alice Guo', 'Carlo Sotto', 'Harry Roque'];
   showCheckboxes = false;
 
   addNewRole() {
     this.showCheckboxes = !this.showCheckboxes;
+  }
+
+  roles: string[] = [];
+  assignedRole: string = '';
+  showRolePopup: boolean = false;
+  newManageRole: string = '';
+
+  openRolePopup() {
+    this.showRolePopup = true;
+  }
+
+  closeRolePopup() {
+    this.showRolePopup = false;
+  }
+
+  confirmRolePopup() {
+    if (this.newManageRole.trim()) {
+      this.roles.push(this.newManageRole.trim());
+    }
+    this.newManageRole = '';
+    this.showRolePopup = false;
+  }
+
+  cancelRolePopup() {
+    this.newManageRole = '';
+    this.showRolePopup = false;
+  }
+
+  // Handle clicking a role in the Manage Roles table
+  onRoleClick(role: string) {
+    this.assignedRole = role;
   }
 
   // Mockdata for Tickets
