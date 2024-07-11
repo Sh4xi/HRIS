@@ -35,19 +35,19 @@
       </ul>
     </nav>
 
-    <!-- Logout Section -->
-    <div class="border-t border-gray-200">
-      <a href="#" class="flex items-center py-3 px-4 text-red-600 hover:text-red-800 hover:bg-red-50 transition-all duration-300 ease-in-out"
-         [ngClass]="{'justify-center': !isExpanded}">
-        <span class="material-icons text-xl transition-transform duration-300 ease-in-out"
-              [ngClass]="{'mr-3': isExpanded, 'scale-125': !isExpanded}">logout</span>
-        <span class="transition-all duration-300 ease-in-out whitespace-nowrap overflow-hidden"
-              [ngClass]="{'opacity-0 max-w-0': !isExpanded, 'opacity-100 max-w-full': isExpanded}">
-          Logout
-        </span>
-      </a>
-    </div>
-  </div>
+<!-- Logout Section -->
+<div class="border-t border-gray-200">
+  <a (click)="signOut($event)" class="flex items-center py-3 px-4 text-red-600 hover:text-red-800 hover:bg-red-50 transition-all duration-300 ease-in-out cursor-pointer"
+     [ngClass]="{'justify-center': !isExpanded}">
+    <span class="material-icons text-xl transition-transform duration-300 ease-in-out"
+          [ngClass]="{'mr-3': isExpanded, 'scale-125': !isExpanded}">logout</span>
+    <span class="transition-all duration-300 ease-in-out whitespace-nowrap overflow-hidden"
+          [ngClass]="{'opacity-0 max-w-0': !isExpanded, 'opacity-100 max-w-full': isExpanded}">
+      Logout
+    </span>
+  </a>
+</div>
+</div>
 
   <!-- Main Content -->
   <div class="flex-1 p-4 transition-all duration-300 ease-in-out"

@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-
+import { SupabaseService } from '../Supabase/supabase.service';
 interface SidebarItem {
   name: string;
   route: string;
@@ -25,7 +25,7 @@ export class SidebarNavigationComponent {
   ];
 
   private routeIconMap: { [key: string]: string } = {
-    '/Dashboard': 'dashboard',
+    '/dashboard': 'dashboard',
     '/user-management': 'group',
     '/system-management': 'settings',
     '/payroll': 'attach_money',
@@ -34,7 +34,10 @@ export class SidebarNavigationComponent {
     '/reports': 'assessment'
   };
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private supabaseService: SupabaseService
+  ) {}
 
   expandSidebar = () => setTimeout(() => this.isExpanded = true, 100);
 
@@ -43,4 +46,14 @@ export class SidebarNavigationComponent {
   navigateTo = (route: string) => this.router.navigate([route]);
 
   getIconForRoute = (route: string): string => this.routeIconMap[route] || 'circle';
+
+  async signOut(event: Event): Promise<void> {
+    event.preventDefault();
+    try {
+      await this.supabaseService.signOut();
+      await this.router.navigate(['/login']);
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
+  }
 }
