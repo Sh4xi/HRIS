@@ -80,7 +80,7 @@ export class UserManagementComponent implements OnInit {
 
   // Functions for Support tickets tab
   paginatedTickets: Ticket[] = [];
-  searchTicketTerm: string  = '';
+  searchTicketTerm: string = '';
   ticket_currentPage: number = 1;
   ticket_itemsPerPage: number = 10;
 
@@ -90,7 +90,6 @@ export class UserManagementComponent implements OnInit {
 
   selectedTicket: any = null;
   isModalVisible = false;
-  showTicketModal = false;
 
   employee = {
     email: '',
@@ -138,18 +137,7 @@ export class UserManagementComponent implements OnInit {
   ];
 
   // Mockdata for Tickets
-  tickets: Ticket[] = [
-    { id: 1, title: 'Issue with login', email: 'user1@example.com', description: 'Cannot login to the system', status: 'read', dateTime: new Date('2024-07-11T10:30:00') },
-    { id: 2, title: 'Page not loading', email: 'user1@example.com', description: 'Homepage takes too long to load', status: 'unread', dateTime: new Date('2024-07-11T10:30:00') },
-    { id: 3, title: 'Error 404', email: 'user1@example.com', description: 'Page not found error when navigating to profile', status: 'read', dateTime: new Date('2024-07-11T10:30:00') },
-    { id: 4, title: 'Feature request', email: 'user2@example.com', description: 'Request for a new feature in the system', status: 'read', dateTime: new Date('2024-07-11T10:30:00') },
-    { id: 5, title: 'Bug in form submission', email: 'user2@example.com', description: 'Form does not submit properly', status: 'unread', dateTime: new Date('2024-07-11T10:30:00')},
-    { id: 6, title: 'Crash on startup', email: 'user3@example.com', description: 'Application crashes on startup', status: 'unread', dateTime: new Date('2024-07-11T10:30:00')},
-    { id: 7, title: 'Performance issue', email: 'user4@example.com', description: 'System performance is slow', status: 'read', dateTime: new Date('2024-07-11T10:30:00')},
-    { id: 8, title: 'UI glitch', email: 'user5@example.com', description: 'Minor UI glitch in dashboard', status: 'unread', dateTime: new Date('2024-07-11T10:30:00')},
-    { id: 9, title: 'Security vulnerability', email: 'user6@example.com', description: 'Potential security vulnerability reported', status: 'read', dateTime: new Date('2024-07-11T10:30:00')},
-    { id: 10, title: 'Database error', email: 'user7@example.com', description: 'Error connecting to database', status: 'unread', dateTime: new Date('2024-07-11T10:30:00')},
-  ];
+  tickets: Ticket[] = [];
 
   privileges = ['View', 'Edit', 'Delete', 'Approve'];
 
@@ -166,9 +154,10 @@ export class UserManagementComponent implements OnInit {
   ];
 
   departmentAccess: AccessRights = {};
+  showPassword: any;
 
   constructor(private supabaseService: SupabaseService) {}
-  
+
   toggleModal() {
     this.showModal = !this.showModal;
     if (this.showModal) {
@@ -419,8 +408,25 @@ async onSubmit() {
     this.filteredTickets = this.tickets;
     this.selectedTickets = new Array(this.tickets.length).fill(false);
     this.updateDateTimeForTickets();
+    this.loadTickets();
+
+  } 
+  // Fetch tickets from the database
+  async loadTickets() {
+    try {
+      const { data, error } = await this.supabaseService.getTickets();
+      if (error) {
+        console.error('Error fetching tickets:', error.message);
+      } else if (data) {
+        this.tickets = data;
+        this.filteredTickets = this.tickets;
+        this.selectedTickets = new Array(this.tickets.length).fill(false);
+        this.ticketUpdatePagination();
+      }
+    } catch (error) {
+      console.error('Error fetching tickets:', error);
+    }
   }
-  showPassword: boolean = false;
 
   
   async loadEmployees() {
@@ -476,9 +482,12 @@ async onSubmit() {
     }
   }
 
+
   toggleUserAccess(user: User) {
     user.access = !user.access;
+    user.status = user.access ? 'Active' : 'Inactive';
   }
+
   togglePasswordVisibility() {
     this.showPassword = !this.showPassword;
   }
@@ -646,14 +655,26 @@ deleteUsers() {
     }
 
     const departmentData = {
-      department: this.newDepartment,
-      accessRights: this.departmentAccess
+      department_name: this.newDepartment,
+      mod_access: this.selectedModules.length > 0 ? this.selectedModules : [],
+      rep_access: this.selectedReports.length > 0 ? this.selectedReports : [],
+      data_access: this.selectedDataAccess.length > 0 ? this.selectedDataAccess : [],
+      privileges: this.selectedPrivileges.length > 0 ? this.selectedPrivileges : [],
     };
-
-    console.log('Saving department:', departmentData);
-    // Implement your logic to save the department data
-
-    this.closeAddDepartmentPopup();
+  
+    this.supabaseService.createDepartment(departmentData)
+    .then(response => {
+      if (response.error) {
+        console.error('Error creating department:', response.error.message);
+      } else {
+        if (response.data) {
+          console.log('Department created successfully:', response.data);
+        } else {
+          console.log('Department created successfully, but no data returned.');
+        }
+        this.closeAddDepartmentPopup();
+      }
+    });
   }
 
   updateSelectedModules(event: any) {
@@ -692,13 +713,13 @@ deleteUsers() {
     }
   }
 
-  // Method to search tickets
-searchTicketTable() {
-  const searchTerm = this.searchTicketTerm.toLowerCase();
-  this.filteredTickets = this.tickets.filter(ticket => 
-    ticket.title.toLowerCase().includes(searchTerm) ||
-    ticket.description.toLowerCase().includes(searchTerm) ||
-    ticket.status.toLowerCase().includes(searchTerm)
+ // Method to search tickets
+  searchTicketTable() {
+    const searchTerm = this.searchTicketTerm.toLowerCase();
+    this.filteredTickets = this.tickets.filter(ticket =>
+      ticket.title.toLowerCase().includes(searchTerm) ||
+      ticket.description.toLowerCase().includes(searchTerm) ||
+      ticket.status.toLowerCase().includes(searchTerm)
     );
     this.ticketUpdatePagination();
   }
