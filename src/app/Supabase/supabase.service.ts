@@ -6,15 +6,23 @@ import { environment } from '../environments/environment';
   providedIn: 'root',
 })
 export class SupabaseService {
-  private supabase: SupabaseClient;
+  uploadPhoto(photoFile: any) {
+    throw new Error('Method not implemented.');
+  }
+  private static instance: SupabaseService;
+  private supabase!: SupabaseClient;
   private isLockAcquired = false;
 
   constructor() {
+    if (SupabaseService.instance) {
+      return SupabaseService.instance;
+    }
     const supabaseUrl = environment.supabaseUrl;
     const supabaseKey = environment.supabaseKey;
     this.supabase = createClient(supabaseUrl, supabaseKey);
     console.log('Supabase client initialized with URL:', supabaseUrl);
     this.setupRealtimeSubscription(); // Setup the real-time subscription
+    SupabaseService.instance = this;
   }
 
   // Automatically reload when the Supabase is updated
@@ -208,20 +216,70 @@ export class SupabaseService {
     return data;
   }
 
-    // Fetch tickets from the database
-    async getTickets() {
-      const { data, error } = await this.supabase
-        .from('ticket')
-        .select('*')
-        .order('dateTime', { ascending: false });
+  // Fetch tickets from the database
+  async getTickets() {
+    const { data, error } = await this.supabase
+      .from('ticket')
+      .select('*')
+      .order('dateTime', { ascending: false });
+    if (error) {
+      console.error('Error fetching tickets:', error);
+      return { data: [], error };
+    }
+    return { data, error };
+  }
+
+  async uploadImage(file: File): Promise<{ data: { url: string } | null, error: Error | null }> {
+    console.log('Uploading image...');
+    try {
+      const { data, error } = await this.supabase.storage
+        .from('photos') // Replace with your Supabase storage bucket name
+        .upload(`employimages/${file.name}`, file, {
+          contentType: file.type
+        });
+
       if (error) {
-        console.error('Error fetching tickets:', error);
-        return { data: [], error };
+        console.error('Error during upload:', error.message);
+        return { data: null, error };
       }
-      return { data, error };
+
+      console.log('Upload successful:', data);
+
+      // Constructing the URL assuming the structure of the response
+      const url = data?.path ? `https://${environment.supabaseUrl}/storage/v1/object/public/${data.path}` : '';
+
+      return { data: { url }, error: null };
+    } catch (error) {
+      console.error('Unexpected error during upload:', error);
+      return { data: null, error: error as Error };
     }
   }
 
+  async setStoragePolicy(): Promise<boolean> {
+    try {
+      const supabaseAny = this.supabase as any; // Cast supabase to any temporarily
+      const { data, error } = await supabaseAny.storage
+        .from('photos')
+        .createPolicy({
+          path: '*',
+          public: false, // Set to true if you want files to be publicly accessible
+          cacheControl: '3600', // Cache control settings in seconds
+          contentType: 'image/jpeg,image/png', // Allowed content types
+          expiration: '2024-12-31T00:00:00Z', // Expiration date for access
+          actions: ['read', 'write'], // Allowed actions: read, write
+          roles: ['authenticated'], // Roles that can access (e.g., authenticated users)
+        });
 
-  
+      if (error) {
+        console.error('Error setting storage policy:', error);
+        return false;
+      }
 
+      console.log('Storage policy set successfully:', data);
+      return true;
+    } catch (error) {
+      console.error('Failed to set storage policy:', error);
+      return false;
+    }
+  }
+}
