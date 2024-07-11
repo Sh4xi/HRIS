@@ -30,9 +30,7 @@ export class SystemManagementComponent {
   parameters: Parameter[] = [];
   scheduleStartTime: string = '';
   scheduleEndTime: string = '';
-
-  // Define auditTrailData property
-  auditTrailData: Parameter[] = [];
+  searchTerm: string = '';
 
   constructor(private router: Router) {}
 
@@ -88,16 +86,42 @@ export class SystemManagementComponent {
     this.router.navigate(['/dtr']);
   }
 
+  goToWorkflow() {
+    this.router.navigate(['/workflow-approval']);
+  }
+
   openTable() {
-    // Populate auditTrailData with existing parameters
-    this.auditTrailData = [...this.parameters];
-    console.log('Audit Trail Data:', this.auditTrailData);
-    this.showAll = false;
-    this.showTable = true;
+    this.showTable = true; // Set showTable to true to display the table
+    this.filteredParameters = this.parameters; // Ensure filtered parameters are populated
   }
 
   closeTable() {
     this.showAll = true;
     this.showTable = false;
+    this.searchTerm = ''; // Reset search term when closing the table
+    // Reset parameters to show all
+    this.filteredParameters = this.parameters;
+  }
+
+  applySearch() {
+    const term = this.searchTerm.toLowerCase().trim();
+    this.filteredParameters = this.parameters.filter(param =>
+      param.name.toLowerCase().includes(term)
+    );
+  }
+
+  // Array to hold filtered parameters
+  filteredParameters: Parameter[] = [];
+
+  // Getter for filtered parameters
+  getFilteredParameters(): Parameter[] {
+    // If no search term, return all parameters
+    if (!this.searchTerm.trim()) {
+      return this.parameters;
+    }
+    // Apply search term filter
+    return this.parameters.filter(param =>
+      param.name.toLowerCase().includes(this.searchTerm.toLowerCase())
+    );
   }
 }
