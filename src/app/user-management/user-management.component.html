@@ -358,71 +358,64 @@
         </div>
         
         <div class="flex gap-10 justify-center">
-          <div class="w-[400px] h-[740p] shadow-xl rounded-xl">
-            <p class="pl-10 pt-10 text-2xl -pb-3 font-black">Manage Roles</p>
-            <table class="table-auto ml-10"> 
-              <tbody>
-                <tr class="h-9 hover:bg-gray-200">
-                  <td>HR Manager</td>
-                </tr>
-                <tr class="h-9 hover:bg-gray-200">
-                  <td>HR Manager</td>
-                </tr>
-                <tr class="h-9 hover:bg-gray-200">
-                  <td>HR Manager</td>
-                </tr>
-                <tr class="h-9 hover:bg-gray-200">
-                  <td>HR Manager</td>
-                </tr>
-                <tr class="h-9 hover:bg-gray-200">
-                  <td>HR Manager</td>
-                </tr>
-                <tr class="h-9 hover:bg-gray-200">
-                  <td>HR Manager</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <div class="flex flex-col gap-10">
-            <div class="w-[400px] h-[350px] shadow-xl rounded-xl">
-              <p class="pl-10 pt-10 text-2xl -pb-3 font-black">Assigned for HR Manager</p>
-              <table class="table-auto ml-10"> 
-                <tbody>
-                  <tr class="h-9">
-                    <td>Kobe Bryant</td>
-                  </tr>
-                  <tr class="h-9">
-                    <td>Alice Guo</td>
-                  </tr>
-                  <tr class="h-9">
-                    <td>Carlo Sotto</td>
-                  </tr>
-                  <tr class="h-9">
-                    <td>Harry Roque</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <div class="w-[400px] h-[350px] shadow-xl rounded-xl">
-            </div>
-          </div>
-          <div class="w-[400px] h-[740px] shadow-xl rounded-xl">
-            <div class="flex justify-between items-center">
-              <p class="pl-10 pt-10 text-2xl font-black">All Employees</p>
-              <button class="bg-blue-500 text-white px-4 py-2 rounded mt-10 mr-10" (click)="addNewRole()">Add Role</button>
-            </div>
-            <table class="table-auto ml-10"> 
-              <tbody>
-                <tr class="h-9 hover:bg-gray-200" *ngFor="let employee of employees">
-                  <td *ngIf="showCheckboxes">
-                    <input type="checkbox">
-                  </td>
-                  <td>{{ employee }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
+  <div class="w-[400px] h-[740px] shadow-xl rounded-xl">
+    <div class="flex justify-between items-center">
+      <p class="pl-10 pt-10 text-2xl font-black">Manage Roles</p>
+      <button class="bg-blue-500 text-white px-4 py-2 rounded mt-10 mr-10" (click)="openRolePopup()">Add Role</button>
+    </div>
+    <table class="table-auto ml-10"> 
+      <tbody>
+        <tr class="h-9 hover:bg-gray-200" *ngFor="let role of roles" (click)="onRoleClick(role)">
+          <td>{{ role }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  
+  <div class="flex flex-col gap-10">
+    <div class="w-[400px] h-[350px] shadow-xl rounded-xl">
+      <p class="pl-10 pt-10 text-2xl pb-3 font-black">Assigned for {{ assignedRole }}</p>
+      <table class="table-auto ml-10"> 
+        <tbody>
+          <tr class="h-9" *ngFor="let employee of assignedEmployees">
+            <td>{{ employee }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="w-[400px] h-[350px] shadow-xl rounded-xl">
+    </div>
+  </div>
+  
+  <div class="w-[400px] h-[740px] shadow-xl rounded-xl">
+    <div class="flex justify-between items-center">
+      <p class="pl-10 pt-10 text-2xl font-black">All Employees</p>
+      <button class="bg-blue-500 text-white px-4 py-2 rounded mt-10 mr-10" (click)="addNewRole()">Assign</button>
+    </div>
+    <table class="table-auto ml-10"> 
+      <tbody>
+        <tr class="h-9" *ngFor="let employee of employees">
+          <td *ngIf="showCheckboxes">
+            <input type="checkbox">
+          </td>
+          <td>{{ employee }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+        <!-- Popup Modal -->
+<div *ngIf="showRolePopup" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
+  <div class="bg-white p-6 rounded-lg shadow-lg">
+    <h2 class="text-xl font-bold mb-4">Add Role</h2>
+    <input [(ngModel)]="newManageRole" type="text" placeholder="Enter role" class="border p-2 mb-4 w-full"/>
+    <div class="flex justify-end">
+      <button (click)="confirmRolePopup()" class="bg-blue-500 text-white px-4 py-2 rounded mr-2">Confirm</button>
+      <button (click)="cancelRolePopup()" class="bg-gray-500 text-white px-4 py-2 rounded">Cancel</button>
+    </div>
+  </div>
+</div>
         
         <!-- <div class="flex grid-cols-1 md:grid-cols-2 gap-8 justify-center items-center">
           <div class="bg-white shadow-lg rounded-lg p-4 w-1/2 max-w-2xl">
