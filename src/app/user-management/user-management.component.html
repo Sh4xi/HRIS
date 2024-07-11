@@ -7,11 +7,10 @@
     <!-- Main componenet -->
 <div class="bg-white min-h-screen">
   <header class="bg-white text-center py-4 px-4 sm:px-6">
-    <h1 class="text-xl sm:text-2xl">User Management System</h1>
+    <h1 class="text-m sm:text-2xl">User Management System</h1>
   </header>
 
   <main class="p-6">
-    <h1 class="text-white">Employees</h1>
 
     <div class="flex mb-6">
       <button (click)="setActiveTab('users')" [ngClass]="activeTab === 'users' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-500'" class="mr-4">Users</button>
@@ -109,7 +108,7 @@
 <div *ngIf="activeTab === 'users'" class="flex flex-col h-screen">
   <section id="user-list" class="flex flex-col h-full">
     <div class="mb-4 flex flex-col md:flex-row md:justify-between md:items-center">
-      <input type="text" [(ngModel)]="searchTerm" (input)="searchTable()" placeholder="Search..." class="w-full md:w-1/2 p-2 border rounded-lg mb-2 md:mb-0">>
+      <input type="text" [(ngModel)]="searchTerm" (input)="searchTable()" placeholder="Search..." class="w-full md:w-1/2 p-2 border rounded-lg mb-2 md:mb-0">
       <div class="flex space-x-4">
         <!-- Delete button only displayed when in editing mode -->
         <button *ngIf="isEditing" class="bg-red-500 text-white px-4 py-2 rounded-lg" (click)="deleteUsers()">
