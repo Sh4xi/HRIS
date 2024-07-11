@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { SidebarNavigationModule } from './../sidebar-navigation/sidebar-navigation.module';
 
 interface Parameter {
   name: string;
@@ -12,7 +13,7 @@ interface Parameter {
 @Component({
   selector: 'app-system-management',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, SidebarNavigationModule],
   templateUrl: './system-management.component.html',
   styleUrl: './system-management.component.css'
 })
@@ -23,11 +24,11 @@ export class SystemManagementComponent {
   parameterName: string = '';
   selectedType: string = '';
   types: string[] = ['Holiday', 'OT Type', 'Schedule', 'Leave'];
-  holidayDate: string = ''; // New property for holiday date
-  parameters: Parameter[] = []; // List to store parameters
-  hasHolidayParameter: boolean = false; // Flag to indicate if there is any 'Holiday' parameter
+  holidayDate: string = '';
+  parameters: Parameter[] = [];
+  hasHolidayParameter: boolean = false;
 
-  constructor(private router: Router) {} // Inject Router
+  constructor(private router: Router) {}
 
   openPopup() {
     this.showPopup = true;
@@ -44,8 +45,8 @@ export class SystemManagementComponent {
       type: this.selectedType,
       date: this.selectedType === 'Holiday' ? this.holidayDate : undefined
     };
-    this.parameters.push(newParameter); // Save the new parameter
-    this.hasHolidayParameter = this.parameters.some(p => p.type === 'Holiday'); // Update flag
+    this.parameters.push(newParameter);
+    this.hasHolidayParameter = this.parameters.some(p => p.type === 'Holiday');
     this.closePopup();
   }
 
@@ -55,7 +56,6 @@ export class SystemManagementComponent {
     this.holidayDate = '';
   }
 
-  // Navigate to Audit Trail
   goToAuditTrail() {
     this.router.navigate(['/audit-trail']);
   }
@@ -63,7 +63,7 @@ export class SystemManagementComponent {
   goToDTR() {
     this.router.navigate(['/dtr']);
   }
-  
+
   openTable() {
     this.showAll = false;
     this.showTable = true;
