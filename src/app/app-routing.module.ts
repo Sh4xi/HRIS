@@ -9,6 +9,7 @@ import { SystemManagementComponent } from './system-management/system-management
 import { AuditTrailComponent } from './audit-trail/audit-trail.component';
 import { WorkflowComponent } from './workflow-approval/workflow-approval.component';
 import { AuthGuard } from './auth/auth.guard';
+import { SidebarNavigationComponent } from './sidebar-navigation/sidebar-navigation.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -20,6 +21,7 @@ const routes: Routes = [
   { path: 'system-management', component: SystemManagementComponent },
   { path: 'audit-trail', component: AuditTrailComponent },
   { path: 'workflow-approval', component: WorkflowComponent },
+  {path: 'sidebar-navigation', component: SidebarNavigationComponent},
   { path: '**', redirectTo: '/login' } // Wildcard route for a 404 page
 ];
 

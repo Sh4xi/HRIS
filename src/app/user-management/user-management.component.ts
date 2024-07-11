@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SupabaseService } from '../Supabase/supabase.service';
+import { SidebarNavigationModule } from './../sidebar-navigation/sidebar-navigation.module';
 
 interface AccessRights {
   [key: string]: boolean;
@@ -43,7 +44,7 @@ interface Ticket {
 @Component({
   selector: 'app-user-management',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, SidebarNavigationModule],
   templateUrl: './user-management.component.html',
   styleUrls: ['./user-management.component.css']
 })
