@@ -488,6 +488,11 @@ async onSubmit() {
     user.status = user.access ? 'Active' : 'Inactive';
   }
 
+  // ticketStatus(ticket: Ticket){
+  //   ticket.status = !ticket;
+  //   ticket.status = ticket.status? 'Open' : 'Closed' : 'In-progress';
+  // }
+
   togglePasswordVisibility() {
     this.showPassword = !this.showPassword;
   }

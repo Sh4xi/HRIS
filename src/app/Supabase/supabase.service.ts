@@ -4,9 +4,18 @@ import { createClient, SupabaseClient, User, Session, PostgrestSingleResponse, P
 import { environment } from '../environments/environment';
 import { BehaviorSubject, Observable } from 'rxjs';
 
+
+interface Ticket {
+  id: number;
+  // Add other fields as per your ticket structure
+  status: string; // Assuming 'status' is a field in your ticket table
+  adminViewedDateTime?: Date; // Optional field indicating when admin viewed/opened the ticket
+}
+
 @Injectable({
   providedIn: 'root',
 })
+
 export class SupabaseService {
   uploadPhoto(photoFile: any) {
     throw new Error('Method not implemented.');

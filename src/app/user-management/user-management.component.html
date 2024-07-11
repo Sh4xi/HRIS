@@ -43,38 +43,45 @@
     </div>
       
 <!-- Table for support tickets -->
-    <div class="overflow-x-auto">
-      <table class="min-w-full text-sm text-left text-gray-500 dark:text-gray-400 border-collapse rounded-lg shadow-lg bg-white">
-        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-          <tr>
-            <th scope="col" class="p-4"><input type="checkbox" (click)="toggleAllTickets()"></th>
-            <th scope="col" class="px-6 py-3">Ticket ID</th>
-            <th scope="col" class="px-6 py-3">Title</th>
-            <th scope="col" class="px-6 py-3">Email</th>
-            <th scope="col" class="px-6 py-3">Description</th>
-            <th scope="col" class="px-6 py-3">Status</th>
-            <th scope="col" class="px-6 py-3">Date</th>
-            <th scope="col" class="px-6 py-3">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let ticket of filteredTickets; let i = index" class="border-b border-gray-200 hover:bg-gray-100" (click)="openTicketDetails(ticket)">
-            <td class="p-4">
-              <input type="checkbox" [(ngModel)]="selectedTickets[i]" (click)="$event.stopPropagation()">
-            </td>
-            <td class="px-6 py-3">{{ ticket.id }}</td>
-            <td class="px-6 py-3">{{ ticket.title }}</td>
-            <td class="px-6 py-3">{{ ticket.email }}</td>
-            <td class="px-6 py-3">{{ ticket.description }}</td>
-            <td class="px-6 py-3">{{ ticket.status }}</td>
-            <td class="px-6 py-3">{{ ticket.dateTime | date:'short' }}</td> <!-- Adjust this line to format the date and time -->
-            <td class="px-6 py-3">
-              <button class="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded-lg" (click)="deleteTicket(ticket.id); $event.stopPropagation()">Delete</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+<div class="overflow-x-auto">
+  <table class="min-w-full text-sm text-center text-black dark:text-gray-700 border-collapse rounded-lg shadow-lg bg-white">
+    <thead class="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-300 dark:text-black">
+      <tr>
+        <th scope="col" class="p-4"><input type="checkbox" (click)="toggleAllTickets()"></th>
+        <th scope="col" class="px-6 py-3">Ticket ID</th>
+        <th scope="col" class="px-6 py-3">Title</th>
+        <th scope="col" class="px-6 py-3">Email</th>
+        <th scope="col" class="px-6 py-3">Description</th>
+        <th scope="col" class="px-6 py-3">Status</th>
+        <th scope="col" class="px-6 py-3">Date</th>
+        <th scope="col" class="px-6 py-3">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let ticket of filteredTickets; let i = index" class="border-b border-gray-200 hover:bg-gray-100" (click)="openTicketDetails(ticket)">
+        <td class="p-4">
+          <input type="checkbox" [(ngModel)]="selectedTickets[i]" (click)="$event.stopPropagation()">
+        </td>
+        <td class="px-6 py-3">{{ ticket.id }}</td>
+        <td class="px-6 py-3">{{ ticket.title }}</td>
+        <td class="px-6 py-3">{{ ticket.email }}</td>
+        <td class="px-6 py-3">{{ ticket.description }}</td>
+        <td class="px-6 py-3">
+          <span [ngClass]="{
+            'text-green-700 bg-green-300 py-1 px-3 rounded-full text-xs': ticket.status === 'Open',
+            'text-blue-700 bg-blue-300 py-1 px-3 rounded-full text-xs': ticket.status === 'In Progress',
+            'text-red-700 bg-red-300 py-1 px-3 rounded-full text-xs': ticket.status === 'Closed'}">{{ ticket.status }}
+          </span>
+        </td>
+        <td class="px-6 py-3">{{ ticket.dateTime | date:'MMMM d, yyyy' }}</td>        
+          <td class="px-6 py-3">
+          <button class="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded-lg" (click)="deleteTicket(ticket.id); $event.stopPropagation()">Delete</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
 </section>
 
 <!-- Paginations for users tab -->
@@ -86,23 +93,28 @@
     </div>
     
 <!-- Ticket Details Modal -->
-    <div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50" *ngIf="isModalVisible">
-      <div class="bg-white rounded-lg p-4 max-w-md w-full">
-        <div class="flex justify-between items-center border-b pb-2">
-          <h2 class="text-xl font-semibold">Ticket Details</h2>
-          <button class="text-gray-500 hover:text-gray-700" (click)="closeModal()">X</button>
-        </div>
-        <div class="mt-4">
-          <p><strong>Title:</strong> {{ selectedTicket?.title }}</p>
-          <p><strong>Description:</strong> {{ selectedTicket?.description }}</p>
-          <p><strong>Email:</strong> {{ selectedTicket?.email }}</p>
-          <p><strong>Status:</strong> {{ selectedTicket?.status }}</p>
-        </div>
-        <div class="mt-4 flex justify-end">
-          <button class="bg-gray-500 text-white px-4 py-2 rounded" (click)="closeModal()">Close</button>
-        </div>
-      </div>
+<div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50" *ngIf="isModalVisible">
+  <div class="bg-white rounded-lg p-4 max-w-md w-full">
+    <div class="flex justify-between items-center border-b pb-2">
+      <h2 class="text-xl font-semibold">Ticket Details</h2>
+      <button class="text-gray-500 hover:text-gray-700" (click)="closeModal()">X</button>
     </div>
+    <div class="mt-4">
+      <p><strong>Title:</strong> {{ selectedTicket?.title }}</p>
+      <p><strong>Description:</strong> {{ selectedTicket?.description }}</p>
+      <p><strong>Email:</strong> {{ selectedTicket?.email }}</p>
+      <p><strong>Status: </strong>
+        <span [ngClass]="{
+          'text-green-600': selectedTicket?.status === 'Open',
+          'text-blue-600': selectedTicket?.status === 'In Progress',
+          'text-red-600': selectedTicket?.status === 'Closed'}">{{ selectedTicket?.status }}</span>
+      </p>
+    </div>
+    <div class="mt-4 flex justify-end">
+      <button class="bg-gray-500 text-white px-4 py-2 rounded" (click)="closeModal()">Close</button>
+    </div>
+  </div>
+</div>
 
 <!-- Users active tab -->
 <div *ngIf="activeTab === 'users'" class="flex flex-col h-screen">
@@ -251,11 +263,11 @@
         </div>
       </div>
 
-<!-- Managing Roles -->
+<!-- Users active tab -->
       <div *ngIf="filteredUsers.length > 0" class="p-4 rounded-lg shadow-lg bg-white">
         <table class="w-full md:min-w-full border-collapse">
           <thead>
-            <tr class="bg-gray-100 text-gray-700 uppercase text-sm leading-normal">
+            <tr class="bg-gray-300 text-gray-700 uppercase text-sm leading-normal">
               <th *ngIf="isEditing" class="py-3 px-6 text-center">Select</th>
               <th class="py-3 px-6 text-left">Profile</th>
               <th class="py-3 px-6 text-left">Name</th>
@@ -290,9 +302,7 @@
               <td class="py-3 px-6 text-left">
                 <span [ngClass]="{
                   'bg-green-200 text-green-600': user.status === 'Active',
-                  'bg-red-200 text-red-600': user.status === 'Inactive'
-                }" class="py-1 px-3 rounded-full text-xs">
-                  {{ user.status }}
+                  'bg-red-200 text-red-600': user.status === 'Inactive'}" class="py-1 px-3 rounded-full text-xs">{{ user.status }}
                 </span>
               </td>
               <td class="py-3 px-6 text-center">
