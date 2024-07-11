@@ -62,17 +62,16 @@ export class LoginComponent {
     this.errorMessage = '';
 
     try {
-      const { data, error } = await this.supabaseService.authenticateUser(this.email, this.password);
+      const success = await this.supabaseService.signIn(this.email, this.password);
 
       this.isLoading = false;
 
-      if (error) {
+      if (!success) {
         this.handleLoginFailure('Invalid email or password. Please try again.');
       } else {
-        console.log('User authenticated!', data);
+        console.log('User authenticated!');
         this.errorMessage = '';
         this.loginAttemptService.resetLoginAttempts();
-        localStorage.setItem('token', data.access_token); // Store the token for authentication
         this.router.navigate(['/dashboard']); // Redirect to the dashboard
       }
     } catch (error) {
@@ -86,5 +85,3 @@ export class LoginComponent {
     this.errorMessage = message;
   }
 }
-
-

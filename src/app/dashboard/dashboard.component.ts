@@ -66,6 +66,7 @@ export class DashboardComponent implements OnInit {
   navigateTo(route: string) {
     this.router.navigate([route]);
   }
+
   expandSidebar() {
     setTimeout(() => {
       this.isExpanded = true;
@@ -88,6 +89,15 @@ export class DashboardComponent implements OnInit {
       case '/recruitment': return 'person_add';
       case '/reports': return 'assessment';
       default: return 'circle';
+    }
+  }
+
+  async signOut() {
+    try {
+      await this.supabaseService.signOut();
+      this.router.navigate(['/login']);
+    } catch (error) {
+      console.error('Error signing out:', error);
     }
   }
 }
