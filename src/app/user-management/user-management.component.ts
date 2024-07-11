@@ -136,6 +136,13 @@ export class UserManagementComponent implements OnInit {
     'No Access'
   ];
 
+  employees: string[] = ['Kobe Bryant', 'Alice Guo', 'Carlo Sotto', 'Harry Roque'];
+  showCheckboxes = false;
+
+  addNewRole() {
+    this.showCheckboxes = !this.showCheckboxes;
+  }
+
   // Mockdata for Tickets
   tickets: Ticket[] = [];
 
