@@ -101,13 +101,12 @@
     </div>
     <div class="mt-4">
       <p><strong>Title:</strong> {{ selectedTicket?.title }}</p>
-      <p><strong>Description:</strong> {{ selectedTicket?.description }}</p>
       <p><strong>Email:</strong> {{ selectedTicket?.email }}</p>
-      <p><strong>Status: </strong>
-        <span [ngClass]="{
-          'text-green-600': selectedTicket?.status === 'Open',
-          'text-blue-600': selectedTicket?.status === 'In Progress',
-          'text-red-600': selectedTicket?.status === 'Closed'}">{{ selectedTicket?.status }}</span>
+      <p><strong>Status: </strong><span [ngClass]="{
+        'text-green-600': selectedTicket?.status === 'Open',
+        'text-blue-600': selectedTicket?.status === 'In Progress',
+        'text-red-600': selectedTicket?.status === 'Closed'}">{{ selectedTicket?.status }}</span>
+      <p><strong>Description:</strong> {{ selectedTicket?.description }}
       </p>
     </div>
     <div class="mt-4 flex justify-end">
