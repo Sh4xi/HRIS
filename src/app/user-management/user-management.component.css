@@ -52,6 +52,14 @@
     font-size: 10px;
     font-weight: bold;
   }
+
+  .truncate-text {
+    /* Ensure text is truncated and overflow is hidden */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap; /* Ensure text stays in one line */
+  }
+  
   
   .on { left: 60%; }
   .off { left: 40%; }
