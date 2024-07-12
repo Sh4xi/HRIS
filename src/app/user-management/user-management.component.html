@@ -395,11 +395,11 @@
     </div>
     <table class="table-auto ml-10"> 
       <tbody>
-        <tr class="h-9" *ngFor="let employee of employees">
+        <tr class="h-9" *ngFor="let emp of employees">
           <td *ngIf="showCheckboxes">
             <input type="checkbox">
           </td>
-          <td>{{ employee }}</td>
+          <td>{{ emp.firstname }} {{ emp.midname }} {{ emp.surname }}</td>
         </tr>
       </tbody>
     </table>

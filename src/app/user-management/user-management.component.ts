@@ -63,6 +63,7 @@ export class UserManagementComponent implements OnInit {
   showManagePopup = false;
   showAddPopup = false;
   showEditPopup = false;
+  employees: any[] = [];
 
   showAccessRightsPopup = false;
   showAddDepartmentPopup = false;
@@ -139,7 +140,6 @@ export class UserManagementComponent implements OnInit {
   ];
 
   assignedEmployees: string[] = ['Kobe Bryant', 'Alice Guo', 'Carlo Sotto', 'Harry Roque'];
-  employees: string[] = ['Kobe Bryant', 'Alice Guo', 'Carlo Sotto', 'Harry Roque'];
   showCheckboxes = false;
 
   addNewRole() {
@@ -465,8 +465,27 @@ export class UserManagementComponent implements OnInit {
     this.selectedTickets = new Array(this.tickets.length).fill(false);
     this.updateDateTimeForTickets();
     this.loadTickets();
+    this.loadEmployeeNames();
 
   } 
+
+    // Added method to fetch employee names
+    loadEmployeeNames(): void {
+      this.supabaseService.getEmployeeNames().then(data => {
+        if (data) {  // Ensure data is not null
+          this.employees = data.map(emp => ({
+            firstname: emp.first_name,
+            midname: emp.mid_name,
+            surname: emp.surname
+          }));
+        } else {
+          console.error('No employee data found.');
+        }
+      }).catch(error => {
+        console.error('Error fetching employees:', error);
+      });
+    }
+
   // Fetch tickets from the database
   async loadTickets() {
     try {
