@@ -25,6 +25,8 @@ export class WorkflowApprovalUserComponent implements OnInit {
   };
   selectedStatus: string = '';
   searchTerm: string = '';
+  currentPage!: number;
+  totalPages!: number;
 
   constructor() {
     console.log('Initializing Supabase client...');
@@ -153,6 +155,21 @@ export class WorkflowApprovalUserComponent implements OnInit {
   trackById(index: number, workflow: any) {
     return workflow.id;
   }
+
+  async previousPage() {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      await this.fetchUserWorkflows();
+    }
+  }
+
+  async nextPage() {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      await this.fetchUserWorkflows();
+    }
+  }
+
 
   openUploadModal() {
     this.showUploadModal = true;
