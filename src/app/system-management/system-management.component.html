@@ -2,6 +2,9 @@
   <app-sidebar-navigation></app-sidebar-navigation>
   <div class="flex-grow">
     <div class="flex flex-col items-center px-16 pt-5 pb-20 w-full bg-white max-md:px-5 max-md:max-w-full">
+      <div *ngIf="message" [class]="isError ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'" class="p-4 rounded-md mb-4 w-full max-w-[960px]">
+        {{ message }}
+      </div>
       <div *ngIf="!showTable" class="flex flex-col p-4 mb-96 w-full max-w-[960px] max-md:mb-10 max-md:max-w-full">
         <div class="self-start text-3xl font-bold text-neutral-900 max-md:max-w-full">System Management</div>
         <div class="self-start mt-3 text-sm leading-5 text-slate-500 max-md:max-w-full">Configure system settings and manage your organization's data</div>
@@ -114,7 +117,7 @@
           </div>
           <!-- Table displaying parameters -->
           <div class="overflow-x-auto bg-white shadow-md rounded-lg">
-            <table class="w-full text-left border-collapse">
+            <table class="w-full text-left border-collapse" *ngIf="filteredParameters && filteredParameters.length > 0">
               <thead class="bg-gray-50">
                 <tr>
                   <th class="px-6 py-4 text-sm font-thin text-gray-600 tracking-wider">Parameter Name</th>
@@ -125,15 +128,16 @@
               </thead>
               <tbody class="bg-white divide-y divide-gray-200">
                 <tr *ngFor="let param of filteredParameters">
-                  <td class="px-6 py-4 whitespace-nowrap">{{ param.name }}</td>
-                  <td class="px-6 py-4 whitespace-nowrap">{{ param.type }}</td>
-                  <td class="px-6 py-4 whitespace-nowrap">{{ param.date ? (param.date | date:'mediumDate') : '-' }}</td>
-                  <td class="px-6 py-4 whitespace-nowrap">
-                    {{ param.startTime ? (param.startTime + ' - ' + param.endTime) : '-' }}
-                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">{{ param.parameter_name || 'N/A' }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap">{{ param.parameter_type || 'N/A' }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap">{{ param.parameter_date ? (param.parameter_date | date:'mediumDate') : '-' }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap">{{ param.parameter_time || '-' }}</td>
                 </tr>
-              </tbody>
+              </tbody>              
             </table>
+            <div *ngIf="!filteredParameters || filteredParameters.length === 0" class="p-4 text-center text-gray-500">
+              No parameters found.
+            </div>
           </div>
         </div>
       </div>

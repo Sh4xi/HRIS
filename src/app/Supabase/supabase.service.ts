@@ -433,4 +433,22 @@ export class SupabaseService {
       console.error('Error logging action:', error);
     }
   }
+
+  //parameters
+  async getParameters() {
+    const { data, error } = await this.supabase
+      .from('parameters')
+      .select('*');
+    if (error) throw error;
+    return data;
+  }
+
+  async createParameter(parameter: any) {
+    const { data, error } = await this.supabase
+      .from('parameters')
+      .insert(parameter);
+    if (error) throw error;
+    return data;
+  }
+
 }

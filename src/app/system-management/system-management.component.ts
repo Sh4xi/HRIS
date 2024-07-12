@@ -1,15 +1,15 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { SidebarNavigationModule } from './../sidebar-navigation/sidebar-navigation.module';
+import { SupabaseService } from '../Supabase/supabase.service';
 
 interface Parameter {
-  name: string;
-  type: string;
-  date?: string;
-  startTime?: string;
-  endTime?: string;
+  parameter_name: string;
+  parameter_type: string;
+  parameter_date?: string | null;
+  parameter_time?: string | null;
 }
 
 @Component({
@@ -19,7 +19,7 @@ interface Parameter {
   templateUrl: './system-management.component.html',
   styleUrls: ['./system-management.component.css']
 })
-export class SystemManagementComponent {
+export class SystemManagementComponent implements OnInit {
   showPopup = false;
   showTable = false;
   showAll = true;
@@ -31,15 +31,22 @@ export class SystemManagementComponent {
   scheduleStartTime: string = '';
   scheduleEndTime: string = '';
   searchTerm: string = '';
+  filteredParameters: Parameter[] = [];
+  message: string = '';
+  isError: boolean = false;
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private supabaseService: SupabaseService) {}
+
+  ngOnInit() {
+    this.loadParameters();
+  }
 
   get hasHolidayParameter(): boolean {
-    return this.parameters.some(p => p.type === 'Holiday');
+    return this.parameters.some(p => p.parameter_type === 'Holiday');
   }
 
   get hasScheduleParameter(): boolean {
-    return this.parameters.some(p => p.type === 'Schedule');
+    return this.parameters.some(p => p.parameter_type === 'Schedule');
   }
 
   openPopup() {
@@ -49,25 +56,6 @@ export class SystemManagementComponent {
   closePopup() {
     this.showPopup = false;
     this.resetForm();
-  }
-
-  saveParameter() {
-    const newParameter: Parameter = {
-      name: this.parameterName,
-      type: this.selectedType
-    };
-
-    if (this.selectedType === 'Holiday') {
-      newParameter.date = this.holidayDate;
-    } else if (this.selectedType === 'Schedule') {
-      newParameter.startTime = this.scheduleStartTime;
-      newParameter.endTime = this.scheduleEndTime;
-    }
-
-    this.parameters.push(newParameter);
-    console.log('New parameter saved:', newParameter);
-    console.log('Current parameters:', this.parameters);
-    this.closePopup();
   }
 
   resetForm() {
@@ -93,38 +81,80 @@ export class SystemManagementComponent {
   goToApproval() {
     this.router.navigate(['/workflow-approval']);
   }
+
   openTable() {
-    this.showTable = true; // Set showTable to true to display the table
-    this.filteredParameters = this.parameters; // Ensure filtered parameters are populated
+    this.showTable = true;
+    this.loadParameters(); // Make sure to load parameters when opening the table
   }
 
   closeTable() {
     this.showAll = true;
     this.showTable = false;
-    this.searchTerm = ''; // Reset search term when closing the table
-    // Reset parameters to show all
+    this.searchTerm = '';
     this.filteredParameters = this.parameters;
   }
 
   applySearch() {
     const term = this.searchTerm.toLowerCase().trim();
     this.filteredParameters = this.parameters.filter(param =>
-      param.name.toLowerCase().includes(term)
+      param.parameter_name.toLowerCase().includes(term)
     );
   }
 
-  // Array to hold filtered parameters
-  filteredParameters: Parameter[] = [];
-
-  // Getter for filtered parameters
   getFilteredParameters(): Parameter[] {
-    // If no search term, return all parameters
     if (!this.searchTerm.trim()) {
       return this.parameters;
     }
-    // Apply search term filter
     return this.parameters.filter(param =>
-      param.name.toLowerCase().includes(this.searchTerm.toLowerCase())
+      param.parameter_name.toLowerCase().includes(this.searchTerm.toLowerCase())
     );
+  }
+
+  //parameters
+
+  showMessage(msg: string, isError: boolean = false) {
+    this.message = msg;
+    this.isError = isError;
+    setTimeout(() => {
+      this.message = '';
+      this.isError = false;
+    }, 3000);
+  }
+
+  async loadParameters() {
+    try {
+      const data = await this.supabaseService.getParameters();
+      this.parameters = data;
+      this.filteredParameters = data;
+      console.log('Loaded parameters:', this.parameters);
+      if (this.parameters.length > 0) {
+        console.log('First parameter:', this.parameters[0]);
+        console.log('Parameter name:', this.parameters[0].parameter_name);
+      }
+    } catch (error) {
+      console.error('Error loading parameters:', error);
+      this.showMessage('Failed to load parameters', true);
+    }
+  }
+  
+  
+
+  async saveParameter() {
+    const newParameter: Parameter = {
+      parameter_name: this.parameterName,
+      parameter_type: this.selectedType,
+      parameter_date: this.selectedType === 'Holiday' ? this.holidayDate : null,
+      parameter_time: this.selectedType === 'Schedule' ? `${this.scheduleStartTime}-${this.scheduleEndTime}` : null
+    };
+
+    try {
+      await this.supabaseService.createParameter(newParameter);
+      await this.loadParameters();
+      this.closePopup();
+      this.showMessage('Parameter saved successfully');
+    } catch (error) {
+      console.error('Error saving parameter:', error);
+      this.showMessage('Failed to save parameter', true);
+    }
   }
 }
