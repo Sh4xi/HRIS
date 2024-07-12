@@ -344,19 +344,28 @@ export class SupabaseService {
     return data;
   }
 
-  // Fetch tickets from the database
-  async getTickets() {
-    const { data, error } = await this.supabase
+
+
+  async deleteTicket(ticketId: number) {
+    return await this.supabase
       .from('ticket')
-      .select('*')
-      .order('dateTime', { ascending: false });
-    if (error) {
-      console.error('Error fetching tickets:', error);
-      return { data: [], error };
-    }
-    return { data, error };
+      .delete()
+      .eq('id', ticketId);
   }
 
+    // Fetch tickets from the database
+    async getTickets() {
+      const { data, error } = await this.supabase
+        .from('ticket')
+        .select('*')
+        .order('dateTime', { ascending: false });
+      if (error) {
+        console.error('Error fetching tickets:', error);
+        return { data: [], error };
+      }
+      return { data, error };
+    }
+  
   async uploadImage(file: File): Promise<{ data: { url: string } | null, error: Error | null }> {
     console.log('Uploading image...');
     try {

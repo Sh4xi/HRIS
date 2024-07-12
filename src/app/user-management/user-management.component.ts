@@ -819,132 +819,154 @@ toggleAllTickets() {
     this.selectedTickets.fill(!selectAll);
   }
 
+
 // Method to get selected tickets
 getSelectedTickets(): Ticket[] {
-    return this.tickets.filter((ticket, index) => this.selectedTickets[index]);
-  }
+  return this.tickets.filter((ticket, index) => this.selectedTickets[index]);
+}
 
 // Method to update a ticket
-updateTicket(updatedTicket: Ticket) {             // Neeed to fix
-  const index = this.tickets.findIndex(ticket => ticket.id === updatedTicket.id);
-  if (index !== -1) {
-    this.tickets[index] = updatedTicket;
-    this.filteredTickets = [...this.tickets];
-    this.ticketUpdatePagination();
-    }
+updateTicket(updatedTicket: Ticket) {
+const index = this.tickets.findIndex(ticket => ticket.id === updatedTicket.id);
+if (index !== -1) {
+  this.tickets[index] = updatedTicket;
+  this.filteredTickets = [...this.tickets];
+  this.ticketUpdatePagination();
   }
+}
 
 // Method to delete a ticket
-deleteTicket(ticketId: number) {           // Need to Fix
-  const index = this.tickets.findIndex(ticket => ticket.id === ticketId);
-  if (index !== -1) {
-    this.tickets.splice(index, 1);
-    this.filteredTickets = [...this.tickets];
-    this.selectedTickets.splice(index, 1);
-    this.ticketUpdatePagination();
-    }
+deleteTicket(ticketId: number) {
+const index = this.tickets.findIndex(ticket => ticket.id === ticketId);
+if (index !== -1) {
+  this.tickets.splice(index, 1);
+  this.filteredTickets = [...this.tickets];
+  this.selectedTickets.splice(index, 1);
+  this.ticketUpdatePagination();
   }
+}
 
 // Method to delete selected tickets
-deleteSelectedTickets() {               // Need to fix
-  const selectedIndexes = this.selectedTickets
-    .map((selected, index) => selected ? index : -1)
-    .filter(index => index !== -1);
+async deleteSelectedTickets() {
+const selectedTickets = this.getSelectedTickets();
+if (selectedTickets.length === 0) {
+  console.log("No tickets selected for deletion");
+  return;
+}
 
-  for (let i = selectedIndexes.length - 1; i >= 0; i--) {
-    const index = selectedIndexes[i];
-    this.tickets.splice(index, 1);
-    this.selectedTickets.splice(index, 1);
+try {
+  for (const ticket of selectedTickets) {
+    const { error } = await this.supabaseService.deleteTicket(ticket.id);
+    if (error) {
+      console.error(`Error deleting ticket ${ticket.id}:`, error.message);
+    } else {
+      console.log(`Ticket ${ticket.id} deleted successfully`);
     }
-    this.filteredTickets = [...this.tickets];
-    this.ticketUpdatePagination();
   }
 
-// // Method to prompt user for filter options
-// promptFilterOptions() {
-//   const markAsRead = confirm("Mark all tickets as read? Click 'Cancel' to mark all as unread.");
-//   if (markAsRead) {
-//     this.markAllAsRead();
-//     } else {
-//     this.markAllAsUnread();
-//     }
-//   }
+  // Remove deleted tickets from local arrays
+  this.tickets = this.tickets.filter(ticket => !selectedTickets.includes(ticket));
+  this.filteredTickets = this.filteredTickets.filter(ticket => !selectedTickets.includes(ticket));
+  this.selectedTickets = this.selectedTickets.filter((_, index) => !this.selectedTickets[index]);
+
+  console.log(`Deleted ${selectedTickets.length} tickets`);
+
+  // Update pagination
+  this.ticketUpdatePagination();
+
+  // Refresh the ticket list
+  await this.loadTickets();
+} catch (error) {
+  console.error('Error deleting tickets:', error);
+}
+}
+
+// Method to prompt user for filter options
+promptFilterOptions() {
+const markAsRead = confirm("Mark all tickets as read? Click 'Cancel' to mark all as unread.");
+if (markAsRead) {
+  this.markAllAsRead();
+  } else {
+  this.markAllAsUnread();
+  }
+}
 
 // Method to mark all tickets as read
-markAllAsRead() {                   // Need to Fix
-    this.tickets.forEach(ticket => ticket.status = 'Read');
-    this.filteredTickets = [...this.tickets];
-    this.ticketUpdatePagination();
-  }
+markAllAsRead() {
+  this.tickets.forEach(ticket => ticket.status = 'Read');
+  this.filteredTickets = [...this.tickets];
+  this.ticketUpdatePagination();
+}
 
 // Method to mark all tickets as unread
-markAllAsUnread() {                 // Need to Fix
-    this.tickets.forEach(ticket => ticket.status = 'Unread');
-    this.filteredTickets = [...this.tickets];
-    this.ticketUpdatePagination();
-  }
+markAllAsUnread() {
+  this.tickets.forEach(ticket => ticket.status = 'Unread');
+  this.filteredTickets = [...this.tickets];
+  this.ticketUpdatePagination();
+}
 
 // Method to filter tickets based on selected option
-filterTickets() {                   // Need to Fix
-  switch (this.filterOption) {
-    case 'read':
-      this.filteredTickets = this.tickets.filter(ticket => ticket.status.toLowerCase() === 'read');
-      break;
-    case 'unread':
-      this.filteredTickets = this.tickets.filter(ticket => ticket.status.toLowerCase() === 'unread');
-      break;
-    default:
-      this.filteredTickets = [...this.tickets];
-      break;
-    }
-    this.ticketUpdatePagination();
+filterTickets() {
+switch (this.filterOption) {
+  case 'read':
+    this.filteredTickets = this.tickets.filter(ticket => ticket.status.toLowerCase() === 'read');
+    break;
+  case 'unread':
+    this.filteredTickets = this.tickets.filter(ticket => ticket.status.toLowerCase() === 'unread');
+    break;
+  default:
+    this.filteredTickets = [...this.tickets];
+    break;
   }
+  this.ticketUpdatePagination();
+}
 
 // Pagination Methods for Support Tickets
 ticketTotalPages(): number {
-    return Math.ceil(this.filteredTickets.length / this.ticket_itemsPerPage);
-  }
+  return Math.ceil(this.filteredTickets.length / this.ticket_itemsPerPage);
+}
 
 ticketUpdatePagination() {
-    this.ticket_currentPage = 1;
-    this.ticketPaginate();
-  }
+  this.ticket_currentPage = 1;
+  this.ticketPaginate();
+}
 
 ticketPaginate(): Ticket[] {
-    const start = (this.ticket_currentPage - 1) * this.ticket_itemsPerPage;
-    const end = start + this.ticket_itemsPerPage;
-    return this.filteredTickets.slice(start, end);
-  }
+  const start = (this.ticket_currentPage - 1) * this.ticket_itemsPerPage;
+  const end = start + this.ticket_itemsPerPage;
+  return this.filteredTickets.slice(start, end);
+}
 
-ticketPrevPage() {                      // Need to Fix
-  if (this.ticket_currentPage > 1) {
-    this.ticket_currentPage--;
-    this.ticketPaginate();
-    }
+ticketPrevPage() {
+if (this.ticket_currentPage > 1) {
+  this.ticket_currentPage--;
+  this.ticketPaginate();
   }
+}
 
-ticketNextPage() {                        // Need to fix
-  if (this.ticket_currentPage < this.ticketTotalPages()) {
-    this.ticket_currentPage++;
-    this.ticketPaginate();
-    }
+ticketNextPage() {
+if (this.ticket_currentPage < this.ticketTotalPages()) {
+  this.ticket_currentPage++;
+  this.ticketPaginate();
   }
+}
 
 updateDateTimeForTickets() {
-    // Update dateTime property for each ticket
-    this.tickets.forEach(ticket => {
-      ticket.dateTime = new Date(); // Assign current date and time
-    });
-  }
-  
-openTicketDetails(ticket: any) {
-    this.selectedTicket = ticket;
-    this.isModalVisible = true;
-  }
+  // Update dateTime property for each ticket
+  this.tickets.forEach(ticket => {
+    ticket.dateTime = new Date(); // Assign current date and time
+  });
+}
 
-  closeModal() {
-    this.isModalVisible = false;
-  }
+openTicketDetails(ticket: any) {
+  this.selectedTicket = ticket;
+  this.isModalVisible = true;
+}
+
+closeModal() {
+  this.isModalVisible = false;
+}
+
 
   editTicket(){
     // Update selectedTicket with changes
