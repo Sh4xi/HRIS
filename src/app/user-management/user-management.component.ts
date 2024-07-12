@@ -64,6 +64,7 @@ export class UserManagementComponent implements OnInit {
   showAddPopup = false;
   showEditPopup = false;
   employees: any[] = [];
+  roles: any[] = [];
 
   showAccessRightsPopup = false;
   showAddDepartmentPopup = false;
@@ -146,7 +147,6 @@ export class UserManagementComponent implements OnInit {
     this.showCheckboxes = !this.showCheckboxes;
   }
 
-  roles: string[] = [];
   assignedRole: string = '';
   showRolePopup: boolean = false;
   newManageRole: string = '';
@@ -466,8 +466,17 @@ export class UserManagementComponent implements OnInit {
     this.updateDateTimeForTickets();
     this.loadTickets();
     this.loadEmployeeNames();
+    this.loadRoles();
 
   } 
+
+  async loadRoles() {
+    try {
+      this.roles = await this.supabaseService.getRoles();
+    } catch (error) {
+      console.error('Error fetching roles:', error);
+    }
+  }
 
     // Added method to fetch employee names
     loadEmployeeNames(): void {
