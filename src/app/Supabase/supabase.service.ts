@@ -17,6 +17,7 @@ interface Ticket {
 })
 
 export class SupabaseService {
+  //uploadFile: any;
   uploadPhoto(photoFile: any) {
     throw new Error('Method not implemented.');
   }
@@ -131,28 +132,34 @@ export class SupabaseService {
     return data.length > 0;
   }
 
-  async createEmployee(employee: any): Promise<PostgrestSingleResponse<any>> {
-    const response = await this.supabase.from('profile').insert([
-      {
-        email: employee.email,
-        first_name: employee.firstname,
-        mid_name: employee.midname,
-        surname: employee.surname,
-        password: employee.password, // Hash the password before storing
-        department: employee.department,
-        position: employee.position,
-        types: employee.type
-      },
-    ]);
-
-    if (response.error) {
-      console.error('Error creating employee:', response.error.message);
-    } else {
-      console.log('Employee created successfully:', response.data);
-      await this.refreshSession();
+  async createEmployee(employeeData: any): Promise<{ data: any; error: any }> {
+    console.log('SupabaseService received employee data:', employeeData);
+  
+    try {
+      // Remove any fields that don't exist in the database schema
+      const { name, ...dataToInsert } = employeeData;
+  
+      const { data, error } = await this.supabase
+        .from('profile')
+        .insert([dataToInsert])
+        .select();
+  
+      if (error) {
+        console.error('Supabase insert error:', error);
+        return { data: null, error };
+      }
+  
+      if (!data || data.length === 0) {
+        console.error('No data returned from Supabase insert');
+        return { data: null, error: new Error('No data returned from insert') };
+      }
+  
+      console.log('Supabase insert successful:', data);
+      return { data: data[0], error: null };
+    } catch (error) {
+      console.error('Error in createEmployee:', error);
+      return { data: null, error };
     }
-
-    return response;
   }
 
   async createRole(roleData: any): Promise<PostgrestSingleResponse<any>> {
@@ -321,13 +328,15 @@ export class SupabaseService {
     return { data, error };
   }
 
-  async uploadImage(file: File): Promise<{ data: { url: string } | null, error: Error | null }> {
-    console.log('Uploading image...');
+async uploadFile(bucket: string, fileName: string, file: File): Promise<{ data: { path: string } | null, error: Error | null }> {
+    console.log('Uploading file...');
     try {
       const { data, error } = await this.supabase.storage
-        .from('photos') // Replace with your Supabase storage bucket name
-        .upload(`employimages/${file.name}`, file, {
-          contentType: file.type
+        .from('photos')
+        .upload(fileName, file, {
+          cacheControl: '3600',
+          contentType: file.type,
+          upsert: false
         });
 
       if (error) {
@@ -336,30 +345,36 @@ export class SupabaseService {
       }
 
       console.log('Upload successful:', data);
-
-      // Constructing the URL assuming the structure of the response
-      const url = data?.path ? `https://${environment.supabaseUrl}/storage/v1/object/public/${data.path}` : '';
-
-      return { data: { url }, error: null };
+      return { data: { path: data.path }, error: null };
     } catch (error) {
       console.error('Unexpected error during upload:', error);
       return { data: null, error: error as Error };
     }
   }
 
+  async updateProfile(email: string, photoUrl: string): Promise<any> {
+    const { data, error } = await this.supabase
+      .from('profile')
+      .update({ photo_url: photoUrl }) // Assuming 'photo_url' is the column name for the photo URL
+      .eq('email', email);
+
+    if (error) {
+      console.error('Error updating profile:', error);
+      return null;
+    }
+
+    return data;
+  }
+  
   async setStoragePolicy(): Promise<boolean> {
     try {
       const supabaseAny = this.supabase as any; // Cast supabase to any temporarily
       const { data, error } = await supabaseAny.storage
         .from('photos')
-        .createPolicy({
-          path: '*',
+        .updateBucket('photos', {
           public: false, // Set to true if you want files to be publicly accessible
           cacheControl: '3600', // Cache control settings in seconds
-          contentType: 'image/jpeg,image/png', // Allowed content types
-          expiration: '2024-12-31T00:00:00Z', // Expiration date for access
-          actions: ['read', 'write'], // Allowed actions: read, write
-          roles: ['authenticated'], // Roles that can access (e.g., authenticated users)
+          allowedMimeTypes: ['image/jpeg', 'image/png'], // Allowed content types
         });
 
       if (error) {
