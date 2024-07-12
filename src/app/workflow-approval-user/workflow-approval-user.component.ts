@@ -27,6 +27,7 @@ export class WorkflowApprovalUserComponent implements OnInit {
   searchTerm: string = '';
   currentPage!: number;
   totalPages!: number;
+  router: any;
 
   constructor() {
     console.log('Initializing Supabase client...');
@@ -182,5 +183,9 @@ export class WorkflowApprovalUserComponent implements OnInit {
       submitted_for: '',
       request: ''
     };
+  }
+
+  goHome() {
+    this.router.navigate(['/system-management']);
   }
 }
