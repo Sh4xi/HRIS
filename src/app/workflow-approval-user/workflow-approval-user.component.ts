@@ -25,8 +25,9 @@ export class WorkflowApprovalUserComponent implements OnInit {
   };
   selectedStatus: string = '';
   searchTerm: string = '';
-  currentPage!: number;
-  totalPages!: number;
+  currentPage: number = 1;
+  totalPages: number = 1;
+  itemsPerPage: number = 10;
   router: any;
 
   constructor() {

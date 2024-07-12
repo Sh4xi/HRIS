@@ -27,6 +27,7 @@ export class WorkflowComponent implements OnInit {
   private supabase: SupabaseClient;
   workflows: Workflow[] = [];
   filteredWorkflows: Workflow[] = [];
+  paginatedWorkflows: Workflow[] = [];
   selectedStatus: string = '';
   searchTerm: string = '';
   currentPage: number = 1;
@@ -52,7 +53,7 @@ export class WorkflowComponent implements OnInit {
     } else {
       this.workflows = data?.map(item => ({
         id: item.id,
-        status: item.status, // Assuming the column name is 'status' in your table
+        status: item.status,
         submitted_for: item.submitted_for,
         submitted_for_role: item.submitted_for_role,
         reviewer: item.reviewer,
@@ -82,6 +83,13 @@ export class WorkflowComponent implements OnInit {
       return matchesStatus && matchesSearch;
     });
     console.log('After filtering:', this.filteredWorkflows.length);
+    this.updatePaginatedWorkflows();
+  }
+
+  updatePaginatedWorkflows() {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    this.paginatedWorkflows = this.filteredWorkflows.slice(startIndex, endIndex);
   }
 
   async previousPage() {
@@ -100,5 +108,30 @@ export class WorkflowComponent implements OnInit {
 
   goHome() {
     this.router.navigate(['/system-management']);
+  }
+
+  onStatusChange() {
+    this.currentPage = 1; // Reset to first page when filter changes
+    this.fetchWorkflows();
+  }
+
+  onSearchChange() {
+    this.currentPage = 1; // Reset to first page when search changes
+    this.fetchWorkflows();
+  }
+
+  viewWorkflowDetails(workflowId: number) {
+    console.log('View details for workflow:', workflowId);
+    // Implement navigation to workflow details page if needed
+  }
+
+  approveWorkflow(workflowId: number) {
+    console.log('Approve workflow:', workflowId);
+    // Implement approval logic
+  }
+
+  rejectWorkflow(workflowId: number) {
+    console.log('Reject workflow:', workflowId);
+    // Implement rejection logic
   }
 }

@@ -50,7 +50,7 @@
             </tr>
           </thead>
           <tbody>
-            @for (workflow of filteredWorkflows; track workflow.id) {
+            @for (workflow of paginatedWorkflows; track workflow.id) {
               <tr>
                 <div class="flex w-full bg-white border-b border-gray-200">
                   <td class="flex-1 p-3">
@@ -90,11 +90,16 @@
         </table>
       </div>
       
-      <nav class="flex justify-between items-center p-2 bg-white text-xs">
-        <button (click)="previousPage()" [disabled]="currentPage === 1" class="px-2 py-0.5 bg-blue-500 text-white rounded disabled:bg-gray-300">Prev</button>
-        <span>Page {{ currentPage }} of {{ totalPages }}</span>
-        <button (click)="nextPage()" [disabled]="currentPage === totalPages" class="px-2 py-0.5 bg-blue-500 text-white rounded disabled:bg-gray-300">Next</button>
-      </nav>
+      @if (filteredWorkflows.length > 0) {
+        <nav class="flex justify-between items-center p-2 bg-gray-300 text-xs">
+          <button (click)="previousPage()" [disabled]="currentPage === 1" class="px-2 py-0.5 bg-blue-500 text-white rounded disabled:bg-gray-500">Prev</button>
+          <span>Page {{ currentPage }} of {{ totalPages }}</span>
+          <button (click)="nextPage()" [disabled]="currentPage === totalPages" class="px-2 py-0.5 bg-blue-500 text-white rounded disabled:bg-gray-500">Next</button>
+        </nav>
+      }
+      @else {
+        <p class="text-center py-4">No items found.</p>
+      }
     </section>
   </div>
 </main>
