@@ -1,0 +1,96 @@
+<main class="flex flex-col px-4 pt-2 pb-8 bg-white max-md:px-2">
+    <header class="flex gap-2 justify-between w-full text-black whitespace-nowrap max-md:flex-wrap max-md:max-w-full">
+      <h1 class="flex gap-2 justify-between text-2xl font-bold max-md:text-xl">
+        <span class="max-md:text-xl">Quanby</span>
+        <img loading="lazy" src="https://cdn.builder.io/api/v1/image/assets/TEMP/ab4e5bd827f14f911a2d583072c36d16d70f94a881729504f6e5d71e5dc42681?apiKey=f35c25b17acb406083beeda46a28c843&" alt="" class="shrink-0 my-auto w-3 aspect-square" />
+      </h1>
+      <nav class="my-auto text-lg">Home</nav>
+    </header>
+  
+    <section class="flex gap-2 justify-between self-start mt-3 ml-4 text-xl font-bold text-center text-black whitespace-nowrap max-md:ml-1 max-md:text-lg">
+      <h2 class="max-md:text-lg">My Workflows</h2>
+    </section>
+  
+    <div class="flex gap-2 justify-between pr-1 mt-2 text-xs text-neutral-800 text-opacity-70 max-md:flex-wrap max-md:max-w-full">
+      <div class="flex flex-col justify-center px-2 py-1 whitespace-nowrap">
+        <select [(ngModel)]="selectedStatus" (change)="filterWorkflows()" class="justify-center items-start px-2 py-1 bg-white rounded-md border border-solid border-neutral-400 border-opacity-30 max-md:px-1 text-xs">
+          <option value="">All</option>
+          <option value="Pending">Pending</option>
+          <option value="Approved">Approved</option>
+          <option value="Rejected">Rejected</option>
+        </select>
+      </div>
+      <div class="flex justify-center items-center gap-2">
+        <div class="justify-center px-2 py-1 my-auto bg-white rounded-md border border-solid border-neutral-400 border-opacity-30 max-md:px-1 max-md:max-w-full">
+          <input
+            type="text"
+            [(ngModel)]="searchTerm"
+            (input)="filterWorkflows()"
+            placeholder="Search workflow..."
+            class="w-full bg-transparent text-xs"
+          />
+        </div>
+        <button (click)="openUploadModal()" class="px-4 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-xs">
+          Submit Request
+        </button>
+      </div>
+    </div>
+  
+    <section class="mt-4 ml-2 w-full rounded-md bg-zinc-300 max-md:max-w-full">
+      <table class="w-full text-xs">
+        <thead>
+          <tr class="text-sm font-medium text-black">
+            <th class="p-1 text-center">Status</th>
+            <th class="p-1 text-center">Submitted for</th>
+            <th class="p-1 text-center">Reviewer</th>
+            <th class="p-1 text-center">Request</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let workflow of filteredWorkflows; trackBy: trackById" class="bg-white border-b border-solid border-neutral-400 border-opacity-50">
+            <td class="p-1 text-center">
+              <span [ngClass]="{
+                'bg-yellow-200': workflow.status === 'Pending',
+                'bg-lime-300': workflow.status === 'Approved',
+                'bg-rose-400': workflow.status === 'Rejected'
+              }" class="px-2 py-0.5 rounded text-white text-[10px] font-bold">
+                {{ workflow.status }}
+              </span>
+            </td>
+            <td class="p-1 text-center">{{ workflow.submitted_for }}</td>
+            <td class="p-1 text-xs text-neutral-800 text-center">{{ workflow.reviewer }}</td>
+            <td class="p-1 text-center">
+              <div class="text-xs text-neutral-800">{{ workflow.request }}</div>
+              <a href="#" class="text-[10px] text-sky-700 underline">View</a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </main>
+  
+  <!-- Upload Modal -->
+  <div *ngIf="showUploadModal" class="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50">
+    <div class="bg-white p-4 rounded-md max-w-md w-full">
+      <h2 class="text-xl font-bold mb-4">Submit Workflow Request</h2>
+      <form (ngSubmit)="submitWorkflowRequest()">
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700">Reviewer</label>
+          <input [(ngModel)]="newWorkflow.reviewer" name="reviewer" required class="mt-1 p-2 border border-gray-300 rounded-md w-full" />
+        </div>
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700">Submitted For</label>
+          <input [(ngModel)]="newWorkflow.submitted_for" name="submitted_for" required class="mt-1 p-2 border border-gray-300 rounded-md w-full" />
+        </div>
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700">Request</label>
+          <textarea [(ngModel)]="newWorkflow.request" name="request" required class="mt-1 p-2 border border-gray-300 rounded-md w-full"></textarea>
+        </div>
+        <div class="flex justify-end">
+          <button type="button" (click)="closeUploadModal()" class="mr-2 px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">Cancel</button>
+          <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Submit</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  
