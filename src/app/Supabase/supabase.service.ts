@@ -468,9 +468,10 @@ export class SupabaseService {
       .from('parameters')
       .select('*');
     if (error) throw error;
+    console.log('Fetched data from Supabase:', data);
     return data;
   }
-
+  
   async createParameter(parameter: any) {
     const { data, error } = await this.supabase
       .from('parameters')
@@ -478,5 +479,4 @@ export class SupabaseService {
     if (error) throw error;
     return data;
   }
-
 }

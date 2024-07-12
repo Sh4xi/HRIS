@@ -95,7 +95,7 @@
           </div>
         </div>
       </div>
-
+      
       <!-- Display Table -->
       <div *ngIf="showTable" class="flex justify-center items-start min-h-screen bg-white-100 pt-10 px-6">
         <div class="flex flex-col w-full max-w-6xl">
@@ -123,7 +123,8 @@
                   <th class="px-6 py-4 text-sm font-thin text-gray-600 tracking-wider">Parameter Name</th>
                   <th class="px-6 py-4 text-sm font-thin text-gray-600 tracking-wider">Parameter Type</th>
                   <th class="px-6 py-4 text-sm font-thin text-gray-600 tracking-wider">Date</th>
-                  <th class="px-6 py-4 text-sm font-thin text-gray-600 tracking-wider">Schedule</th>
+                  <th class="px-6 py-4 text-sm font-thin text-gray-600 tracking-wider">Schedule AM</th>
+                  <th class="px-6 py-4 text-sm font-thin text-gray-600 tracking-wider">Schedule PM</th>
                 </tr>
               </thead>
               <tbody class="bg-white divide-y divide-gray-200">
@@ -132,6 +133,7 @@
                   <td class="px-6 py-4 whitespace-nowrap">{{ param.parameter_type || 'N/A' }}</td>
                   <td class="px-6 py-4 whitespace-nowrap">{{ param.parameter_date ? (param.parameter_date | date:'mediumDate') : '-' }}</td>
                   <td class="px-6 py-4 whitespace-nowrap">{{ param.parameter_time || '-' }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap">{{ param.parameter_time2 || '-' }}</td> <!-- Added this line -->
                 </tr>
               </tbody>              
             </table>
@@ -140,7 +142,7 @@
             </div>
           </div>
         </div>
-      </div>
+      </div>      
     </div>
   </div>
 </div>

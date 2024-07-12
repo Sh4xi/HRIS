@@ -6,10 +6,11 @@ import { SidebarNavigationModule } from './../sidebar-navigation/sidebar-navigat
 import { SupabaseService } from '../Supabase/supabase.service';
 
 interface Parameter {
-  parameter_name: string;
+  parameter_name: string; // Updated to match the database schema
   parameter_type: string;
   parameter_date?: string | null;
   parameter_time?: string | null;
+  parameter_time2?: string | null;
 }
 
 @Component({
@@ -97,7 +98,7 @@ export class SystemManagementComponent implements OnInit {
   applySearch() {
     const term = this.searchTerm.toLowerCase().trim();
     this.filteredParameters = this.parameters.filter(param =>
-      param.parameter_name.toLowerCase().includes(term)
+      param.parameter_name.toLowerCase().includes(term) // Updated to match the database schema
     );
   }
 
@@ -106,11 +107,9 @@ export class SystemManagementComponent implements OnInit {
       return this.parameters;
     }
     return this.parameters.filter(param =>
-      param.parameter_name.toLowerCase().includes(this.searchTerm.toLowerCase())
+      param.parameter_name.toLowerCase().includes(this.searchTerm.toLowerCase()) // Updated to match the database schema
     );
   }
-
-  //parameters
 
   showMessage(msg: string, isError: boolean = false) {
     this.message = msg;
@@ -124,27 +123,27 @@ export class SystemManagementComponent implements OnInit {
   async loadParameters() {
     try {
       const data = await this.supabaseService.getParameters();
+      console.log('Loaded parameters:', data); // Log the full data to inspect it
       this.parameters = data;
       this.filteredParameters = data;
-      console.log('Loaded parameters:', this.parameters);
       if (this.parameters.length > 0) {
         console.log('First parameter:', this.parameters[0]);
-        console.log('Parameter name:', this.parameters[0].parameter_name);
+        console.log('Parameter name:', this.parameters[0].parameter_name); // Updated to match the database schema
+        console.log('Parameter time2:', this.parameters[0].parameter_time2); // Log the new field
       }
     } catch (error) {
       console.error('Error loading parameters:', error);
       this.showMessage('Failed to load parameters', true);
     }
   }
-  
-  
 
   async saveParameter() {
     const newParameter: Parameter = {
-      parameter_name: this.parameterName,
+      parameter_name: this.parameterName, // Updated to match the database schema
       parameter_type: this.selectedType,
       parameter_date: this.selectedType === 'Holiday' ? this.holidayDate : null,
-      parameter_time: this.selectedType === 'Schedule' ? `${this.scheduleStartTime}-${this.scheduleEndTime}` : null
+      parameter_time: this.selectedType === 'Schedule' ? this.scheduleStartTime : null,
+      parameter_time2: this.selectedType === 'Schedule' ? this.scheduleEndTime : null // Add this line
     };
 
     try {
