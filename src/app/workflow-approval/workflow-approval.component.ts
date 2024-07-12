@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterModule, Router } from '@angular/router';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { environment } from '../environments/environment';
 
@@ -18,9 +19,9 @@ interface Workflow {
 @Component({
   selector: 'app-workflow',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './workflow-approval.component.html',
-  styleUrls: ['./workflow-approval.component.css']
+  styleUrls: ['./workflow-approval.component.css'],
 })
 export class WorkflowComponent implements OnInit {
   private supabase: SupabaseClient;
@@ -33,7 +34,7 @@ export class WorkflowComponent implements OnInit {
   itemsPerPage: number = 10;
   supabaseService: any;
 
-  constructor() {
+  constructor(private router: Router) {
     this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey);
   }
 
@@ -98,6 +99,10 @@ export class WorkflowComponent implements OnInit {
       this.currentPage++;
       await this.fetchWorkflows();
     }
+  }
+
+  goHome() {
+    this.router.navigate(['/system-management']);
   }
 
 }
