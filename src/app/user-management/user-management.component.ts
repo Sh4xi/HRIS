@@ -860,15 +860,15 @@ deleteSelectedTickets() {               // Need to fix
     this.ticketUpdatePagination();
   }
 
-// Method to prompt user for filter options
-promptFilterOptions() {
-  const markAsRead = confirm("Mark all tickets as read? Click 'Cancel' to mark all as unread.");
-  if (markAsRead) {
-    this.markAllAsRead();
-    } else {
-    this.markAllAsUnread();
-    }
-  }
+// // Method to prompt user for filter options
+// promptFilterOptions() {
+//   const markAsRead = confirm("Mark all tickets as read? Click 'Cancel' to mark all as unread.");
+//   if (markAsRead) {
+//     this.markAllAsRead();
+//     } else {
+//     this.markAllAsUnread();
+//     }
+//   }
 
 // Method to mark all tickets as read
 markAllAsRead() {                   // Need to Fix
@@ -952,11 +952,11 @@ openTicketDetails(ticket: any) {
     this.closeModal();
   }
 
-  doneTicket(){
-    // Mark selectedTicket as done
-    this.selectedTicket.status = 'Done';
-    this.updateTicket(this.selectedTicket);
-    this.closeModal();
-  }
+  // doneTicket(){
+  //   // Mark selectedTicket as done
+  //   this.selectedTicket.status = 'Done';
+  //   this.updateTicket(this.selectedTicket);
+  //   this.closeModal();
+  // }
 }
 
