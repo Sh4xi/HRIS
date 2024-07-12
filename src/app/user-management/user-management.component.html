@@ -219,10 +219,7 @@
                           <label for="position" class="block mb-1 text-sm font-medium text-gray-900 dark:text-white">Position*</label>
                           <select id="position" [(ngModel)]="employee.position" name="position" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required>
                             <option value="" disabled selected>Select a position</option>
-                            <option value="Manager">Manager</option>
-                            <option value="Developer">Developer</option>
-                            <option value="Designer">Designer</option>
-                            <option value="Analyst">Analyst</option>
+                            <option *ngFor="let role of roles" [value]="role.role_name">{{ role.role_name }}</option>
                           </select>
                         </div>
                         <div>

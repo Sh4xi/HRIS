@@ -48,6 +48,19 @@ export class SupabaseService {
     }
   }
 
+  async getRoles() {
+    const { data, error } = await this.supabase
+      .from('roles')
+      .select('role_name, role_id');
+  
+    if (error) {
+      throw error;
+    }
+  
+    return data;
+  }
+  
+
   async getEmployeeNames() {
     let { data, error } = await this.supabase
       .from('profile')
@@ -143,15 +156,38 @@ export class SupabaseService {
         position: employee.position,
         types: employee.type
       },
-    ]);
+    ]).select('user_id');
 
     if (response.error) {
       console.error('Error creating employee:', response.error.message);
     } else {
       console.log('Employee created successfully:', response.data);
+      const newUserId = response.data[0].user_id;
+  
+      // Assign role to the user
+      const assignRoleResponse = await this.assignUserRole(newUserId, employee.position);
+  
+      if (assignRoleResponse.error) {
+        console.error('Error assigning role:', assignRoleResponse.error.message);
+      } else {
+        console.log('Role assigned successfully:', assignRoleResponse.data);
+      }
+  
       await this.refreshSession();
     }
 
+    return response;
+  }
+
+  async assignUserRole(userId: number, roleId: number): Promise<PostgrestSingleResponse<any>> {
+    const response = await this.supabase
+      .from('user_roles')
+      .insert({ user_id: userId, role_id: roleId });
+  
+    if (response.error) {
+      console.error('Error assigning role:', response.error.message);
+    }
+  
     return response;
   }
 
@@ -372,6 +408,29 @@ export class SupabaseService {
     } catch (error) {
       console.error('Failed to set storage policy:', error);
       return false;
+    }
+  }
+  async getAuditLogs() {
+    const { data, error } = await this.supabase
+      .from('audit_logs')
+      .select('*')
+      .order('timestamp', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching audit logs:', error);
+      return [];
+    }
+
+    return data;
+  }
+
+  async logAction(userId: number, action: string) {
+    const { error } = await this.supabase
+      .from('audit_logs')
+      .insert([{ user_id: userId, action }]);
+
+    if (error) {
+      console.error('Error logging action:', error);
     }
   }
 }
