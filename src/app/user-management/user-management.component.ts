@@ -917,5 +917,18 @@ openTicketDetails(ticket: any) {
   closeModal() {
     this.isModalVisible = false;
   }
+
+  editTicket(){
+    // Update selectedTicket with changes
+    this.updateTicket(this.selectedTicket);
+    this.closeModal();
+  }
+
+  doneTicket(){
+    // Mark selectedTicket as done
+    this.selectedTicket.status = 'Done';
+    this.updateTicket(this.selectedTicket);
+    this.closeModal();
+  }
 }
 
