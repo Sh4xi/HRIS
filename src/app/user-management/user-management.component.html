@@ -65,7 +65,7 @@
         <td class="px-6 py-3">{{ ticket.id }}</td>
         <td class="px-6 py-3">{{ ticket.title }}</td>
         <td class="px-6 py-3">{{ ticket.email }}</td>
-        <td class="px-6 py-3">{{ ticket.description }}</td>
+        <td class="px-6 py-3 overflow-hidden max-w-xs whitespace-nowrap overflow-ellipsis">{{ ticket.description }}</td>
         <td class="px-6 py-3">
           <span [ngClass]="{
             'text-green-700 bg-green-300 py-1 px-3 rounded-full text-xs': ticket.status === 'Open',
@@ -85,7 +85,7 @@
 </section>
 
 <!-- Paginations for users tab -->
-      <div class="flex justify-between items-center mt-4">
+    <div class="flex justify-between items-center mt-4">
         <button class="bg-gray-500 text-white px-4 py-2 rounded" (click)="prevPage()" [disabled]="currentPage === 1">Previous</button>
         <span class="text-gray-600">Page {{ currentPage }} of {{ totalPages }}</span>
         <button class="bg-gray-500 text-white px-4 py-2 rounded" (click)="nextPage()" [disabled]="currentPage === totalPages">Next</button>
@@ -101,18 +101,17 @@
     </div>
     <div class="mt-4">
       <p><strong>Title:</strong> {{ selectedTicket?.title }}</p>
-      <p><strong>Description:</strong> {{ selectedTicket?.description }}</p>
       <p><strong>Email:</strong> {{ selectedTicket?.email }}</p>
-      <p><strong>Status: </strong>
-        <span [ngClass]="{
-          'text-green-600': selectedTicket?.status === 'Open',
-          'text-blue-600': selectedTicket?.status === 'In Progress',
-          'text-red-600': selectedTicket?.status === 'Closed'}">{{ selectedTicket?.status }}</span>
-      </p>
+      <p><strong>Status: </strong><span [ngClass]="{
+        'text-green-600': selectedTicket?.status === 'Open',
+        'text-blue-600': selectedTicket?.status === 'In Progress',
+        'text-red-600': selectedTicket?.status === 'Closed'}">{{ selectedTicket?.status }}</span></p>
+      <div class="max-h-40 overflow-y-auto">
+        <p><strong>Description:</strong> {{ selectedTicket?.description }}</p>
+      </div>
     </div>
     <div class="mt-4 flex justify-end">
       <button class="bg-blue-500 text-white px-4 py-2 rounded" (click)="editTicket()">Edit</button>
-
     </div>
   </div>
 </div>

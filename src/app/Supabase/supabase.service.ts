@@ -410,4 +410,27 @@ export class SupabaseService {
       return false;
     }
   }
+  async getAuditLogs() {
+    const { data, error } = await this.supabase
+      .from('audit_logs')
+      .select('*')
+      .order('timestamp', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching audit logs:', error);
+      return [];
+    }
+
+    return data;
+  }
+
+  async logAction(userId: number, action: string) {
+    const { error } = await this.supabase
+      .from('audit_logs')
+      .insert([{ user_id: userId, action }]);
+
+    if (error) {
+      console.error('Error logging action:', error);
+    }
+  }
 }
