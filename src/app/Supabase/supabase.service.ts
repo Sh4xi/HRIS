@@ -48,6 +48,18 @@ export class SupabaseService {
     }
   }
 
+  async getEmployeeNames() {
+    let { data, error } = await this.supabase
+      .from('profile')
+      .select('first_name, mid_name, surname');
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    return data;
+  }
+
   getCurrentUser(): Observable<User | null> {
     return this.currentUser.asObservable();
   }

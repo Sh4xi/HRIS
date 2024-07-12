@@ -90,6 +90,9 @@ export class SystemManagementComponent {
     this.router.navigate(['/workflow-approval']);
   }
 
+  goToApproval() {
+    this.router.navigate(['/workflow-approval']);
+  }
   openTable() {
     this.showTable = true; // Set showTable to true to display the table
     this.filteredParameters = this.parameters; // Ensure filtered parameters are populated
