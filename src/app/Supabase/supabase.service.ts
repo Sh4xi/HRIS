@@ -158,25 +158,44 @@ export class SupabaseService {
       },
     ]).select('user_id');
 
-    if (response.error) {
-      console.error('Error creating employee:', response.error.message);
-    } else {
-      console.log('Employee created successfully:', response.data);
-      const newUserId = response.data[0].user_id;
+  // Step 2: Handle potential errors in the employee creation process
+  if (response.error) {
+    console.error('Error creating employee:', response.error.message);
+    return response; // Return early if there was an error
+  } else {
+    console.log('Employee created successfully:', response.data);
+    const newUserId = response.data[0].user_id;
   
-      // Assign role to the user
-      const assignRoleResponse = await this.assignUserRole(newUserId, employee.position);
-  
-      if (assignRoleResponse.error) {
-        console.error('Error assigning role:', assignRoleResponse.error.message);
-      } else {
-        console.log('Role assigned successfully:', assignRoleResponse.data);
-      }
-  
-      await this.refreshSession();
+    // Step 3: Fetch the corresponding role_id for the role_name
+    const { data: rolesData, error: rolesError } = await this.supabase
+      .from('roles')
+      .select('role_id')
+      .eq('role_name', employee.position)
+      .single();
+
+    // Step 4: Handle potential errors in fetching the role_id
+    if (rolesError) {
+      console.error('Error fetching role_id:', rolesError.message);
+      return { data: null, error: rolesError } as PostgrestSingleResponse<any>; // Return early if there was an error
     }
 
-    return response;
+    const roleId = rolesData.role_id;
+
+    // Step 5: Assign role to the user and store role_name
+    const assignRoleResponse = await this.assignUserRole(newUserId, roleId);
+
+    // Step 6: Handle potential errors in the role assignment process
+    if (assignRoleResponse.error) {
+      console.error('Error assigning role:', assignRoleResponse.error.message);
+    } else {
+      console.log('Role assigned successfully:', assignRoleResponse.data);
+    }
+
+    // Step 7: Refresh the session
+    await this.refreshSession();
+  }
+
+  return response;
   }
 
   async assignUserRole(userId: number, roleId: number): Promise<PostgrestSingleResponse<any>> {
