@@ -55,47 +55,55 @@
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let workflow of filteredWorkflows; trackBy: trackById">
-                <td class="p-3">
-                  <span class="px-2 py-1 text-xs font-semibold rounded"
-                        [ngClass]="{
-                          'bg-yellow-200 text-yellow-800': workflow.status === 'Pending',
-                          'bg-green-200 text-green-800': workflow.status === 'Approved',
-                          'bg-red-200 text-red-800': workflow.status === 'Rejected'
-                        }">
-                    {{ workflow.status }}
-                  </span>
-                </td>
-                <td class="p-3">
-                  <div class="flex items-center">
-                    <img [src]="'https://api.dicebear.com/7.x/initials/svg?seed=' + workflow.submitted_for" 
-                        [alt]="workflow.submitted_for" 
-                        class="w-8 h-8 mr-2 rounded-full">
-                    <div>
-                      <div class="font-medium">{{ workflow.submitted_for }}</div>
-                      <div class="text-xs text-gray-500">{{ workflow.submitted_for_role }}</div>
+              @for (workflow of paginatedWorkflows; track workflow.id) {
+                <tr>
+                  <td class="p-3">
+                    <span class="px-2 py-1 text-xs font-semibold rounded"
+                          [ngClass]="{
+                            'bg-yellow-200 text-yellow-800': workflow.status === 'Pending',
+                            'bg-green-200 text-green-800': workflow.status === 'Approved',
+                            'bg-red-200 text-red-800': workflow.status === 'Rejected'
+                          }">
+                      {{ workflow.status }}
+                    </span>
+                  </td>
+                  <td class="p-3">
+                    <div class="flex items-center">
+                      <img [src]="'https://api.dicebear.com/7.x/initials/svg?seed=' + workflow.submitted_for" 
+                          [alt]="workflow.submitted_for" 
+                          class="w-8 h-8 mr-2 rounded-full">
+                      <div>
+                        <div class="font-medium">{{ workflow.submitted_for }}</div>
+                        <div class="text-xs text-gray-500">{{ workflow.submitted_for_role }}</div>
+                      </div>
                     </div>
-                  </div>
-                </td>
-                <td class="p-3">{{ workflow.reviewer }}</td>
-                <td class="p-3">
-                  <div>{{ workflow.request }}</div>
-                  <a href="#" class="text-xs text-blue-600 hover:underline">View</a>
-                </td>
-                <td class="p-3">
-                  <div>{{ workflow.requested_by }}</div>
-                  <div class="text-xs text-gray-500">{{ workflow.requested_by_role }}</div>
-                </td>
-              </tr>
+                  </td>
+                  <td class="p-3">{{ workflow.reviewer }}</td>
+                  <td class="p-3">
+                    <div>{{ workflow.request }}</div>
+                    <a href="#" class="text-xs text-blue-600 hover:underline">View</a>
+                  </td>
+                  <td class="p-3">
+                    <div>{{ workflow.requested_by }}</div>
+                    <div class="text-xs text-gray-500">{{ workflow.requested_by_role }}</div>
+                  </td>
+                </tr>
+              }
             </tbody>
           </table>
         </div>
-        
-        <nav class="flex justify-between items-center p-2 bg-gray-300 text-xs">
+<!-- buttons for the prev and next button -->
+        @if (filteredWorkflows.length > 0) {
+          <nav class="flex justify-between items-center p-2 bg-gray-300 text-xs">
             <button (click)="previousPage()" [disabled]="currentPage === 1" class="px-2 py-0.5 bg-blue-500 text-white rounded disabled:bg-gray-500">Prev</button>
             <span>Page {{ currentPage }} of {{ totalPages }}</span>
             <button (click)="nextPage()" [disabled]="currentPage === totalPages" class="px-2 py-0.5 bg-blue-500 text-white rounded disabled:bg-gray-500">Next</button>
           </nav>
+        }
+        @else {
+          <p class="text-center py-4">No items found.</p>
+        }
+
       </section>
     </div>
   

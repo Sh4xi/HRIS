@@ -17,6 +17,7 @@ export class WorkflowApprovalUserComponent implements OnInit {
   private supabase: SupabaseClient | undefined;
   userWorkflows: any[] = [];
   filteredWorkflows: any[] = [];
+  paginatedWorkflows: any[] = [];
   showUploadModal = false;
   newWorkflow: any = {
     reviewer: '',
@@ -85,11 +86,31 @@ export class WorkflowApprovalUserComponent implements OnInit {
   
       this.userWorkflows = data || [];
       this.filterWorkflows();
+      this.updatePaginatedWorkflows(); 
     } catch (error) {
       console.error('Error fetching workflows:', error);
     }
   }
   
+  filterWorkflows() {
+    this.filteredWorkflows = this.userWorkflows.filter(workflow =>
+      (this.searchTerm ? 
+        workflow.submitted_for.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+        workflow.reviewer.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+        workflow.request.toLowerCase().includes(this.searchTerm.toLowerCase())
+        : true
+      ) && (this.selectedStatus ? workflow.status === this.selectedStatus : true)
+    ); 
+    this.currentPage = 1;
+    this.updatePaginatedWorkflows();
+  }
+
+  updatePaginatedWorkflows() {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    this.paginatedWorkflows = this.filteredWorkflows.slice(startIndex, endIndex);
+    this.totalPages = Math.ceil(this.filteredWorkflows.length / this.itemsPerPage);
+  }
 
   async submitWorkflowRequest() {
     if (!this.supabase) {
@@ -126,7 +147,8 @@ export class WorkflowApprovalUserComponent implements OnInit {
       console.log('Workflow submitted successfully:', data);
 
       this.closeUploadModal();
-      this.fetchUserWorkflows(); // Refresh the list
+      await this.fetchUserWorkflows(); // Use await here
+      this.updatePaginatedWorkflows(); // Refresh the list
       alert('Workflow request submitted successfully!');
     } catch (error) {
       console.error('Error submitting workflow request:', error);
@@ -143,32 +165,23 @@ export class WorkflowApprovalUserComponent implements OnInit {
     }
   }
 
-  filterWorkflows() {
-    this.filteredWorkflows = this.userWorkflows.filter(workflow =>
-      (this.searchTerm ? 
-        workflow.submitted_for.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-        workflow.reviewer.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-        workflow.request.toLowerCase().includes(this.searchTerm.toLowerCase())
-        : true
-      ) && (this.selectedStatus ? workflow.status === this.selectedStatus : true)
-    );
-  }
-
   trackById(index: number, workflow: any) {
     return workflow.id;
   }
 
+  // functionality for the previous button
   async previousPage() {
     if (this.currentPage > 1) {
       this.currentPage--;
-      await this.fetchUserWorkflows();
+      this.updatePaginatedWorkflows();
     }
   }
 
+  // funtionality for the next page button
   async nextPage() {
     if (this.currentPage < this.totalPages) {
       this.currentPage++;
-      await this.fetchUserWorkflows();
+      this.updatePaginatedWorkflows();  
     }
   }
 
