@@ -136,12 +136,12 @@ export class SupabaseService {
     console.log('SupabaseService received employee data:', employeeData);
   
     try {
-      // Remove any fields that don't exist in the database schema
-      const { name, ...dataToInsert } = employeeData;
+      // Log the exact data being inserted
+      console.log('Data to insert:', employeeData);
   
       const { data, error } = await this.supabase
         .from('profile')
-        .insert([dataToInsert])
+        .insert([employeeData])
         .select();
   
       if (error) {

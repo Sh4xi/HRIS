@@ -70,7 +70,7 @@ export class UserManagementComponent implements OnInit {
   showAddDepartmentPopup = false;
   isEditing: boolean = false;
   showModal = false;
-  photoPreviewUrl = 'https://via.placeholder.com/200x200';
+  photoPreviewUrl: string = 'https://via.placeholder.com/150';;
   showPasswordGeneratedMessage: boolean = false;
   newRole = '';
   newDepartment = '';
@@ -291,16 +291,20 @@ export class UserManagementComponent implements OnInit {
       const photoUrl = await this.uploadPhoto();
   
       const employeeData = {
-        profile: photoUrl || this.photoPreviewUrl,
-        name: `${this.employee.firstname} ${this.employee.midname ? this.employee.midname + ' ' : ''}${this.employee.surname}`,
+        first_name: this.employee.firstname,
+        mid_name: this.employee.midname,
+        surname: this.employee.surname,
         email: this.employee.email,
         password: this.employee.password,
         department: this.employee.department,
         position: this.employee.position,
-        type: this.employee.type,
-        status: 'Active',
-        access: true
+        types: this.employee.type,
+        access: true,
+        photo_url: photoUrl || this.photoPreviewUrl
+        // status field removed
       };
+  
+      console.log('Employee data to be sent:', employeeData);
   
       let response;
   
@@ -320,7 +324,7 @@ export class UserManagementComponent implements OnInit {
       }
   
       if (response.error) {
-        console.error(`Error ${this.isEditing ? 'updating' : 'creating'} employee:`, response.error.message);
+        console.error(`Error ${this.isEditing ? 'updating' : 'creating'} employee:`, response.error);
         alert(`Error ${this.isEditing ? 'updating' : 'creating'} employee. Please try again.`);
       } else {
         console.log(`Employee ${this.isEditing ? 'updated' : 'created'} successfully:`, response.data);
@@ -334,6 +338,7 @@ export class UserManagementComponent implements OnInit {
       alert('An unexpected error occurred. Please try again.');
     }
   }
+  
   
   async uploadPhoto(): Promise<string | null> {
     if (!this.photoFile) {
