@@ -70,7 +70,7 @@ export class UserManagementComponent implements OnInit {
   showAddDepartmentPopup = false;
   isEditing: boolean = false;
   showModal = false;
-  photoPreviewUrl: string = 'https://via.placeholder.com/150';;
+  photoPreviewUrl: string = 'https://via.placeholder.com/200x200';;
   showPasswordGeneratedMessage: boolean = false;
   newRole = '';
   newDepartment = '';
