@@ -440,7 +440,7 @@ export class SupabaseService {
   }
   async getAuditLogs() {
     const { data, error } = await this.supabase
-      .from('audit_logs')
+      .from('audit')
       .select('*')
       .order('timestamp', { ascending: false });
 
@@ -454,7 +454,7 @@ export class SupabaseService {
 
   async logAction(userId: number, action: string) {
     const { error } = await this.supabase
-      .from('audit_logs')
+      .from('audit')
       .insert([{ user_id: userId, action }]);
 
     if (error) {
