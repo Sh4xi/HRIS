@@ -848,37 +848,34 @@ if (index !== -1) {
 
 // Method to delete selected tickets
 async deleteSelectedTickets() {
-const selectedTickets = this.getSelectedTickets();
-if (selectedTickets.length === 0) {
-  console.log("No tickets selected for deletion");
-  return;
-}
-
-try {
-  for (const ticket of selectedTickets) {
-    const { error } = await this.supabaseService.deleteTicket(ticket.id);
-    if (error) {
-      console.error(`Error deleting ticket ${ticket.id}:`, error.message);
-    } else {
-      console.log(`Ticket ${ticket.id} deleted successfully`);
-    }
+  const selectedTickets = this.getSelectedTickets();
+  if (selectedTickets.length === 0) {
+    console.log("No tickets selected for deletion");
+    return;
   }
 
-  // Remove deleted tickets from local arrays
-  this.tickets = this.tickets.filter(ticket => !selectedTickets.includes(ticket));
-  this.filteredTickets = this.filteredTickets.filter(ticket => !selectedTickets.includes(ticket));
-  this.selectedTickets = this.selectedTickets.filter((_, index) => !this.selectedTickets[index]);
+  try {
+    for (const ticket of selectedTickets) {
+      const { error } = await this.supabaseService.deleteTicket(ticket.id);
+      if (error) {
+        console.error(`Error deleting ticket ${ticket.id}:`, error.message);
+      } else {
+        console.log(`Ticket ${ticket.id} deleted successfully`);
+      }
+  }
 
+// Remove deleted tickets from local arrays
+this.tickets = this.tickets.filter(ticket => !selectedTickets.includes(ticket));
+this.filteredTickets = this.filteredTickets.filter(ticket => !selectedTickets.includes(ticket));
+this.selectedTickets = this.selectedTickets.filter((_, index) => !this.selectedTickets[index]);
   console.log(`Deleted ${selectedTickets.length} tickets`);
-
-  // Update pagination
-  this.ticketUpdatePagination();
-
-  // Refresh the ticket list
-  await this.loadTickets();
-} catch (error) {
-  console.error('Error deleting tickets:', error);
-}
+    // Update pagination
+      this.ticketUpdatePagination();
+     // Refresh the ticket list
+      await this.loadTickets();
+    } catch (error) {
+      console.error('Error deleting tickets:', error);
+    }
 }
 
 // Method to prompt user for filter options
