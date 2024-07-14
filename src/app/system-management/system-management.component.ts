@@ -24,6 +24,7 @@ export class SystemManagementComponent implements OnInit {
   showPopup = false;
   showTable = false;
   showAll = true;
+  isManageMode: boolean = false;
   parameterName: string = '';
   selectedType: string = '';
   types: string[] = ['Holiday', 'OT Type', 'Schedule', 'Leave'];
@@ -93,6 +94,7 @@ export class SystemManagementComponent implements OnInit {
     this.showTable = false;
     this.searchTerm = '';
     this.filteredParameters = this.parameters;
+    this.isManageMode = false;
   }
 
   applySearch() {
@@ -156,4 +158,20 @@ export class SystemManagementComponent implements OnInit {
       this.showMessage('Failed to save parameter', true);
     }
   }
+
+  toggleManageMode() {
+    this.isManageMode = !this.isManageMode;
+  }
+
+  editParameter(param: any) {
+    // Logic for editing the parameter
+    console.log('Editing parameter:', param);
+    // You can open a modal or navigate to an edit page, etc.
+  }
+
+  deleteSelectedParameters(){
+
+  }
+
+  
 }
