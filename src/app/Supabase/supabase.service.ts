@@ -60,6 +60,16 @@ export class SupabaseService {
     return data;
   }
   
+  async getAssignedEmployees(roleId: number): Promise<any> {
+    const { data, error } = await this.supabase
+      .from('user_roles')
+      .select('user_id')
+      .eq('role_id', roleId);
+
+    if (error) {
+      return { data: null, error };
+    }
+  }
 
   async getEmployeeNames() {
     let { data, error } = await this.supabase

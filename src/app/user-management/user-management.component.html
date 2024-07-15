@@ -370,8 +370,8 @@
   </div>
   
   <div class="flex flex-col gap-10">
-    <div class="w-[400px] h-[350px] shadow-xl rounded-xl">
-      <p class="pl-10 pt-10 text-2xl pb-3 font-black">Assigned for {{ assignedRole }}</p>
+    <div class="w-[400px] h-[350px] shadow-xl rounded-xl" *ngIf="assignedRole">
+      <p class="pl-10 pt-10 text-2xl pb-3 font-black"> Assigned for {{ assignedRole.role_name }}</p>
       <table class="table-auto ml-10"> 
         <tbody>
           <tr class="h-9" *ngFor="let employee of assignedEmployees">

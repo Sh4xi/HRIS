@@ -65,6 +65,7 @@ export class UserManagementComponent implements OnInit {
   showEditPopup = false;
   employees: any[] = [];
   roles: any[] = [];
+  selectedRole: any = null;
 
   showAccessRightsPopup = false;
   showAddDepartmentPopup = false;
@@ -147,7 +148,7 @@ export class UserManagementComponent implements OnInit {
     this.showCheckboxes = !this.showCheckboxes;
   }
 
-  assignedRole: string = '';
+  assignedRole: any = null;
   showRolePopup: boolean = false;
   newManageRole: string = '';
 
@@ -173,8 +174,14 @@ export class UserManagementComponent implements OnInit {
   }
 
   // Handle clicking a role in the Manage Roles table
-  onRoleClick(role: string) {
+  async onRoleClick(role: { role_id: number }) {
     this.assignedRole = role;
+    const { data, error } = await this.supabaseService.getAssignedEmployees(role.role_id);
+    if (error) {
+      console.error('Error loading assigned employees:', error.message);
+    } else {
+      this.assignedEmployees = data;
+    }
   }
 
   // Mockdata for Tickets
