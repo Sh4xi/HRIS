@@ -93,6 +93,7 @@ export class UserManagementComponent implements OnInit {
 
   selectedTicket: any = null;
   isModalVisible = false;
+  replyText: string = '';
 
   employee = {
     email: '',
@@ -976,12 +977,17 @@ closeModal() {
   this.isModalVisible = false;
 }
 
-
-  editTicket(){
-    // Update selectedTicket with changes
+replyTicket(): void {
+  if (this.selectedTicket) {
+    // Logic for replying to a ticket
+    this.selectedTicket.reply = this.replyText;
     this.updateTicket(this.selectedTicket);
     this.closeModal();
+    this.replyText = ''; // Reset reply text after sending
+  } else {
+    console.log('No ticket selected to reply.');
   }
+}
 
   // doneTicket(){
   //   // Mark selectedTicket as done
