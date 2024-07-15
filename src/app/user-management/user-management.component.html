@@ -47,14 +47,15 @@
   <table class="min-w-full text-sm text-center text-black dark:text-gray-700 border-collapse rounded-lg shadow-lg bg-white">
     <thead class="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-300 dark:text-black">
       <tr>
-        <th scope="col" class="p-4"><input type="checkbox" (click)="toggleAllTickets()"></th>
+        <th scope="col" class="p-4">
+          <input type="checkbox" (click)="toggleAllTickets()">
+        </th>
         <th scope="col" class="px-6 py-3">Ticket ID</th>
         <th scope="col" class="px-6 py-3">Title</th>
         <th scope="col" class="px-6 py-3">Email</th>
         <th scope="col" class="px-6 py-3">Description</th>
         <th scope="col" class="px-6 py-3">Status</th>
-        <th scope="col" class="px-6 py-3">Date</th>
-        <th scope="col" class="px-6 py-3">Actions</th>
+        <th scope="col" class="px-6 py-3">Date Created</th>
       </tr>
     </thead>
     <tbody>
@@ -70,13 +71,12 @@
           <span [ngClass]="{
             'text-green-700 bg-green-300 py-1 px-3 rounded-full text-xs': ticket.status === 'Open',
             'text-blue-700 bg-blue-300 py-1 px-3 rounded-full text-xs': ticket.status === 'In Progress',
-            'text-red-700 bg-red-300 py-1 px-3 rounded-full text-xs': ticket.status === 'Closed'}">{{ ticket.status }}
+            'text-red-700 bg-red-300 py-1 px-3 rounded-full text-xs': ticket.status === 'Closed'
+          }">{{ ticket.status }}
           </span>
         </td>
-        <td class="px-6 py-3">{{ ticket.dateTime | date:'MMMM d, yyyy' }}</td>        
-          <td class="px-6 py-3">
-          <button class="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded-lg" (click)="deleteTicket(ticket.id); $event.stopPropagation()">Delete</button>
-        </td>
+        <div class="text-sm">{{ ticket.dateTime | date:'hh:mm a' }}</div>
+        <div>{{ ticket.dateTime | date:'MMMM d, yyyy' }}</div>
       </tr>
     </tbody>
   </table>
@@ -95,23 +95,35 @@
 <!-- Ticket Details Modal -->
 <div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50" *ngIf="isModalVisible">
   <div class="bg-white rounded-lg p-4 max-w-md w-full">
+  
+    <!-- Modal Header -->
     <div class="flex justify-between items-center border-b pb-2">
       <h2 class="text-xl font-semibold">Ticket Details</h2>
-      <button class="text-white hover:text-gray-700 bg-red-400 rounded-lg py-2 px-2" (click)="closeModal()">X</button>
+      <button class="text-white hover:text-gray-700 bg-red-400 rounded-lg py-2 px-3" (click)="closeModal()">✖</button>
     </div>
+    
+    <!-- Modal Body -->
     <div class="mt-4">
       <p><strong>Title:</strong> {{ selectedTicket?.title }}</p>
       <p><strong>Email:</strong> {{ selectedTicket?.email }}</p>
-      <p><strong>Status: </strong><span [ngClass]="{
-        'text-green-600': selectedTicket?.status === 'Open',
-        'text-blue-600': selectedTicket?.status === 'In Progress',
-        'text-red-600': selectedTicket?.status === 'Closed'}">{{ selectedTicket?.status }}</span></p>
-      <div class="max-h-40 overflow-y-auto">
-        <p><strong>Description:</strong> {{ selectedTicket?.description }}</p>
+      <p><strong>Status:</strong>
+        <span [ngClass]="{
+          'text-green-600': selectedTicket?.status === 'Open',
+          'text-blue-600': selectedTicket?.status === 'In Progress',
+          'text-red-600': selectedTicket?.status === 'Closed'
+        }">{{ selectedTicket?.status }}</span>
+      </p>
+      <div class="mt-2">
+        <p><strong>Description:</strong></p>
+        <div class="max-h-40 overflow-y-auto border border-gray-200 rounded p-2">
+          {{ selectedTicket?.description }}
+        </div>
       </div>
     </div>
+    
+    <!-- Modal Footer -->
     <div class="mt-4 flex justify-end">
-      <button class="bg-blue-500 text-white px-4 py-2 rounded" (click)="editTicket()">Edit</button>
+      <button class="bg-blue-500 text-white px-4 py-2 rounded mr-2" (click)="editTicket()">Edit</button>
     </div>
   </div>
 </div>
@@ -304,7 +316,7 @@
                 </span>
               </td>
               <td class="py-3 px-6 text-center">
-                <button 
+                <button
                   (click)="!showModal && toggleUserAccess(user)"
                   class="relative inline-flex items-center w-11 h-6 rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                   [ngClass]="{
@@ -355,32 +367,44 @@
           </div>      
         </div>
         
-        <div class="flex gap-10 justify-center">
+<div class="flex gap-10 justify-center">
   <div class="w-[400px] h-[740px] shadow-xl rounded-xl">
     <div class="flex justify-between items-center">
       <p class="pl-10 pt-10 text-2xl font-black">Manage Roles</p>
       <button class="bg-blue-500 text-white px-4 py-2 rounded mt-10 mr-10" (click)="openRolePopup()">Add Role</button>
     </div>
-    <table class="table-auto ml-10"> 
-      <tbody>
-        <tr class="h-9 hover:bg-gray-200" *ngFor="let role of roles" (click)="onRoleClick(role)">
-          <td>{{ role }}</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-  
-  <div class="flex flex-col gap-10">
-    <div class="w-[400px] h-[350px] shadow-xl rounded-xl">
-      <p class="pl-10 pt-10 text-2xl pb-3 font-black">Assigned for {{ assignedRole }}</p>
-      <table class="table-auto ml-10"> 
+    <div class="overflow-y-auto overflow-x-hidden" style="height: calc(740px - 7rem);"> <!-- Adjust height calculation -->
+      <table class="table-auto ml-10 mt-5 w-[83%]"> 
         <tbody>
-          <tr class="h-9" *ngFor="let employee of assignedEmployees">
-            <td>{{ employee }}</td>
+          <tr class="h-9 text-gray-600 text-sm font-light hover:bg-gray-200" *ngFor="let role of roles" (click)="onRoleClick(role)">
+            <td>{{ role.role_name }}</td>
+            <td class="text-center">
+              <button class="text-blue-500 hover:text-blue-700">Edit</button>
+            </td>
+            <td class="text-center">
+              <button (click)="deleteRole(role)"  class="text-red-500 hover:text-red-700">Delete</button>
+            </td>
           </tr>
         </tbody>
       </table>
     </div>
+</div>
+
+  
+  
+  <div class="flex flex-col gap-10">
+    <div class="w-[400px] h-[350px] shadow-xl rounded-xl" *ngIf="assignedRole">
+      <p class="pl-10 pt-10 text-2xl pb-3 font-black">Assigned for {{ assignedRole.role_name }}</p>
+      <table class="table-auto ml-10"> 
+        <tbody>
+          <tr class="h-9" *ngFor="let user of paginatedUsers">
+            <td class="py-3 px-6 text-left">{{ user.name }}</td>
+            <td class="py-3 px-6 text-left">{{ user.position }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    
     <div class="w-[400px] h-[350px] shadow-xl rounded-xl">
     </div>
   </div>
@@ -407,9 +431,9 @@
 <div *ngIf="showRolePopup" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
   <div class="bg-white p-6 rounded-lg shadow-lg">
     <h2 class="text-xl font-bold mb-4">Add Role</h2>
-    <input [(ngModel)]="newManageRole" type="text" placeholder="Enter role" class="border p-2 mb-4 w-full"/>
+    <input type="text" id="role" [(ngModel)]="newRole" type="text" placeholder="Enter role" class="border p-2 mb-4 w-full"/>
     <div class="flex justify-end">
-      <button (click)="confirmRolePopup()" class="bg-blue-500 text-white px-4 py-2 rounded mr-2">Confirm</button>
+      <button (click)="addRole()" class="bg-blue-500 text-white px-4 py-2 rounded mr-2">Confirm</button>
       <button (click)="cancelRolePopup()" class="bg-gray-500 text-white px-4 py-2 rounded">Cancel</button>
     </div>
   </div>

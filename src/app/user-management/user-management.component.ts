@@ -34,7 +34,6 @@ interface Employee {
 }
 
 
-
 interface Ticket {
   id: number;
   title: string;
@@ -150,7 +149,7 @@ export class UserManagementComponent implements OnInit {
     this.showCheckboxes = !this.showCheckboxes;
   }
 
-  assignedRole: string = '';
+  assignedRole: any = null;
   showRolePopup: boolean = false;
   newManageRole: string = '';
 
@@ -175,9 +174,21 @@ export class UserManagementComponent implements OnInit {
     this.showRolePopup = false;
   }
 
+  deleteRole(roleToDelete: any) {
+    this.roles = this.roles.filter(role => role !== roleToDelete);
+  }
+  
+
+
   // Handle clicking a role in the Manage Roles table
-  onRoleClick(role: string) {
+  async onRoleClick(role: { role_id: number }) {
     this.assignedRole = role;
+    const { data, error } = await this.supabaseService.getAssignedEmployees(role.role_id);
+    if (error) {
+      console.error('Error loading assigned employees:', error.message);
+    } else {
+      this.assignedEmployees = data;
+    }
   }
 
   // Mockdata for Tickets
@@ -378,12 +389,13 @@ export class UserManagementComponent implements OnInit {
     if (!this.newRole) {
       alert('Please enter a role name');
       return;
+      this.showRolePopup = false;
     }
   
-    if (this.departmentType === 'specific' && !this.selectedDepartments) {
-      alert('Please select a department');
-      return;
-    }
+    // if (this.departmentType === 'specific' && !this.selectedDepartments) {
+    //   alert('Please select a department');
+    //   return;
+    // }
   
     const roleData = {
       role_name: this.newRole,
@@ -1030,37 +1042,34 @@ if (index !== -1) {
 
 // Method to delete selected tickets
 async deleteSelectedTickets() {
-const selectedTickets = this.getSelectedTickets();
-if (selectedTickets.length === 0) {
-  console.log("No tickets selected for deletion");
-  return;
-}
-
-try {
-  for (const ticket of selectedTickets) {
-    const { error } = await this.supabaseService.deleteTicket(ticket.id);
-    if (error) {
-      console.error(`Error deleting ticket ${ticket.id}:`, error.message);
-    } else {
-      console.log(`Ticket ${ticket.id} deleted successfully`);
-    }
+  const selectedTickets = this.getSelectedTickets();
+  if (selectedTickets.length === 0) {
+    console.log("No tickets selected for deletion");
+    return;
   }
 
-  // Remove deleted tickets from local arrays
-  this.tickets = this.tickets.filter(ticket => !selectedTickets.includes(ticket));
-  this.filteredTickets = this.filteredTickets.filter(ticket => !selectedTickets.includes(ticket));
-  this.selectedTickets = this.selectedTickets.filter((_, index) => !this.selectedTickets[index]);
+  try {
+    for (const ticket of selectedTickets) {
+      const { error } = await this.supabaseService.deleteTicket(ticket.id);
+      if (error) {
+        console.error(`Error deleting ticket ${ticket.id}:`, error.message);
+      } else {
+        console.log(`Ticket ${ticket.id} deleted successfully`);
+      }
+  }
 
+// Remove deleted tickets from local arrays
+this.tickets = this.tickets.filter(ticket => !selectedTickets.includes(ticket));
+this.filteredTickets = this.filteredTickets.filter(ticket => !selectedTickets.includes(ticket));
+this.selectedTickets = this.selectedTickets.filter((_, index) => !this.selectedTickets[index]);
   console.log(`Deleted ${selectedTickets.length} tickets`);
-
-  // Update pagination
-  this.ticketUpdatePagination();
-
-  // Refresh the ticket list
-  await this.loadTickets();
-} catch (error) {
-  console.error('Error deleting tickets:', error);
-}
+    // Update pagination
+      this.ticketUpdatePagination();
+     // Refresh the ticket list
+      await this.loadTickets();
+    } catch (error) {
+      console.error('Error deleting tickets:', error);
+    }
 }
 
 // Method to prompt user for filter options

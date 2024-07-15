@@ -6,11 +6,13 @@ import { SidebarNavigationModule } from './../sidebar-navigation/sidebar-navigat
 import { SupabaseService } from '../Supabase/supabase.service';
 
 interface Parameter {
-  parameter_name: string; // Updated to match the database schema
+  id?: number; // Add this line
+  parameter_name: string;
   parameter_type: string;
   parameter_date?: string | null;
   parameter_time?: string | null;
   parameter_time2?: string | null;
+  selected?: boolean;
 }
 
 @Component({
@@ -24,6 +26,8 @@ export class SystemManagementComponent implements OnInit {
   showPopup = false;
   showTable = false;
   showAll = true;
+  isEdit = false;
+  isManageMode: boolean = false;
   parameterName: string = '';
   selectedType: string = '';
   types: string[] = ['Holiday', 'OT Type', 'Schedule', 'Leave'];
@@ -35,6 +39,11 @@ export class SystemManagementComponent implements OnInit {
   filteredParameters: Parameter[] = [];
   message: string = '';
   isError: boolean = false;
+  selectedParameter: Parameter | null = null;
+  // Pagination variables
+  currentPage = 1;
+  itemsPerPage = 8; // Adjust the number of items per page as needed
+  totalPages = 1;
 
   constructor(private router: Router, private supabaseService: SupabaseService) {}
 
@@ -51,12 +60,22 @@ export class SystemManagementComponent implements OnInit {
   }
 
   openPopup() {
+    this.isEdit = false;
+    this.selectedParameter = {
+      parameter_name: '',
+      parameter_type: this.types[0],
+      parameter_date: null,
+      parameter_time: null,
+      parameter_time2: null
+    };
     this.showPopup = true;
   }
 
   closePopup() {
     this.showPopup = false;
     this.resetForm();
+    this.selectedParameter = null;
+    this.isEdit = false;
   }
 
   resetForm() {
@@ -65,6 +84,13 @@ export class SystemManagementComponent implements OnInit {
     this.holidayDate = '';
     this.scheduleStartTime = '';
     this.scheduleEndTime = '';
+    this.selectedParameter = {
+      parameter_name: '',
+      parameter_type: '',
+      parameter_date: null,
+      parameter_time: null,
+      parameter_time2: null
+    };
   }
 
   goToAuditTrail() {
@@ -93,13 +119,15 @@ export class SystemManagementComponent implements OnInit {
     this.showTable = false;
     this.searchTerm = '';
     this.filteredParameters = this.parameters;
+    this.isManageMode = false;
   }
 
   applySearch() {
     const term = this.searchTerm.toLowerCase().trim();
     this.filteredParameters = this.parameters.filter(param =>
-      param.parameter_name.toLowerCase().includes(term) // Updated to match the database schema
+      param.parameter_name.toLowerCase().includes(term)
     );
+    this.updatePagination();
   }
 
   getFilteredParameters(): Parameter[] {
@@ -107,7 +135,7 @@ export class SystemManagementComponent implements OnInit {
       return this.parameters;
     }
     return this.parameters.filter(param =>
-      param.parameter_name.toLowerCase().includes(this.searchTerm.toLowerCase()) // Updated to match the database schema
+      param.parameter_name.toLowerCase().includes(this.searchTerm.toLowerCase())
     );
   }
 
@@ -123,14 +151,11 @@ export class SystemManagementComponent implements OnInit {
   async loadParameters() {
     try {
       const data = await this.supabaseService.getParameters();
-      console.log('Loaded parameters:', data); // Log the full data to inspect it
+      console.log('Loaded parameters:', data);
       this.parameters = data;
       this.filteredParameters = data;
-      if (this.parameters.length > 0) {
-        console.log('First parameter:', this.parameters[0]);
-        console.log('Parameter name:', this.parameters[0].parameter_name); // Updated to match the database schema
-        console.log('Parameter time2:', this.parameters[0].parameter_time2); // Log the new field
-      }
+      this.updatePagination();
+      this.selectedParameter = null; // Reset selected parameter
     } catch (error) {
       console.error('Error loading parameters:', error);
       this.showMessage('Failed to load parameters', true);
@@ -139,11 +164,11 @@ export class SystemManagementComponent implements OnInit {
 
   async saveParameter() {
     const newParameter: Parameter = {
-      parameter_name: this.parameterName, // Updated to match the database schema
+      parameter_name: this.parameterName,
       parameter_type: this.selectedType,
       parameter_date: this.selectedType === 'Holiday' ? this.holidayDate : null,
       parameter_time: this.selectedType === 'Schedule' ? this.scheduleStartTime : null,
-      parameter_time2: this.selectedType === 'Schedule' ? this.scheduleEndTime : null // Add this line
+      parameter_time2: this.selectedType === 'Schedule' ? this.scheduleEndTime : null
     };
 
     try {
@@ -154,6 +179,112 @@ export class SystemManagementComponent implements OnInit {
     } catch (error) {
       console.error('Error saving parameter:', error);
       this.showMessage('Failed to save parameter', true);
+    }
+  }
+
+  toggleManageMode() {
+    this.isManageMode = !this.isManageMode;
+  }
+
+  // editParameter(parameter: Parameter) {
+  //   this.isEdit = true;
+  //   this.selectedParameter = { ...parameter };
+  //   this.parameterName = parameter.parameter_name;
+  //   this.selectedType = parameter.parameter_type;
+  //   this.holidayDate = parameter.parameter_date || '';
+  //   this.scheduleStartTime = parameter.parameter_time || '';
+  //   this.scheduleEndTime = parameter.parameter_time2 || '';
+  //   this.showPopup = true;
+    
+  // }
+
+  editParameter(parameter: Parameter) {
+    this.isEdit = true;
+    this.selectedParameter = { ...parameter };
+    this.showPopup = true;
+  }
+
+
+  async deleteSelectedParameters() {
+    try {
+      const selectedParams = this.filteredParameters.filter(param => param.selected);
+      const deletions = selectedParams.map(param =>
+        this.supabaseService.deleteParameter(param.parameter_name)
+      );
+      await Promise.all(deletions);
+      await this.loadParameters(); // Reload parameters after deletion
+      this.showMessage('Parameters deleted successfully');
+    } catch (error) {
+      console.error('Error deleting parameters:', error);
+      this.showMessage('Failed to delete parameters', true);
+    }
+  }
+  
+
+  updatePagination() {
+    this.totalPages = Math.ceil(this.filteredParameters.length / this.itemsPerPage);
+    if (this.currentPage > this.totalPages) {
+      this.currentPage = this.totalPages;
+    }
+    if (this.currentPage < 1) {
+      this.currentPage = 1;
+    }
+  }
+
+  get paginatedParameters(): Parameter[] {
+    const start = (this.currentPage - 1) * this.itemsPerPage;
+    const end = start + this.itemsPerPage;
+    return this.filteredParameters.slice(start, end);
+  }
+
+  nextPage() {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      this.updatePagination();
+    }
+  }
+
+  prevPage() {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.updatePagination();
+    }
+  }
+
+  // Function to update parameter
+  async updateParameter(updatedParameter: any) {
+    try {
+      const response = await this.supabaseService.updateParameter(updatedParameter);
+      console.log('Update response:', response);
+      // Optionally, update the local parameter list or reload data
+      // Reload data example: await this.loadParameters();
+      this.closePopup();
+    } catch (error) {
+      console.error('Error updating parameter:', error);
+    }
+  }
+
+
+  async saveOrUpdateParameter() {
+    try {
+      if (!this.selectedParameter) {
+        throw new Error('No parameter selected');
+      }
+  
+      if (this.isEdit) {
+        // Updating existing parameter
+        await this.supabaseService.updateParameter(this.selectedParameter);
+        this.showMessage('Parameter updated successfully');
+      } else {
+        // Creating new parameter
+        await this.supabaseService.createParameter(this.selectedParameter);
+        this.showMessage('Parameter saved successfully');
+      }
+      await this.loadParameters();
+      this.closePopup();
+    } catch (error) {
+      console.error('Error saving/updating parameter:', error);
+      this.showMessage('Failed to save/update parameter', true);
     }
   }
 }

@@ -18,6 +18,10 @@ interface Ticket {
 
 export class SupabaseService {
   //uploadFile: any;
+
+  private databaseChangeSubject = new BehaviorSubject<boolean>(false);
+  public databaseChange$ = this.databaseChangeSubject.asObservable();
+
   uploadPhoto(photoFile: any) {
     throw new Error('Method not implemented.');
   }
@@ -61,6 +65,16 @@ export class SupabaseService {
     return data;
   }
   
+  async getAssignedEmployees(roleId: number): Promise<any> {
+    const { data, error } = await this.supabase
+      .from('user_roles')
+      .select('user_id')
+      .eq('role_id', roleId);
+
+    if (error) {
+      return { data: null, error };
+    }
+  }
 
   async getEmployeeNames() {
     let { data, error } = await this.supabase
@@ -124,11 +138,12 @@ export class SupabaseService {
   }
 
   private handleDatabaseChange(): void {
-    if (isPlatformBrowser(this.platformId)) {
-      window.location.reload();
-    } else {
-      console.log('Database change detected, but not in browser environment');
-    }
+    // if (isPlatformBrowser(this.platformId)) {
+    //   window.location.reload();
+    // } else {
+    //   console.log('Database change detected, but not in browser environment');
+    // }
+    this.databaseChangeSubject.next(true);
   }
 
   async checkEmailExists(email: string): Promise<boolean> {
@@ -574,7 +589,7 @@ export class SupabaseService {
   }
   async getAuditLogs() {
     const { data, error } = await this.supabase
-      .from('audit_logs')
+      .from('audit')
       .select('*')
       .order('timestamp', { ascending: false });
 
@@ -588,7 +603,7 @@ export class SupabaseService {
 
   async logAction(userId: number, action: string) {
     const { error } = await this.supabase
-      .from('audit_logs')
+      .from('audit')
       .insert([{ user_id: userId, action }]);
 
     if (error) {
@@ -611,6 +626,37 @@ export class SupabaseService {
       .from('parameters')
       .insert(parameter);
     if (error) throw error;
+    return data;
+  }
+
+  async deleteParameter(parameterName: string): Promise<void> {
+    const { error } = await this.supabase
+      .from('parameters')
+      .delete()
+      .eq('parameter_name', parameterName);
+  
+    if (error) {
+      throw error;
+    }
+  }
+
+  async updateParameter(parameter: any) {
+    const { data, error } = await this.supabase
+      .from('parameters') // Replace 'parameters' with your actual table name
+      .update({
+        parameter_name: parameter.parameter_name,
+        parameter_type: parameter.parameter_type,
+        parameter_date: parameter.parameter_date,
+        parameter_time: parameter.parameter_time,
+        parameter_time2: parameter.parameter_time2
+        // Add any other fields that your parameter object has
+      })
+      .eq('id', parameter.id); // Assuming 'id' is the unique identifier
+
+    if (error) {
+      throw error;
+    }
+
     return data;
   }
 }
