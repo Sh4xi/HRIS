@@ -6,7 +6,7 @@ import { SidebarNavigationModule } from './../sidebar-navigation/sidebar-navigat
 import { SupabaseService } from '../Supabase/supabase.service';
 
 interface Parameter {
-  parameter_name: string; // Updated to match the database schema
+  parameter_name: string;
   parameter_type: string;
   parameter_date?: string | null;
   parameter_time?: string | null;
@@ -36,6 +36,10 @@ export class SystemManagementComponent implements OnInit {
   filteredParameters: Parameter[] = [];
   message: string = '';
   isError: boolean = false;
+  // Pagination variables
+  currentPage = 1;
+  itemsPerPage = 8; // Adjust the number of items per page as needed
+  totalPages = 1;
 
   constructor(private router: Router, private supabaseService: SupabaseService) {}
 
@@ -100,8 +104,9 @@ export class SystemManagementComponent implements OnInit {
   applySearch() {
     const term = this.searchTerm.toLowerCase().trim();
     this.filteredParameters = this.parameters.filter(param =>
-      param.parameter_name.toLowerCase().includes(term) // Updated to match the database schema
+      param.parameter_name.toLowerCase().includes(term)
     );
+    this.updatePagination();
   }
 
   getFilteredParameters(): Parameter[] {
@@ -109,7 +114,7 @@ export class SystemManagementComponent implements OnInit {
       return this.parameters;
     }
     return this.parameters.filter(param =>
-      param.parameter_name.toLowerCase().includes(this.searchTerm.toLowerCase()) // Updated to match the database schema
+      param.parameter_name.toLowerCase().includes(this.searchTerm.toLowerCase())
     );
   }
 
@@ -125,14 +130,10 @@ export class SystemManagementComponent implements OnInit {
   async loadParameters() {
     try {
       const data = await this.supabaseService.getParameters();
-      console.log('Loaded parameters:', data); // Log the full data to inspect it
+      console.log('Loaded parameters:', data);
       this.parameters = data;
       this.filteredParameters = data;
-      if (this.parameters.length > 0) {
-        console.log('First parameter:', this.parameters[0]);
-        console.log('Parameter name:', this.parameters[0].parameter_name); // Updated to match the database schema
-        console.log('Parameter time2:', this.parameters[0].parameter_time2); // Log the new field
-      }
+      this.updatePagination();
     } catch (error) {
       console.error('Error loading parameters:', error);
       this.showMessage('Failed to load parameters', true);
@@ -141,11 +142,11 @@ export class SystemManagementComponent implements OnInit {
 
   async saveParameter() {
     const newParameter: Parameter = {
-      parameter_name: this.parameterName, // Updated to match the database schema
+      parameter_name: this.parameterName,
       parameter_type: this.selectedType,
       parameter_date: this.selectedType === 'Holiday' ? this.holidayDate : null,
       parameter_time: this.selectedType === 'Schedule' ? this.scheduleStartTime : null,
-      parameter_time2: this.selectedType === 'Schedule' ? this.scheduleEndTime : null // Add this line
+      parameter_time2: this.selectedType === 'Schedule' ? this.scheduleEndTime : null
     };
 
     try {
@@ -164,14 +165,40 @@ export class SystemManagementComponent implements OnInit {
   }
 
   editParameter(param: any) {
-    // Logic for editing the parameter
     console.log('Editing parameter:', param);
-    // You can open a modal or navigate to an edit page, etc.
   }
 
-  deleteSelectedParameters(){
-
+  deleteSelectedParameters() {
+    // Implement delete logic here
   }
 
-  
+  updatePagination() {
+    this.totalPages = Math.ceil(this.filteredParameters.length / this.itemsPerPage);
+    if (this.currentPage > this.totalPages) {
+      this.currentPage = this.totalPages;
+    }
+    if (this.currentPage < 1) {
+      this.currentPage = 1;
+    }
+  }
+
+  get paginatedParameters(): Parameter[] {
+    const start = (this.currentPage - 1) * this.itemsPerPage;
+    const end = start + this.itemsPerPage;
+    return this.filteredParameters.slice(start, end);
+  }
+
+  nextPage() {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      this.updatePagination();
+    }
+  }
+
+  prevPage() {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.updatePagination();
+    }
+  }
 }
