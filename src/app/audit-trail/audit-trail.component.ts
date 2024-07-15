@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { SupabaseService } from '../Supabase/supabase.service';
 
 @Component({
@@ -12,7 +13,10 @@ import { SupabaseService } from '../Supabase/supabase.service';
 export class AuditTrailComponent implements OnInit {
   auditLogs: any[] = [];
 
-  constructor(private supabaseService: SupabaseService) {}
+  constructor(
+    private supabaseService: SupabaseService,
+    private router: Router
+  ) {}
 
   async ngOnInit() {
     await this.fetchAuditLogs();
@@ -21,7 +25,7 @@ export class AuditTrailComponent implements OnInit {
   async fetchAuditLogs() {
     try {
       const logs = await this.supabaseService.fetchAuditLogs();
-      console.log('Fetched audit logs:', logs); // Add this line for debugging
+      console.log('Fetched audit logs:', logs);
       this.auditLogs = logs.map(log => ({
         ...log,
         user: log.user || 'Unknown User',
@@ -37,15 +41,17 @@ export class AuditTrailComponent implements OnInit {
     }
   }
 
-  // Example method to log an action
   async logUserAction(userId: number, action: string) {
     try {
       await this.supabaseService.logAction(userId, action);
-      // Optionally, refresh the audit logs after logging a new action
       await this.fetchAuditLogs();
     } catch (error) {
       console.error('Error logging user action:', error);
       // Handle the error appropriately
     }
+  }
+
+  goHome() {
+    this.router.navigate(['/system-management']);
   }
 }
