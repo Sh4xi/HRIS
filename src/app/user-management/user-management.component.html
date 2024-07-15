@@ -75,7 +75,7 @@
           }">{{ ticket.status }}
           </span>
         </td>
-        <div>{{ ticket.dateTime | date:'hh:mm a' }}</div>
+        <div class="text-sm">{{ ticket.dateTime | date:'hh:mm a' }}</div>
         <div>{{ ticket.dateTime | date:'MMMM d, yyyy' }}</div>
       </tr>
     </tbody>
@@ -95,23 +95,35 @@
 <!-- Ticket Details Modal -->
 <div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50" *ngIf="isModalVisible">
   <div class="bg-white rounded-lg p-4 max-w-md w-full">
+  
+    <!-- Modal Header -->
     <div class="flex justify-between items-center border-b pb-2">
       <h2 class="text-xl font-semibold">Ticket Details</h2>
-      <button class="text-white hover:text-gray-700 bg-red-400 rounded-lg py-2 px-2" (click)="closeModal()">X</button>
+      <button class="text-white hover:text-gray-700 bg-red-400 rounded-lg py-2 px-3" (click)="closeModal()">✖</button>
     </div>
+    
+    <!-- Modal Body -->
     <div class="mt-4">
       <p><strong>Title:</strong> {{ selectedTicket?.title }}</p>
       <p><strong>Email:</strong> {{ selectedTicket?.email }}</p>
-      <p><strong>Status: </strong><span [ngClass]="{
-        'text-green-600': selectedTicket?.status === 'Open',
-        'text-blue-600': selectedTicket?.status === 'In Progress',
-        'text-red-600': selectedTicket?.status === 'Closed'}">{{ selectedTicket?.status }}</span></p>
-      <div class="max-h-40 overflow-y-auto">
-        <p><strong>Description:</strong> {{ selectedTicket?.description }}</p>
+      <p><strong>Status:</strong>
+        <span [ngClass]="{
+          'text-green-600': selectedTicket?.status === 'Open',
+          'text-blue-600': selectedTicket?.status === 'In Progress',
+          'text-red-600': selectedTicket?.status === 'Closed'
+        }">{{ selectedTicket?.status }}</span>
+      </p>
+      <div class="mt-2">
+        <p><strong>Description:</strong></p>
+        <div class="max-h-40 overflow-y-auto border border-gray-200 rounded p-2">
+          {{ selectedTicket?.description }}
+        </div>
       </div>
     </div>
+    
+    <!-- Modal Footer -->
     <div class="mt-4 flex justify-end">
-      <button class="bg-blue-500 text-white px-4 py-2 rounded" (click)="editTicket()">Edit</button>
+      <button class="bg-blue-500 text-white px-4 py-2 rounded mr-2" (click)="editTicket()">Edit</button>
     </div>
   </div>
 </div>
