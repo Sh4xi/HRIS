@@ -64,7 +64,6 @@ export class UserManagementComponent implements OnInit {
   showEditPopup = false;
   employees: any[] = [];
   roles: any[] = [];
-  selectedRole: any = null;
 
   showAccessRightsPopup = false;
   showAddDepartmentPopup = false;

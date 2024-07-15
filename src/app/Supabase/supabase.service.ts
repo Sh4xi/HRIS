@@ -17,6 +17,10 @@ interface Ticket {
 })
 
 export class SupabaseService {
+
+  private databaseChangeSubject = new BehaviorSubject<boolean>(false);
+  public databaseChange$ = this.databaseChangeSubject.asObservable();
+
   uploadPhoto(photoFile: any) {
     throw new Error('Method not implemented.');
   }
@@ -133,11 +137,12 @@ export class SupabaseService {
   }
 
   private handleDatabaseChange(): void {
-    if (isPlatformBrowser(this.platformId)) {
-      window.location.reload();
-    } else {
-      console.log('Database change detected, but not in browser environment');
-    }
+    // if (isPlatformBrowser(this.platformId)) {
+    //   window.location.reload();
+    // } else {
+    //   console.log('Database change detected, but not in browser environment');
+    // }
+    this.databaseChangeSubject.next(true);
   }
 
   async checkEmailExists(email: string): Promise<boolean> {
