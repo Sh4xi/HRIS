@@ -6,7 +6,7 @@ import { SidebarNavigationModule } from './../sidebar-navigation/sidebar-navigat
 import { SupabaseService } from '../Supabase/supabase.service';
 
 interface Parameter {
-  id?: number; // Add this line
+  id?: number;
   parameter_name: string;
   parameter_type: string;
   parameter_date?: string | null;
@@ -27,22 +27,21 @@ export class SystemManagementComponent implements OnInit {
   showTable = false;
   showAll = true;
   isEdit = false;
-  isManageMode: boolean = false;
-  parameterName: string = '';
-  selectedType: string = '';
+  isManageMode = false;
+  parameterName = '';
+  selectedType = '';
   types: string[] = ['Holiday', 'OT Type', 'Schedule', 'Leave'];
-  holidayDate: string = '';
+  holidayDate = '';
   parameters: Parameter[] = [];
-  scheduleStartTime: string = '';
-  scheduleEndTime: string = '';
-  searchTerm: string = '';
+  scheduleStartTime = '';
+  scheduleEndTime = '';
+  searchTerm = '';
   filteredParameters: Parameter[] = [];
-  message: string = '';
-  isError: boolean = false;
+  message = '';
+  isError = false;
   selectedParameter: Parameter | null = null;
-  // Pagination variables
   currentPage = 1;
-  itemsPerPage = 8; // Adjust the number of items per page as needed
+  itemsPerPage = 8;
   totalPages = 1;
 
   constructor(private router: Router, private supabaseService: SupabaseService) {}
@@ -105,13 +104,9 @@ export class SystemManagementComponent implements OnInit {
     this.router.navigate(['/workflow-approval']);
   }
 
-  goToApproval() {
-    this.router.navigate(['/workflow-approval']);
-  }
-
   openTable() {
     this.showTable = true;
-    this.loadParameters(); // Make sure to load parameters when opening the table
+    this.loadParameters();
   }
 
   closeTable() {
@@ -151,11 +146,10 @@ export class SystemManagementComponent implements OnInit {
   async loadParameters() {
     try {
       const data = await this.supabaseService.getParameters();
-      console.log('Loaded parameters:', data);
       this.parameters = data;
       this.filteredParameters = data;
       this.updatePagination();
-      this.selectedParameter = null; // Reset selected parameter
+      this.selectedParameter = null;
     } catch (error) {
       console.error('Error loading parameters:', error);
       this.showMessage('Failed to load parameters', true);
@@ -186,24 +180,11 @@ export class SystemManagementComponent implements OnInit {
     this.isManageMode = !this.isManageMode;
   }
 
-  // editParameter(parameter: Parameter) {
-  //   this.isEdit = true;
-  //   this.selectedParameter = { ...parameter };
-  //   this.parameterName = parameter.parameter_name;
-  //   this.selectedType = parameter.parameter_type;
-  //   this.holidayDate = parameter.parameter_date || '';
-  //   this.scheduleStartTime = parameter.parameter_time || '';
-  //   this.scheduleEndTime = parameter.parameter_time2 || '';
-  //   this.showPopup = true;
-    
-  // }
-
   editParameter(parameter: Parameter) {
     this.isEdit = true;
     this.selectedParameter = { ...parameter };
     this.showPopup = true;
   }
-
 
   async deleteSelectedParameters() {
     try {
@@ -212,14 +193,13 @@ export class SystemManagementComponent implements OnInit {
         this.supabaseService.deleteParameter(param.parameter_name)
       );
       await Promise.all(deletions);
-      await this.loadParameters(); // Reload parameters after deletion
+      await this.loadParameters();
       this.showMessage('Parameters deleted successfully');
     } catch (error) {
       console.error('Error deleting parameters:', error);
       this.showMessage('Failed to delete parameters', true);
     }
   }
-  
 
   updatePagination() {
     this.totalPages = Math.ceil(this.filteredParameters.length / this.itemsPerPage);
@@ -251,20 +231,6 @@ export class SystemManagementComponent implements OnInit {
     }
   }
 
-  // Function to update parameter
-  async updateParameter(updatedParameter: any) {
-    try {
-      const response = await this.supabaseService.updateParameter(updatedParameter);
-      console.log('Update response:', response);
-      // Optionally, update the local parameter list or reload data
-      // Reload data example: await this.loadParameters();
-      this.closePopup();
-    } catch (error) {
-      console.error('Error updating parameter:', error);
-    }
-  }
-
-
   async saveOrUpdateParameter() {
     try {
       if (!this.selectedParameter) {
@@ -272,11 +238,9 @@ export class SystemManagementComponent implements OnInit {
       }
   
       if (this.isEdit) {
-        // Updating existing parameter
         await this.supabaseService.updateParameter(this.selectedParameter);
         this.showMessage('Parameter updated successfully');
       } else {
-        // Creating new parameter
         await this.supabaseService.createParameter(this.selectedParameter);
         this.showMessage('Parameter saved successfully');
       }
@@ -286,5 +250,5 @@ export class SystemManagementComponent implements OnInit {
       console.error('Error saving/updating parameter:', error);
       this.showMessage('Failed to save/update parameter', true);
     }
-  }
+  }  
 }

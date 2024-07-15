@@ -50,8 +50,7 @@
       </div>
 
       <!-- Popup overlay -->
-      <!-- Popup overlay -->
-      <div *ngIf="showPopup" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div *ngIf="showPopup && selectedParameter" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div class="bg-white rounded-lg p-8 max-w-md w-full">
           <div class="flex flex-col bg-white">
             <div class="flex flex-col pb-10 w-full bg-white">
@@ -59,30 +58,30 @@
                 <div class="self-start text-3xl font-bold">{{ isManageMode ? 'Edit Parameter' : 'Create Parameter' }}</div>
                 <div class="self-start mt-3 text-sm leading-5 text-slate-500">{{ isManageMode ? 'Edit the parameter details' : 'Create a new parameter for use in your events' }}</div>
                 <div class="mt-9 font-medium leading-[150%]">Name</div>
-                <input [(ngModel)]="selectedParameter.parameter_name" type="text" placeholder="Parameter name" class="w-full px-4 pt-4 pb-2 mt-2 bg-white rounded-xl border border-solid border-zinc-200 leading-[150%] text-slate-500">
+                <input [(ngModel)]="selectedParameter!.parameter_name" type="text" placeholder="Parameter name" class="w-full px-4 pt-4 pb-2 mt-2 bg-white rounded-xl border border-solid border-zinc-200 leading-[150%] text-slate-500">
                 <div class="mt-8 font-medium leading-[150%]">Type</div>
                 <div class="relative">
-                  <select [(ngModel)]="selectedParameter.parameter_type" class="w-full justify-center py-2 mt-2 bg-white rounded-xl border border-solid border-zinc-200 leading-[150%]">
+                  <select [(ngModel)]="selectedParameter!.parameter_type" class="w-full justify-center py-2 mt-2 bg-white rounded-xl border border-solid border-zinc-200 leading-[150%]">
                     <option value="" disabled>Select type</option>
                     <option *ngFor="let type of types" [value]="type">{{ type }}</option>
                   </select>
                 </div>
                 <!-- Date input for Holiday type -->
-                <div *ngIf="selectedParameter.parameter_type === 'Holiday'" class="mt-7">
+                <div *ngIf="selectedParameter!.parameter_type === 'Holiday'" class="mt-7">
                   <div class="font-medium leading-[150%]">Date</div>
-                  <input [(ngModel)]="selectedParameter.parameter_date" type="date" class="w-full px-4 pt-4 pb-2 mt-2 bg-white rounded-xl border border-solid border-zinc-200 leading-[150%] text-slate-500">
+                  <input [(ngModel)]="selectedParameter!.parameter_date" type="date" class="w-full px-4 pt-4 pb-2 mt-2 bg-white rounded-xl border border-solid border-zinc-200 leading-[150%] text-slate-500">
                 </div>
                 <!-- Time inputs for Schedule type -->
-                <div *ngIf="selectedParameter.parameter_type === 'Schedule'" class="mt-7">
+                <div *ngIf="selectedParameter!.parameter_type === 'Schedule'" class="mt-7">
                   <div class="font-medium leading-[150%] mb-2">Schedule</div>
                   <div class="flex space-x-4">
                     <div class="w-1/2">
                       <label for="startTime" class="block text-sm font-medium text-gray-700 mb-1">Start Time</label>
-                      <input [(ngModel)]="selectedParameter.parameter_time" type="time" id="startTime" class="w-full px-4 py-2 bg-white rounded-xl border border-solid border-zinc-200 leading-[150%] text-slate-500" min="00:00" max="23:59">
+                      <input [(ngModel)]="selectedParameter!.parameter_time" type="time" id="startTime" class="w-full px-4 py-2 bg-white rounded-xl border border-solid border-zinc-200 leading-[150%] text-slate-500" min="00:00" max="23:59">
                     </div>
                     <div class="w-1/2">
                       <label for="endTime" class="block text-sm font-medium text-gray-700 mb-1">Finish Time</label>
-                      <input [(ngModel)]="selectedParameter.parameter_time2" type="time" id="endTime" class="w-full px-4 py-2 bg-white rounded-xl border border-solid border-zinc-200 leading-[150%] text-slate-500" min="00:00" max="23:59">
+                      <input [(ngModel)]="selectedParameter!.parameter_time2" type="time" id="endTime" class="w-full px-4 py-2 bg-white rounded-xl border border-solid border-zinc-200 leading-[150%] text-slate-500" min="00:00" max="23:59">
                     </div>
                   </div>
                 </div>
@@ -97,7 +96,7 @@
           </div>
         </div>
       </div>
-      
+
       <!-- Display Table -->
       <div *ngIf="showTable" class="flex flex-col w-full bg-white pt-8 px-6">
         <div class="flex justify-between items-center mb-6">
