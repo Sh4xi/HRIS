@@ -32,6 +32,7 @@ interface Employee {
   photoUrl?: string; // Add a new property for photo URL
 }
 
+
 interface Ticket {
   id: number;
   title: string;
