@@ -1097,4 +1097,3 @@ openTicketDetails(ticket: any) {
     this.closeModal();
   }
 }
-

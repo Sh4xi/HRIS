@@ -354,33 +354,39 @@ async uploadFile(bucket: string, fileName: string, file: File): Promise<{ data: 
 
   async getPhotoUrl(employeeId: string): Promise<string | null> {
     try {
+      // Ensure employeeId is not undefined and can be converted to a number
+      if (!employeeId || isNaN(Number(employeeId))) {
+        console.warn(`Invalid employee ID: ${employeeId}`);
+        return null;
+      }
+  
+      const numericEmployeeId = BigInt(employeeId);
+  
+      console.log('Fetching photo URL for employee ID:', numericEmployeeId.toString());
+  
       const { data, error } = await this.supabase
-        .from('profile') // Using 'profile' as the table name
+        .from('profile')
         .select('photo_url')
-        .eq('id', employeeId)
+        .eq('user_id', numericEmployeeId.toString())
         .single();
-
+  
       if (error) {
         console.error('Error fetching photo URL:', error.message);
         return null;
       }
-
+  
       if (!data || !data.photo_url) {
-        console.warn(`No photo URL found for employee ID: ${employeeId}`);
+        console.warn(`No photo URL found for employee ID: ${numericEmployeeId.toString()}`);
         return null;
       }
-
-      console.log(`Photo URL fetched for employee ID ${employeeId}:`, data.photo_url);
+  
+      console.log(`Photo URL fetched for employee ID ${numericEmployeeId.toString()}:`, data.photo_url);
       return data.photo_url;
     } catch (error) {
       console.error('Unexpected error fetching photo URL:', error);
       return null;
     }
   }
-
-
-
-
 
   async updateProfile(email: string, photoUrl: string): Promise<any> {
     const { data, error } = await this.supabase
