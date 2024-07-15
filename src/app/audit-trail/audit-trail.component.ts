@@ -20,7 +20,8 @@ export class AuditTrailComponent implements OnInit {
 
   async fetchAuditLogs() {
     try {
-      const logs = await this.supabaseService.getAuditLogs();
+      const logs = await this.supabaseService.fetchAuditLogs();
+      console.log('Fetched audit logs:', logs); // Add this line for debugging
       this.auditLogs = logs.map(log => ({
         ...log,
         user: log.user || 'Unknown User',
