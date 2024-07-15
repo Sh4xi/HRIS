@@ -15,7 +15,7 @@
               <option value="Password Forgotten">Recover my Account</option>
               <option value="Technical Issues">Technical Issues: Bugs, lag, or crashes</option>
               <option value="Epmployee Request">Employee Assistance Program Request</option>
-              <option value="Others">Others</option>
+              <option value="Other Matters">Others</option>
             </select>
             <textarea [(ngModel)]="ticket.description" name="description" placeholder="Description of the issue" rows="3" required class="w-full p-2 border border-gray-300 rounded bg-gray-100"></textarea>
             <button type="submit" [disabled]="!ticketForm.form.valid || ticketForm.form.pristine" class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition duration-300 disabled:bg-blue-300">

@@ -34,6 +34,7 @@ interface Employee {
 }
 
 
+
 interface Ticket {
   id: number;
   title: string;
@@ -64,7 +65,6 @@ export class UserManagementComponent implements OnInit {
   showAddPopup = false;
   showEditPopup = false;
   employees: any[] = [];
-  roles: any[] = [];
 
   showAccessRightsPopup = false;
   showAddDepartmentPopup = false;
@@ -149,7 +149,8 @@ export class UserManagementComponent implements OnInit {
     this.showCheckboxes = !this.showCheckboxes;
   }
 
-  assignedRole: any = null;
+  roles: string[] = [];
+  assignedRole: string = '';
   showRolePopup: boolean = false;
   newManageRole: string = '';
 
@@ -174,21 +175,9 @@ export class UserManagementComponent implements OnInit {
     this.showRolePopup = false;
   }
 
-  deleteRole(roleToDelete: any) {
-    this.roles = this.roles.filter(role => role !== roleToDelete);
-  }
-  
-
-
   // Handle clicking a role in the Manage Roles table
-  async onRoleClick(role: { role_id: number }) {
+  onRoleClick(role: string) {
     this.assignedRole = role;
-    const { data, error } = await this.supabaseService.getAssignedEmployees(role.role_id);
-    if (error) {
-      console.error('Error loading assigned employees:', error.message);
-    } else {
-      this.assignedEmployees = data;
-    }
   }
 
   // Mockdata for Tickets
@@ -389,13 +378,12 @@ export class UserManagementComponent implements OnInit {
     if (!this.newRole) {
       alert('Please enter a role name');
       return;
-      this.showRolePopup = false;
     }
   
-    // if (this.departmentType === 'specific' && !this.selectedDepartments) {
-    //   alert('Please select a department');
-    //   return;
-    // }
+    if (this.departmentType === 'specific' && !this.selectedDepartments) {
+      alert('Please select a department');
+      return;
+    }
   
     const roleData = {
       role_name: this.newRole,
@@ -611,17 +599,8 @@ export class UserManagementComponent implements OnInit {
     this.updateDateTimeForTickets();
     this.loadTickets();
     this.loadEmployeeNames();
-    this.loadRoles();
 
   } 
-
-  async loadRoles() {
-    try {
-      this.roles = await this.supabaseService.getRoles();
-    } catch (error) {
-      console.error('Error fetching roles:', error);
-    }
-  }
 
     // Added method to fetch employee names
     loadEmployeeNames(): void {
@@ -1013,151 +992,132 @@ toggleAllTickets() {
     this.selectedTickets.fill(!selectAll);
   }
 
-
 // Method to get selected tickets
 getSelectedTickets(): Ticket[] {
-  return this.tickets.filter((ticket, index) => this.selectedTickets[index]);
-}
+    return this.tickets.filter((ticket, index) => this.selectedTickets[index]);
+  }
 
 // Method to update a ticket
-updateTicket(updatedTicket: Ticket) {
-const index = this.tickets.findIndex(ticket => ticket.id === updatedTicket.id);
-if (index !== -1) {
-  this.tickets[index] = updatedTicket;
-  this.filteredTickets = [...this.tickets];
-  this.ticketUpdatePagination();
+updateTicket(updatedTicket: Ticket) {             // Neeed to fix
+  const index = this.tickets.findIndex(ticket => ticket.id === updatedTicket.id);
+  if (index !== -1) {
+    this.tickets[index] = updatedTicket;
+    this.filteredTickets = [...this.tickets];
+    this.ticketUpdatePagination();
+    }
   }
-}
 
 // Method to delete a ticket
-deleteTicket(ticketId: number) {
-const index = this.tickets.findIndex(ticket => ticket.id === ticketId);
-if (index !== -1) {
-  this.tickets.splice(index, 1);
-  this.filteredTickets = [...this.tickets];
-  this.selectedTickets.splice(index, 1);
-  this.ticketUpdatePagination();
+deleteTicket(ticketId: number) {           // Need to Fix
+  const index = this.tickets.findIndex(ticket => ticket.id === ticketId);
+  if (index !== -1) {
+    this.tickets.splice(index, 1);
+    this.filteredTickets = [...this.tickets];
+    this.selectedTickets.splice(index, 1);
+    this.ticketUpdatePagination();
+    }
   }
-}
 
 // Method to delete selected tickets
-async deleteSelectedTickets() {
-  const selectedTickets = this.getSelectedTickets();
-  if (selectedTickets.length === 0) {
-    console.log("No tickets selected for deletion");
-    return;
-  }
+deleteSelectedTickets() {               // Need to fix
+  const selectedIndexes = this.selectedTickets
+    .map((selected, index) => selected ? index : -1)
+    .filter(index => index !== -1);
 
-  try {
-    for (const ticket of selectedTickets) {
-      const { error } = await this.supabaseService.deleteTicket(ticket.id);
-      if (error) {
-        console.error(`Error deleting ticket ${ticket.id}:`, error.message);
-      } else {
-        console.log(`Ticket ${ticket.id} deleted successfully`);
-      }
-  }
-
-// Remove deleted tickets from local arrays
-this.tickets = this.tickets.filter(ticket => !selectedTickets.includes(ticket));
-this.filteredTickets = this.filteredTickets.filter(ticket => !selectedTickets.includes(ticket));
-this.selectedTickets = this.selectedTickets.filter((_, index) => !this.selectedTickets[index]);
-  console.log(`Deleted ${selectedTickets.length} tickets`);
-    // Update pagination
-      this.ticketUpdatePagination();
-     // Refresh the ticket list
-      await this.loadTickets();
-    } catch (error) {
-      console.error('Error deleting tickets:', error);
+  for (let i = selectedIndexes.length - 1; i >= 0; i--) {
+    const index = selectedIndexes[i];
+    this.tickets.splice(index, 1);
+    this.selectedTickets.splice(index, 1);
     }
-}
+    this.filteredTickets = [...this.tickets];
+    this.ticketUpdatePagination();
+  }
 
 // Method to prompt user for filter options
 promptFilterOptions() {
-const markAsRead = confirm("Mark all tickets as read? Click 'Cancel' to mark all as unread.");
-if (markAsRead) {
-  this.markAllAsRead();
-  } else {
-  this.markAllAsUnread();
+  const markAsRead = confirm("Mark all tickets as read? Click 'Cancel' to mark all as unread.");
+  if (markAsRead) {
+    this.markAllAsRead();
+    } else {
+    this.markAllAsUnread();
+    }
   }
-}
 
 // Method to mark all tickets as read
-markAllAsRead() {
-  this.tickets.forEach(ticket => ticket.status = 'Read');
-  this.filteredTickets = [...this.tickets];
-  this.ticketUpdatePagination();
-}
+markAllAsRead() {                   // Need to Fix
+    this.tickets.forEach(ticket => ticket.status = 'Read');
+    this.filteredTickets = [...this.tickets];
+    this.ticketUpdatePagination();
+  }
 
 // Method to mark all tickets as unread
-markAllAsUnread() {
-  this.tickets.forEach(ticket => ticket.status = 'Unread');
-  this.filteredTickets = [...this.tickets];
-  this.ticketUpdatePagination();
-}
+markAllAsUnread() {                 // Need to Fix
+    this.tickets.forEach(ticket => ticket.status = 'Unread');
+    this.filteredTickets = [...this.tickets];
+    this.ticketUpdatePagination();
+  }
 
 // Method to filter tickets based on selected option
-filterTickets() {
-switch (this.filterOption) {
-  case 'read':
-    this.filteredTickets = this.tickets.filter(ticket => ticket.status.toLowerCase() === 'read');
-    break;
-  case 'unread':
-    this.filteredTickets = this.tickets.filter(ticket => ticket.status.toLowerCase() === 'unread');
-    break;
-  default:
-    this.filteredTickets = [...this.tickets];
-    break;
+filterTickets() {                   // Need to Fix
+  switch (this.filterOption) {
+    case 'read':
+      this.filteredTickets = this.tickets.filter(ticket => ticket.status.toLowerCase() === 'read');
+      break;
+    case 'unread':
+      this.filteredTickets = this.tickets.filter(ticket => ticket.status.toLowerCase() === 'unread');
+      break;
+    default:
+      this.filteredTickets = [...this.tickets];
+      break;
+    }
+    this.ticketUpdatePagination();
   }
-  this.ticketUpdatePagination();
-}
 
 // Pagination Methods for Support Tickets
 ticketTotalPages(): number {
-  return Math.ceil(this.filteredTickets.length / this.ticket_itemsPerPage);
-}
+    return Math.ceil(this.filteredTickets.length / this.ticket_itemsPerPage);
+  }
 
 ticketUpdatePagination() {
-  this.ticket_currentPage = 1;
-  this.ticketPaginate();
-}
+    this.ticket_currentPage = 1;
+    this.ticketPaginate();
+  }
 
 ticketPaginate(): Ticket[] {
-  const start = (this.ticket_currentPage - 1) * this.ticket_itemsPerPage;
-  const end = start + this.ticket_itemsPerPage;
-  return this.filteredTickets.slice(start, end);
-}
-
-ticketPrevPage() {
-if (this.ticket_currentPage > 1) {
-  this.ticket_currentPage--;
-  this.ticketPaginate();
+    const start = (this.ticket_currentPage - 1) * this.ticket_itemsPerPage;
+    const end = start + this.ticket_itemsPerPage;
+    return this.filteredTickets.slice(start, end);
   }
-}
 
-ticketNextPage() {
-if (this.ticket_currentPage < this.ticketTotalPages()) {
-  this.ticket_currentPage++;
-  this.ticketPaginate();
+ticketPrevPage() {                      // Need to Fix
+  if (this.ticket_currentPage > 1) {
+    this.ticket_currentPage--;
+    this.ticketPaginate();
+    }
   }
-}
+
+ticketNextPage() {                        // Need to fix
+  if (this.ticket_currentPage < this.ticketTotalPages()) {
+    this.ticket_currentPage++;
+    this.ticketPaginate();
+    }
+  }
 
 updateDateTimeForTickets() {
-  // Update dateTime property for each ticket
-  this.tickets.forEach(ticket => {
-    ticket.dateTime = new Date(); // Assign current date and time
-  });
-}
-
+    // Update dateTime property for each ticket
+    this.tickets.forEach(ticket => {
+      ticket.dateTime = new Date(); // Assign current date and time
+    });
+  }
+  
 openTicketDetails(ticket: any) {
-  this.selectedTicket = ticket;
-  this.isModalVisible = true;
-}
+    this.selectedTicket = ticket;
+    this.isModalVisible = true;
+  }
 
-closeModal() {
-  this.isModalVisible = false;
-}
-
+  closeModal() {
+    this.isModalVisible = false;
+  }
 
   editTicket(){
     // Update selectedTicket with changes
@@ -1165,16 +1125,6 @@ closeModal() {
     this.closeModal();
   }
 
-<<<<<<< HEAD
-  // doneTicket(){
-  //   // Mark selectedTicket as done
-  //   this.selectedTicket.status = 'Done';
-  //   this.updateTicket(this.selectedTicket);
-  //   this.closeModal();
-  // }
-}
-
-=======
   doneTicket(){
     // Mark selectedTicket as done
     this.selectedTicket.status = 'Done';
@@ -1182,4 +1132,3 @@ closeModal() {
     this.closeModal();
   }
 }
->>>>>>> upload_photo_branch13

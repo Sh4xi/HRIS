@@ -1,3 +1,5 @@
+
+
 <div class="flex flex-col justify-center bg-white min-h-screen">
   <main class="flex justify-center items-center px-16 py-5 w-full max-md:px-5">
     <section class="flex flex-col pb-20 w-full max-w-[1200px]">
@@ -33,16 +35,27 @@
               </tr>
             </thead>
             <tbody class="text-slate-500">
-              <tr *ngFor="let log of auditLogs" class="border-t border-gray-200">
-                <td class="px-4 py-3">{{ log.timestamp | date:'MMMM d, y' }}</td>
-                <td class="px-4 py-3">{{ log.timestamp | date:'h:mm a' }}</td>
-                <td class="px-4 py-3">{{ log.user }}</td>
-                <td class="px-4 py-3">{{ log.ip_address }}</td>
-                <td class="px-4 py-3">{{ log.affected_page }}</td>
-                <td class="px-4 py-3">{{ log.action }}</td>
-                <td class="px-4 py-3">{{ log.parameter }}</td>
-                <td class="px-4 py-3">{{ log.old_value }}</td>
-                <td class="px-4 py-3">{{ log.new_value }}</td>
+              <tr class="border-t border-gray-200">
+                <td class="px-4 py-3">August 6, 2024</td>
+                <td class="px-4 py-3">1:00 AM</td>
+                <td class="px-4 py-3">Kai Sotto</td>
+                <td class="px-4 py-3">194.342.3.75</td>
+                <td class="px-4 py-3">User Management</td>
+                <td class="px-4 py-3">Edit</td>
+                <td class="px-4 py-3">Email</td>
+                <td class="px-4 py-3">kaisotto&#64;yahoo.com</td>
+                <td class="px-4 py-3">binikaisotto&#64;yahoo.com</td>
+              </tr>
+              <tr class="border-t border-gray-200">
+                <td class="px-4 py-3">August 6, 2024</td>
+                <td class="px-4 py-3">1:00 AM</td>
+                <td class="px-4 py-3">Kai Sotto</td>
+                <td class="px-4 py-3">194.342.3.75</td>
+                <td class="px-4 py-3">Support Tickets</td>
+                <td class="px-4 py-3">Delete</td>
+                <td class="px-4 py-3">Ticket ID</td>
+                <td class="px-4 py-3">2</td>
+                <td class="px-4 py-3">-</td>
               </tr>
             </tbody>
           </table>

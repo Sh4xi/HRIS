@@ -18,10 +18,6 @@ interface Ticket {
 
 export class SupabaseService {
   //uploadFile: any;
-
-  private databaseChangeSubject = new BehaviorSubject<boolean>(false);
-  public databaseChange$ = this.databaseChangeSubject.asObservable();
-
   uploadPhoto(photoFile: any) {
     throw new Error('Method not implemented.');
   }
@@ -50,29 +46,6 @@ export class SupabaseService {
       if (!sessionError && session) {
         this.currentSession.next(session);
       }
-    }
-  }
-
-  async getRoles() {
-    const { data, error } = await this.supabase
-      .from('roles')
-      .select('role_name, role_id');
-  
-    if (error) {
-      throw error;
-    }
-  
-    return data;
-  }
-  
-  async getAssignedEmployees(roleId: number): Promise<any> {
-    const { data, error } = await this.supabase
-      .from('user_roles')
-      .select('user_id')
-      .eq('role_id', roleId);
-
-    if (error) {
-      return { data: null, error };
     }
   }
 
@@ -138,12 +111,11 @@ export class SupabaseService {
   }
 
   private handleDatabaseChange(): void {
-    // if (isPlatformBrowser(this.platformId)) {
-    //   window.location.reload();
-    // } else {
-    //   console.log('Database change detected, but not in browser environment');
-    // }
-    this.databaseChangeSubject.next(true);
+    if (isPlatformBrowser(this.platformId)) {
+      window.location.reload();
+    } else {
+      console.log('Database change detected, but not in browser environment');
+    }
   }
 
   async checkEmailExists(email: string): Promise<boolean> {
@@ -160,72 +132,6 @@ export class SupabaseService {
     return data.length > 0;
   }
 
-<<<<<<< HEAD
-  async createEmployee(employee: any): Promise<PostgrestSingleResponse<any>> {
-    const response = await this.supabase.from('profile').insert([
-      {
-        email: employee.email,
-        first_name: employee.firstname,
-        mid_name: employee.midname,
-        surname: employee.surname,
-        password: employee.password, // Hash the password before storing
-        department: employee.department,
-        position: employee.position,
-        types: employee.type
-      },
-    ]).select('user_id');
-
-  // Step 2: Handle potential errors in the employee creation process
-  if (response.error) {
-    console.error('Error creating employee:', response.error.message);
-    return response; // Return early if there was an error
-  } else {
-    console.log('Employee created successfully:', response.data);
-    const newUserId = response.data[0].user_id;
-  
-    // Step 3: Fetch the corresponding role_id for the role_name
-    const { data: rolesData, error: rolesError } = await this.supabase
-      .from('roles')
-      .select('role_id')
-      .eq('role_name', employee.position)
-      .single();
-
-    // Step 4: Handle potential errors in fetching the role_id
-    if (rolesError) {
-      console.error('Error fetching role_id:', rolesError.message);
-      return { data: null, error: rolesError } as PostgrestSingleResponse<any>; // Return early if there was an error
-    }
-
-    const roleId = rolesData.role_id;
-
-    // Step 5: Assign role to the user and store role_name
-    const assignRoleResponse = await this.assignUserRole(newUserId, roleId);
-
-    // Step 6: Handle potential errors in the role assignment process
-    if (assignRoleResponse.error) {
-      console.error('Error assigning role:', assignRoleResponse.error.message);
-    } else {
-      console.log('Role assigned successfully:', assignRoleResponse.data);
-    }
-
-    // Step 7: Refresh the session
-    await this.refreshSession();
-  }
-
-  return response;
-  }
-
-  async assignUserRole(userId: number, roleId: number): Promise<PostgrestSingleResponse<any>> {
-    const response = await this.supabase
-      .from('user_roles')
-      .insert({ user_id: userId, role_id: roleId });
-  
-    if (response.error) {
-      console.error('Error assigning role:', response.error.message);
-    }
-  
-    return response;
-=======
   async createEmployee(employeeData: any): Promise<{ data: any; error: any }> {
     console.log('SupabaseService received employee data:', employeeData);
   
@@ -254,7 +160,6 @@ export class SupabaseService {
       console.error('Error in createEmployee:', error);
       return { data: null, error };
     }
->>>>>>> upload_photo_branch13
   }
 
   async createRole(roleData: any): Promise<PostgrestSingleResponse<any>> {
@@ -410,35 +315,21 @@ export class SupabaseService {
     return data;
   }
 
-
-
-  async deleteTicket(ticketId: number) {
-    return await this.supabase
+  // Fetch tickets from the database
+  async getTickets() {
+    const { data, error } = await this.supabase
       .from('ticket')
-      .delete()
-      .eq('id', ticketId);
+      .select('*')
+      .order('dateTime', { ascending: false });
+    if (error) {
+      console.error('Error fetching tickets:', error);
+      return { data: [], error };
+    }
+    return { data, error };
   }
 
-<<<<<<< HEAD
-    // Fetch tickets from the database
-    async getTickets() {
-      const { data, error } = await this.supabase
-        .from('ticket')
-        .select('*')
-        .order('dateTime', { ascending: false });
-      if (error) {
-        console.error('Error fetching tickets:', error);
-        return { data: [], error };
-      }
-      return { data, error };
-    }
-  
-  async uploadImage(file: File): Promise<{ data: { url: string } | null, error: Error | null }> {
-    console.log('Uploading image...');
-=======
   async uploadFile(bucket: string, fileName: string, file: File): Promise<{ data: { path: string, publicUrl: string } | null, error: Error | null }> {
     console.log('Uploading file...');
->>>>>>> upload_photo_branch13
     try {
       const { data, error } = await this.supabase.storage
         .from(bucket)
@@ -586,77 +477,5 @@ export class SupabaseService {
       console.error('Failed to set storage policy:', error);
       return false;
     }
-  }
-  async getAuditLogs() {
-    const { data, error } = await this.supabase
-      .from('audit')
-      .select('*')
-      .order('timestamp', { ascending: false });
-
-    if (error) {
-      console.error('Error fetching audit logs:', error);
-      return [];
-    }
-
-    return data;
-  }
-
-  async logAction(userId: number, action: string) {
-    const { error } = await this.supabase
-      .from('audit')
-      .insert([{ user_id: userId, action }]);
-
-    if (error) {
-      console.error('Error logging action:', error);
-    }
-  }
-
-  //parameters
-  async getParameters() {
-    const { data, error } = await this.supabase
-      .from('parameters')
-      .select('*');
-    if (error) throw error;
-    console.log('Fetched data from Supabase:', data);
-    return data;
-  }
-  
-  async createParameter(parameter: any) {
-    const { data, error } = await this.supabase
-      .from('parameters')
-      .insert(parameter);
-    if (error) throw error;
-    return data;
-  }
-
-  async deleteParameter(parameterName: string): Promise<void> {
-    const { error } = await this.supabase
-      .from('parameters')
-      .delete()
-      .eq('parameter_name', parameterName);
-  
-    if (error) {
-      throw error;
-    }
-  }
-
-  async updateParameter(parameter: any) {
-    const { data, error } = await this.supabase
-      .from('parameters') // Replace 'parameters' with your actual table name
-      .update({
-        parameter_name: parameter.parameter_name,
-        parameter_type: parameter.parameter_type,
-        parameter_date: parameter.parameter_date,
-        parameter_time: parameter.parameter_time,
-        parameter_time2: parameter.parameter_time2
-        // Add any other fields that your parameter object has
-      })
-      .eq('id', parameter.id); // Assuming 'id' is the unique identifier
-
-    if (error) {
-      throw error;
-    }
-
-    return data;
   }
 }
