@@ -1,15 +1,14 @@
-//ts
-
 import { Component, OnInit } from '@angular/core';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router, RouterModule } from '@angular/router';
 import { environment } from '../environments/environment';
 
 @Component({
   selector: 'app-workflow-approval-user',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './workflow-approval-user.component.html',
   styleUrls: ['./workflow-approval-user.component.css']
 })
@@ -29,9 +28,8 @@ export class WorkflowApprovalUserComponent implements OnInit {
   currentPage: number = 1;
   totalPages: number = 1;
   itemsPerPage: number = 10;
-  router: any;
 
-  constructor() {
+  constructor(private router: Router) {
     console.log('Initializing Supabase client...');
     console.log('Supabase URL:', environment.supabaseUrl);
     console.log('Supabase Key:', environment.supabaseKey ? 'Provided' : 'Missing');
@@ -126,9 +124,8 @@ export class WorkflowApprovalUserComponent implements OnInit {
       if (userError) throw new Error(`Authentication error: ${userError.message}`);
       if (!user) throw new Error('No authenticated user found');
 
-      console.log('User email:', user.email); // Log the user email for debugging
+      console.log('User email:', user.email);
 
-      // Construct workflow data with authenticated user's email as requested_by
       const workflowData = {
         ...this.newWorkflow,
         requested_by: user.email,
@@ -147,8 +144,8 @@ export class WorkflowApprovalUserComponent implements OnInit {
       console.log('Workflow submitted successfully:', data);
 
       this.closeUploadModal();
-      await this.fetchUserWorkflows(); // Use await here
-      this.updatePaginatedWorkflows(); // Refresh the list
+      await this.fetchUserWorkflows();
+      this.updatePaginatedWorkflows();
       alert('Workflow request submitted successfully!');
     } catch (error) {
       console.error('Error submitting workflow request:', error);
@@ -169,22 +166,19 @@ export class WorkflowApprovalUserComponent implements OnInit {
     return workflow.id;
   }
 
-  // functionality for the previous button
-  async previousPage() {
+  previousPage() {
     if (this.currentPage > 1) {
       this.currentPage--;
       this.updatePaginatedWorkflows();
     }
   }
 
-  // funtionality for the next page button
-  async nextPage() {
+  nextPage() {
     if (this.currentPage < this.totalPages) {
       this.currentPage++;
       this.updatePaginatedWorkflows();  
     }
   }
-
 
   openUploadModal() {
     this.showUploadModal = true;
