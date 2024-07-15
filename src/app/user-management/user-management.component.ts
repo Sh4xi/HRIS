@@ -40,6 +40,7 @@ interface Ticket {
   description: string;
   status: string;
   dateTime: Date;
+  priority: 'Low' | 'Medium' | 'High' | 'Urgent';
 }
 
 @Component({
@@ -93,7 +94,7 @@ export class UserManagementComponent implements OnInit {
 
   selectedTicket: any = null;
   isModalVisible = false;
-  replyText: string = '';
+  replyText: string = ''; // Text for the reply
 
   employee = {
     email: '',
@@ -971,6 +972,14 @@ updateDateTimeForTickets() {
 openTicketDetails(ticket: any) {
   this.selectedTicket = ticket;
   this.isModalVisible = true;
+}
+
+ // Method to update ticket priority
+ updateTicketPriority(ticket: Ticket, event: Event): void {
+  const selectElement = event.target as HTMLSelectElement;
+  const newPriority = selectElement.value as 'Low' | 'Medium' | 'High' | 'Urgent';
+  ticket.priority = newPriority;
+  // Add logic to save the updated ticket priority, e.g., update the backend or state
 }
 
 closeModal() {
