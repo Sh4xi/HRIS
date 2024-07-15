@@ -17,6 +17,7 @@ interface Ticket {
 })
 
 export class SupabaseService {
+  //uploadFile: any;
   uploadPhoto(photoFile: any) {
     throw new Error('Method not implemented.');
   }
@@ -144,6 +145,7 @@ export class SupabaseService {
     return data.length > 0;
   }
 
+<<<<<<< HEAD
   async createEmployee(employee: any): Promise<PostgrestSingleResponse<any>> {
     const response = await this.supabase.from('profile').insert([
       {
@@ -208,6 +210,36 @@ export class SupabaseService {
     }
   
     return response;
+=======
+  async createEmployee(employeeData: any): Promise<{ data: any; error: any }> {
+    console.log('SupabaseService received employee data:', employeeData);
+  
+    try {
+      // Log the exact data being inserted
+      console.log('Data to insert:', employeeData);
+  
+      const { data, error } = await this.supabase
+        .from('profile')
+        .insert([employeeData])
+        .select();
+  
+      if (error) {
+        console.error('Supabase insert error:', error);
+        return { data: null, error };
+      }
+  
+      if (!data || data.length === 0) {
+        console.error('No data returned from Supabase insert');
+        return { data: null, error: new Error('No data returned from insert') };
+      }
+  
+      console.log('Supabase insert successful:', data);
+      return { data: data[0], error: null };
+    } catch (error) {
+      console.error('Error in createEmployee:', error);
+      return { data: null, error };
+    }
+>>>>>>> upload_photo_branch13
   }
 
   async createRole(roleData: any): Promise<PostgrestSingleResponse<any>> {
@@ -372,6 +404,7 @@ export class SupabaseService {
       .eq('id', ticketId);
   }
 
+<<<<<<< HEAD
     // Fetch tickets from the database
     async getTickets() {
       const { data, error } = await this.supabase
@@ -387,43 +420,144 @@ export class SupabaseService {
   
   async uploadImage(file: File): Promise<{ data: { url: string } | null, error: Error | null }> {
     console.log('Uploading image...');
+=======
+  async uploadFile(bucket: string, fileName: string, file: File): Promise<{ data: { path: string, publicUrl: string } | null, error: Error | null }> {
+    console.log('Uploading file...');
+>>>>>>> upload_photo_branch13
     try {
       const { data, error } = await this.supabase.storage
-        .from('photos') // Replace with your Supabase storage bucket name
-        .upload(`employimages/${file.name}`, file, {
-          contentType: file.type
+        .from(bucket)
+        .upload(fileName, file, {
+          cacheControl: '3600',
+          contentType: file.type,
+          upsert: false
         });
-
+  
       if (error) {
         console.error('Error during upload:', error.message);
         return { data: null, error };
       }
-
+  
       console.log('Upload successful:', data);
-
-      // Constructing the URL assuming the structure of the response
-      const url = data?.path ? `https://${environment.supabaseUrl}/storage/v1/object/public/${data.path}` : '';
-
-      return { data: { url }, error: null };
+  
+      // Get the public URL for the uploaded file
+      const { data: publicUrlData } = this.supabase
+        .storage
+        .from(bucket)
+        .getPublicUrl(data.path);
+  
+      if (!publicUrlData || !publicUrlData.publicUrl) {
+        return { data: null, error: new Error('Failed to get public URL') };
+      }
+  
+      console.log('Public URL:', publicUrlData.publicUrl);
+  
+      return { 
+        data: { 
+          path: data.path,
+          publicUrl: publicUrlData.publicUrl
+        }, 
+        error: null 
+      };
     } catch (error) {
       console.error('Unexpected error during upload:', error);
       return { data: null, error: error as Error };
     }
   }
 
+
+  async updateProfilePhotoUrl(employeeId: string, photoUrl: string): Promise<{ data: any | null, error: Error | null }> {
+    try {
+      // Ensure employeeId is not undefined and can be converted to a number
+      if (!employeeId || isNaN(Number(employeeId))) {
+        console.error(`Invalid employee ID: ${employeeId}`);
+        return { data: null, error: new Error('Invalid employee ID') };
+      }
+  
+      console.log(`Updating photo URL for employee ID: ${employeeId}`);
+      console.log(`New photo URL: ${photoUrl}`);
+  
+      const { data, error } = await this.supabase
+        .from('profile')
+        .update({ photo_url: photoUrl })
+        .eq('id', employeeId)
+        .single();
+  
+      if (error) {
+        console.error('Error updating profile photo URL:', error);
+        //return { data: null, error };
+      }
+  
+      if (!data) {
+        console.warn(`No data returned when updating photo URL for employee ID: ${employeeId}`);
+        return { data: null, error: new Error('No data returned from update operation') };
+      }
+  
+      console.log(`Successfully updated photo URL for employee ID ${employeeId}`);
+      return { data, error: null };
+    } catch (error) {
+      console.error('Unexpected error updating profile photo URL:', error);
+      return { data: null, error: error instanceof Error ? error : new Error('Unknown error occurred') };
+    }
+  }
+
+  async getPhotoUrl(employeeId: string): Promise<string | null> {
+    try {
+        console.log('Fetching photo URL for employee ID:', employeeId);
+
+        const { data, error } = await this.supabase
+            .from('profile')
+            .select('photo_url')
+            .eq('email', employeeId)  // Assuming 'email' is the correct column name for email addresses
+            .single();
+
+        if (error) {
+            console.error('Error fetching photo URL:', error.message);
+            return null;
+        }
+
+        if (!data || !data.photo_url) {
+            console.warn(`No photo URL found for employee ID: ${employeeId}`);
+            return null;
+        }
+
+        console.log(`Photo URL fetched for employee ID ${employeeId}:`, data.photo_url);
+        return data.photo_url;
+    } catch (error) {
+        console.error('Unexpected error fetching photo URL:', error);
+        return null;
+    }
+}
+
+
+
+
+
+
+
+  async updateProfile(email: string, photoUrl: string): Promise<any> {
+    const { data, error } = await this.supabase
+      .from('profile')
+      .update({ photo_url: photoUrl }) // Assuming 'photo_url' is the column name for the photo URL
+      .eq('email', email);
+
+    if (error) {
+      console.error('Error updating profile:', error);
+      return null;
+    }
+
+    return data;
+  }
+  
   async setStoragePolicy(): Promise<boolean> {
     try {
       const supabaseAny = this.supabase as any; // Cast supabase to any temporarily
       const { data, error } = await supabaseAny.storage
         .from('photos')
-        .createPolicy({
-          path: '*',
+        .updateBucket('photos', {
           public: false, // Set to true if you want files to be publicly accessible
           cacheControl: '3600', // Cache control settings in seconds
-          contentType: 'image/jpeg,image/png', // Allowed content types
-          expiration: '2024-12-31T00:00:00Z', // Expiration date for access
-          actions: ['read', 'write'], // Allowed actions: read, write
-          roles: ['authenticated'], // Roles that can access (e.g., authenticated users)
+          allowedMimeTypes: ['image/jpeg', 'image/png'], // Allowed content types
         });
 
       if (error) {

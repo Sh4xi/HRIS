@@ -22,14 +22,15 @@ interface User {
 }
 
 interface Employee {
+  profile: string;
+  name: string;
   email: string;
-  firstName: string;
-  middleName: string;
-  surname: string;
-  position: string;
+  password: string;
   department: string;
+  position: string;
   type: string;
-  photoUrl?: string; // Add a new property for photo URL
+  status: string;
+  access: boolean;
 }
 
 
@@ -70,7 +71,7 @@ export class UserManagementComponent implements OnInit {
   showAddDepartmentPopup = false;
   isEditing: boolean = false;
   showModal = false;
-  photoPreviewUrl = 'https://via.placeholder.com/200x200';
+  photoPreviewUrl: string = 'https://via.placeholder.com/200x200';;
   showPasswordGeneratedMessage: boolean = false;
   newRole = '';
   newDepartment = '';
@@ -81,6 +82,8 @@ export class UserManagementComponent implements OnInit {
   showPhotoMessage = true; // Property to control the visibility of the message
   showFileTypeAlert = false;
   showFileSizeAlert = false;
+  photoFile: File | null = null;
+  
 
   // Functions for Support tickets tab
   paginatedTickets: Ticket[] = [];
@@ -241,27 +244,27 @@ export class UserManagementComponent implements OnInit {
 
   onPhotoChange(event: any) {
     const file = event.target.files[0];
-    const maxSizeInBytes = 50 * 1024 * 1024; // 2MB
-  
+    const maxSizeInBytes = 50 * 1024 * 1024; // 50MB
+
     // Reset alerts
     this.showFileTypeAlert = false;
     this.showFileSizeAlert = false;
-  
+
     if (file) {
       if (file.size > maxSizeInBytes) {
-        // Display size alert if the file exceeds 2MB
         this.showFileSizeAlert = true;
-        event.target.value = ''; // Clear the file input
+        event.target.value = '';
         return;
       }
-  
-      if (file.type !== 'image/png') {
-        // Display type alert if the file is not a PNG
+
+      if (!['image/png', 'image/jpeg', 'image/jpg'].includes(file.type)) {
         this.showFileTypeAlert = true;
-        event.target.value = ''; // Clear the file input
+        event.target.value = '';
         return;
       }
-  
+
+      this.photoFile = file;
+
       // Read and display the selected image file
       const reader = new FileReader();
       reader.onload = (e: any) => {
@@ -270,6 +273,7 @@ export class UserManagementComponent implements OnInit {
       reader.readAsDataURL(file);
     }
   }
+  
   
   isValidEmail(email: string): boolean {
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -283,37 +287,92 @@ export class UserManagementComponent implements OnInit {
       return;
     }
   
-    if (this.isEditing) {
-      console.log('Updating employee:', this.employee);
-      const response = await this.supabaseService.updateEmployee(this.employee);
-      if (response.error) {
-        console.error('Error updating employee:', response.error.message);
+    try {
+      const photoUrl = await this.uploadPhoto();
+  
+      const employeeData = {
+        first_name: this.employee.firstname,
+        mid_name: this.employee.midname,
+        surname: this.employee.surname,
+        email: this.employee.email,
+        password: this.employee.password,
+        department: this.employee.department,
+        position: this.employee.position,
+        types: this.employee.type,
+        access: true,
+        photo_url: photoUrl || this.photoPreviewUrl
+        // status field removed
+      };
+  
+      console.log('Employee data to be sent:', employeeData);
+  
+      let response;
+  
+      if (this.isEditing) {
+        console.log('Updating employee:', employeeData);
+        response = await this.supabaseService.updateEmployee(employeeData);
       } else {
-        console.log('Employee updated successfully:', response.data);
-        this.toggleModal();
-        this.resetForm();
-        this.loadEmployees();
-      }
-    } else {
-      const emailExists = await this.supabaseService.checkEmailExists(this.employee.email);
-      if (emailExists) {
-        console.error('Email already exists. Please use a different email.');
-        alert('Email already exists. Please use a different email.');
-        return;
+        const emailExists = await this.supabaseService.checkEmailExists(this.employee.email);
+        if (emailExists) {
+          console.error('Email already exists. Please use a different email.');
+          alert('Email already exists. Please use a different email.');
+          return;
+        }
+  
+        console.log('Creating employee:', employeeData);
+        response = await this.supabaseService.createEmployee(employeeData);
       }
   
-      console.log('Creating employee:', this.employee);
-      const response = await this.supabaseService.createEmployee(this.employee);
       if (response.error) {
-        console.error('Error creating employee:', response.error.message);
+        console.error(`Error ${this.isEditing ? 'updating' : 'creating'} employee:`, response.error);
+        alert(`Error ${this.isEditing ? 'updating' : 'creating'} employee. Please try again.`);
       } else {
-        console.log('Employee created successfully:', response.data);
+        console.log(`Employee ${this.isEditing ? 'updated' : 'created'} successfully:`, response.data);
+        alert(`Employee ${this.isEditing ? 'updated' : 'created'} successfully.`);
         this.toggleModal();
         this.resetForm();
         this.loadEmployees();
       }
+    } catch (error) {
+      console.error('Error in onSubmit:', error);
+      alert('An unexpected error occurred. Please try again.');
     }
   }
+  
+  
+  async uploadPhoto(): Promise<string | null> {
+    if (!this.photoFile) {
+      console.log('No photo file selected');
+      return null;
+    }
+  
+    try {
+      console.log('Uploading photo:', this.photoFile.name);
+      const fileName = `${Date.now()}_${this.photoFile.name}`;
+      const { data, error } = await this.supabaseService.uploadFile('photos', fileName, this.photoFile);
+  
+      if (error) {
+        console.error('Supabase upload error:', error);
+        throw error;
+      }
+  
+      console.log('Upload response:', data);
+  
+      if (data?.path) {
+        const fullUrl = `https://vhmftufkipgbxmcimeuq.supabase.co/storage/v1/object/public/photos/${data.path}`;
+        console.log('Full photo URL:', fullUrl);
+        return fullUrl;
+      } else {
+        console.warn('Upload successful, but no path returned');
+        return null;
+      }
+    } catch (error) {
+      console.error('Error uploading photo:', error);
+      alert('Error uploading photo. Please try again.');
+      return null;
+    }
+  }
+  
 
   addRole() {
     if (!this.newRole) {
@@ -365,39 +424,76 @@ export class UserManagementComponent implements OnInit {
     return this.users.filter(user => user.selected);
   }
 
-  async updateEmployee(employee: any,) { // updateEmployee(employee: any, index: number) {
-    const updatedUser: Partial<User> = {
-      profile: this.photoPreviewUrl,
-      name: `${employee.firstname} ${employee.midname ? employee.midname + ' ' : ''}${employee.surname}`,
-      email: employee.email,
-      password: employee.password,
-      department: employee.department,
-      position: employee.position,
-      type: employee.type,
-      status: 'Active',
-      access: true
-
-    };
+  async updateEmployee(employee: any) {
+    try {
+      console.log('Updating employee:', employee);
   
-    // Update user locally
-    const index = this.users.findIndex(user => user.email === employee.email);
-    if (index !== -1) {
-      this.users[index] = updatedUser as User;
-    }
-    this.filteredUsers = this.users;
-    this.updatePagination();
+      // Upload the photo and get the URL
+      let photoUrl = null;
+      if (this.photoFile) {
+        photoUrl = await this.uploadPhoto();
+        console.log('New photo uploaded, URL:', photoUrl);
+      } else {
+        console.log('No new photo to upload');
+      }
   
-    // Update user in the database
-    const { data, error } = await this.supabaseService.updateEmployee(employee);
-    if (error) {
-      console.error('Error updating employee:', error.message);
-    } else {
-      console.log('Employee updated successfully:', data);
+      // Determine the profile picture URL
+      const profileUrl = photoUrl || this.photoPreviewUrl || employee.photo_url || 'path/to/default/image.png';
+      console.log('Profile URL to be used:', profileUrl);
+  
+      const updatedUser: Partial<User> = {
+        profile: profileUrl,
+        name: `${employee.firstname.trim()} ${employee.midname ? employee.midname.trim() + ' ' : ''}${employee.surname.trim()}`,
+        email: employee.email.trim(),
+        password: employee.password,
+        department: employee.department.trim(),
+        position: employee.position.trim(),
+        type: employee.type.trim(),
+        status: 'Active',
+        access: true
+      };
+  
+      console.log('Updated user object:', updatedUser);
+  
+      // Update user locally
+      const index = this.users.findIndex(user => user.email === employee.email);
+      if (index !== -1) {
+        this.users[index] = updatedUser as User;
+        console.log('Local user array updated');
+      } else {
+        console.warn('User not found in local array for update');
+      }
+      this.filteredUsers = this.users;
+      this.updatePagination();
+  
+      // Update user in the database
+      const { data, error } = await this.supabaseService.updateEmployee({
+        ...employee,
+        photo_url: profileUrl
+      });
+  
+      if (error) {
+        console.error('Error updating employee in Supabase:', error);
+        throw new Error(`Failed to update employee: ${error.message}`);
+      }
+  
+      console.log('Employee updated successfully in Supabase:', data);
+  
+      // Close modal and reset form
       this.toggleModal();
       this.resetForm();
-      this.loadEmployees(); //added feature
+  
+      // Reload employees to ensure consistency
+      await this.loadEmployees();
+  
+      return updatedUser;
+    } catch (error) {
+      console.error('Error in updateEmployee:', error);
+      // You might want to show an error message to the user here
+      throw error; // Re-throw the error so it can be handled by the caller if needed
     }
   }
+  
   
   resetForm() {
     this.employee = {
@@ -419,46 +515,83 @@ export class UserManagementComponent implements OnInit {
   }
 
   async createEmployee(employee: any) {
+    console.log('Received employee data:', employee);
+  
     if (!this.isValidEmail(employee.email)) {
       console.error('Invalid email format');
       alert('Please enter a valid email address.');
       return;
     }
   
-    const newUser = {
-      email: employee.email,
-      first_name: employee.firstname,
-      mid_name: employee.midname,
-      surname: employee.surname,
-      password: this.generateRandomPassword(8), // Use the generated password
-      department: employee.department,
-      position: employee.position,
-      types: employee.type
-    };
+    // Check for required fields
+    const requiredFields = ['firstname', 'surname', 'department', 'position', 'type'];
+    for (const field of requiredFields) {
+      if (!employee[field]) {
+        console.error(`Missing required field: ${field}`);
+        alert(`Please fill in the ${field} field.`);
+        return;
+      }
+    }
   
-    const { data, error } = await this.supabaseService.createEmployee(newUser);
-    if (error) {
-      console.error('Error creating profile:', error.message);
-    } else if (data) {
-      const newUser: User = {
-        profile: this.photoPreviewUrl,
-        name: `${employee.firstname} ${employee.midname ? employee.midname + ' ' : ''}${employee.surname}`,
+    try {
+      const photoUrl = await this.uploadPhoto();
+  
+      const newEmployee = {
+        profile: photoUrl || this.photoPreviewUrl,
         email: employee.email,
-        password: '***************',
+        first_name: employee.firstname.trim(),
+        mid_name: employee.midname ? employee.midname.trim() : null,
+        surname: employee.surname.trim(),
+        password: this.generateRandomPassword(12),
         department: employee.department,
         position: employee.position,
-        type: employee.type,
+        types: employee.type,
         status: 'Active',
         access: true
       };
+  
+      console.log('Sending employee data to Supabase:', newEmployee);
+  
+      const { data, error } = await this.supabaseService.createEmployee(newEmployee);
+  
+      if (error) {
+        console.error('Error from Supabase:', error);
+        alert(`Error creating employee: ${error.message}`);
+        return;
+      }
+  
+      if (!data) {
+        console.error('No data returned from Supabase');
+        alert('Error creating employee: No data returned');
+        return;
+      }
+  
+      console.log('Employee created successfully:', data);
+  
+      const newUser: User = {
+        profile: newEmployee.profile,
+        name: `${newEmployee.first_name} ${newEmployee.mid_name ? newEmployee.mid_name + ' ' : ''}${newEmployee.surname}`,
+        email: newEmployee.email,
+        password: '***************',
+        department: newEmployee.department,
+        position: newEmployee.position,
+        type: newEmployee.types,
+        status: newEmployee.status,
+        access: newEmployee.access
+      };
+  
       this.users.push(newUser);
-      this.filteredUsers = this.users;
+      this.filteredUsers = [...this.users];
       this.updatePagination();
       this.toggleModal();
       this.resetForm();
+      alert('Employee created successfully.');
+  
+    } catch (error) {
+      console.error('Unexpected error creating employee:', error);
+      alert('An unexpected error occurred. Please try again.');
     }
   }
-
   ngOnInit() {
     this.loadEmployees();
     this.filteredTickets = this.tickets;
@@ -512,32 +645,81 @@ export class UserManagementComponent implements OnInit {
     }
   }
 
-  
+  //edit the photo here
   async loadEmployees() {
     try {
+      console.log('Fetching employees...');
       const { data, error } = await this.supabaseService.getEmployees();
+  
       if (error) {
         console.error('Error fetching employees:', error.message);
-      } else if (data) {
-        this.users = data.map((employee: any): User => ({
-          profile: 'https://via.placeholder.com/200x200',
-          name: `${employee.first_name} ${employee.mid_name ? employee.mid_name + ' ' : ''}${employee.surname}`,
-          email: employee.email,
-          password: employee.password, // Make sure this line is present
-          department: employee.department,
-          position: employee.position,
-          type: employee.types,
-          status: 'Active',
-          access: true
-          //term: '' // Add this property to match the User interface
-        }));
-        this.filteredUsers = this.users;
-        this.updatePagination();
+        throw error;
       }
+  
+      if (!data || data.length === 0) {
+        console.warn('No employee data received');
+        this.users = [];
+        this.filteredUsers = [];
+        this.updatePagination();
+        return;
+      }
+  
+      console.log(`Raw employee data (${data.length} employees):`, data);
+  
+      this.users = await Promise.all(data.map(async (employee: any, index: number): Promise<User> => {
+        console.log(`Employee ${index} data:`, employee);
+  
+        let photoUrl: string | null = null;
+        let employeeIdentifier: string | null = null;
+  
+        if (employee.id) {
+          employeeIdentifier = employee.id.toString();
+        } else if (employee.email) {
+          employeeIdentifier = employee.email;
+          console.warn(`Employee at index ${index} has no id, using email as identifier`);
+        } else {
+          console.warn(`Employee at index ${index} has no id or email`);
+        }
+  
+        if (employeeIdentifier) {
+          try {
+            photoUrl = await this.supabaseService.getPhotoUrl(employeeIdentifier);
+            console.log(`Photo URL for employee ${employeeIdentifier}:`, photoUrl);
+          } catch (error) {
+            console.error(`Error fetching photo URL for employee ${employeeIdentifier}:`, error);
+          }
+        }
+  
+        const user: User = {
+          profile: photoUrl || 'photo_url',
+          name: `${employee.first_name?.trim() || ''} ${employee.mid_name ? employee.mid_name.trim() + ' ' : ''}${employee.surname?.trim() || ''}`.trim(),
+          email: employee.email?.trim() || '',
+          password: employee.password || '',
+          department: employee.department?.trim() || 'Unassigned',
+          position: employee.position?.trim() || 'Unassigned',
+          type: employee.types?.trim() || 'Unassigned',
+          status: 'Active',
+          access: true,
+        };
+  
+        console.log(`Mapped user ${index + 1}:`, user);
+  
+        return user;
+      }));
+  
+      console.log(`Total users mapped: ${this.users.length}`);
+  
+      this.filteredUsers = this.users;
+      this.updatePagination();
+  
+      console.log('Employee loading complete');
     } catch (error) {
-      console.error('Error fetching employees:', error);
+      console.error('Unexpected error while fetching employees:', error);
+      // Here you might want to set some error state or show a user-facing error message
     }
   }
+
+  
 
   searchTable() {
     this.filteredUsers = this.users.filter(user =>
@@ -974,6 +1156,7 @@ closeModal() {
     this.closeModal();
   }
 
+<<<<<<< HEAD
   // doneTicket(){
   //   // Mark selectedTicket as done
   //   this.selectedTicket.status = 'Done';
@@ -982,3 +1165,12 @@ closeModal() {
   // }
 }
 
+=======
+  doneTicket(){
+    // Mark selectedTicket as done
+    this.selectedTicket.status = 'Done';
+    this.updateTicket(this.selectedTicket);
+    this.closeModal();
+  }
+}
+>>>>>>> upload_photo_branch13
