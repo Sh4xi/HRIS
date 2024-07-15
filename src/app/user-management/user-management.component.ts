@@ -171,6 +171,12 @@ export class UserManagementComponent implements OnInit {
     this.showRolePopup = false;
   }
 
+  deleteRole(roleToDelete: any) {
+    this.roles = this.roles.filter(role => role !== roleToDelete);
+  }
+  
+
+
   // Handle clicking a role in the Manage Roles table
   async onRoleClick(role: { role_id: number }) {
     this.assignedRole = role;
