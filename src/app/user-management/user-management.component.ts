@@ -342,18 +342,30 @@ export class UserManagementComponent implements OnInit {
   
   async uploadPhoto(): Promise<string | null> {
     if (!this.photoFile) {
+      console.log('No photo file selected');
       return null;
     }
   
     try {
+      console.log('Uploading photo:', this.photoFile.name);
       const fileName = `${Date.now()}_${this.photoFile.name}`;
-      const { data, error } = await this.supabaseService.uploadFile('photos', fileName, this.photoFile); // Use 'photos' as the bucket name
+      const { data, error } = await this.supabaseService.uploadFile('photos', fileName, this.photoFile);
   
       if (error) {
+        console.error('Supabase upload error:', error);
         throw error;
       }
   
-      return data?.path || null;
+      console.log('Upload response:', data);
+  
+      if (data?.path) {
+        const fullUrl = `https://vhmftufkipgbxmcimeuq.supabase.co/storage/v1/object/public/photos/${data.path}`;
+        console.log('Full photo URL:', fullUrl);
+        return fullUrl;
+      } else {
+        console.warn('Upload successful, but no path returned');
+        return null;
+      }
     } catch (error) {
       console.error('Error uploading photo:', error);
       alert('Error uploading photo. Please try again.');
@@ -646,13 +658,34 @@ export class UserManagementComponent implements OnInit {
       console.log(`Raw employee data (${data.length} employees):`, data);
   
       this.users = await Promise.all(data.map(async (employee: any, index: number): Promise<User> => {
-        const photoUrl = await this.supabaseService.getPhotoUrl(employee.id);
-        
+        console.log(`Employee ${index} data:`, employee);
+  
+        let photoUrl: string | null = null;
+        let employeeIdentifier: string | null = null;
+  
+        if (employee.id) {
+          employeeIdentifier = employee.id.toString();
+        } else if (employee.email) {
+          employeeIdentifier = employee.email;
+          console.warn(`Employee at index ${index} has no id, using email as identifier`);
+        } else {
+          console.warn(`Employee at index ${index} has no id or email`);
+        }
+  
+        if (employeeIdentifier) {
+          try {
+            photoUrl = await this.supabaseService.getPhotoUrl(employeeIdentifier);
+            console.log(`Photo URL for employee ${employeeIdentifier}:`, photoUrl);
+          } catch (error) {
+            console.error(`Error fetching photo URL for employee ${employeeIdentifier}:`, error);
+          }
+        }
+  
         const user: User = {
-          profile: employee.photo_url,
-          name: `${employee.first_name.trim()} ${employee.mid_name ? employee.mid_name.trim() + ' ' : ''}${employee.surname.trim()}`,
-          email: employee.email.trim(),
-          password: employee.password, // Consider if you really need to include the password here
+          profile: photoUrl || 'photo_url',
+          name: `${employee.first_name?.trim() || ''} ${employee.mid_name ? employee.mid_name.trim() + ' ' : ''}${employee.surname?.trim() || ''}`.trim(),
+          email: employee.email?.trim() || '',
+          password: employee.password || '',
           department: employee.department?.trim() || 'Unassigned',
           position: employee.position?.trim() || 'Unassigned',
           type: employee.types?.trim() || 'Unassigned',
@@ -676,6 +709,8 @@ export class UserManagementComponent implements OnInit {
       // Here you might want to set some error state or show a user-facing error message
     }
   }
+
+  
 
   searchTable() {
     this.filteredUsers = this.users.filter(user =>
