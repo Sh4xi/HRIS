@@ -6,17 +6,18 @@
 
     <!-- Main componenet -->
 <div class="bg-white min-h-screen">
-  <header class="bg-white text-center py-4 px-4 sm:px-6">
-    <h1 class="text-m sm:text-2xl">User Management System</h1>
-  </header>
-
   <main class="p-6">
 
-    <div class="flex mb-6">
-      <button (click)="setActiveTab('users')" [ngClass]="activeTab === 'users' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-500'" class="mr-4">Users</button>
-      <button (click)="setActiveTab('roles')" [ngClass]="activeTab === 'roles' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-500'" class="mr-4">Roles</button>
-      <button (click)="setActiveTab('support tickets')" [ngClass]="activeTab === 'support tickets' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-500'">Support Tickets</button>
+    <div class="mb-6">
+      <p class="mb-2 text-3xl font-bold text-neutral-900">System Management<br></p>
+      <p class="mb-2 pb-5 text-slate-500 text-sm">Configure employee details and access rights</p>
+      <div class="flex">
+        <button (click)="setActiveTab('users')" [ngClass]="activeTab === 'users' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-500'" class="mr-4">Users</button>
+        <button (click)="setActiveTab('roles')" [ngClass]="activeTab === 'roles' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-500'" class="mr-4">Roles</button>
+        <button (click)="setActiveTab('support tickets')" [ngClass]="activeTab === 'support tickets' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-500'">Support Tickets</button>
+      </div>
     </div>
+    
 
     <!-- Support tickets -->
   <div *ngIf="activeTab === 'support tickets'">
@@ -273,20 +274,20 @@
       </div>
 
 <!-- Users active tab -->
-      <div *ngIf="filteredUsers.length > 0" class="p-4 rounded-lg shadow-lg bg-white">
-        <table class="w-full md:min-w-full border-collapse">
+      <div *ngIf="filteredUsers.length > 0" class="rounded-lg shadow-lg bg-transparent">
+        <table class="w-full md:min-w-full border-collapse rounded-lg overflow-hidden">
           <thead>
-            <tr class="bg-gray-300 text-gray-700 uppercase text-sm leading-normal">
-              <th *ngIf="isEditing" class="py-3 px-6 text-center">Select</th>
-              <th class="py-3 px-6 text-left">Profile</th>
-              <th class="py-3 px-6 text-left">Name</th>
-              <th class="py-3 px-6 text-left">Email</th> 
-              <th class="py-3 px-6 text-left">Password</th>
-              <th class="py-3 px-6 text-left">Department</th>
-              <th class="py-3 px-6 text-left">Role</th>
-              <th class="py-3 px-6 text-left">Status</th>
-              <th class="py-3 px-6 text-center">Access</th>
-              <th *ngIf="isEditing" class="py-3 px-6 text-center">Edit</th>
+            <tr class="bg-[#E9ECF1] text-gray-700 leading-normal">
+              <th *ngIf="isEditing" class="font-thin py-3 px-6 text-center">Select</th>
+              <th class="py-3 px-6 text-left font-thin text-lg">Profile</th>
+              <th class="py-3 px-6 text-left font-thin text-lg">Name</th>
+              <th class="py-3 px-6 text-left font-thin text-lg">Email</th> 
+              <th class="py-3 px-6 text-left font-thin text-lg">Password</th>
+              <th class="py-3 px-6 text-left font-thin text-lg">Department</th>
+              <th class="py-3 px-6 text-left font-thin text-lg">Role</th>
+              <th class="py-3 px-6 text-left font-thin text-lg">Status</th>
+              <th class="py-3 px-6 text-center font-thin text-lg">Access</th>
+              <th *ngIf="isEditing" class="py-3 px-6 text-center text-lg">Edit</th>
             </tr>
           </thead>
           <tbody class="text-gray-600 text-sm font-light">
