@@ -354,20 +354,23 @@
           </div>      
         </div>
         
-        <div class="flex gap-10 justify-center">
+<div class="flex gap-10 justify-center">
   <div class="w-[400px] h-[740px] shadow-xl rounded-xl">
     <div class="flex justify-between items-center">
       <p class="pl-10 pt-10 text-2xl font-black">Manage Roles</p>
       <button class="bg-blue-500 text-white px-4 py-2 rounded mt-10 mr-10" (click)="openRolePopup()">Add Role</button>
     </div>
-    <table class="table-auto ml-10"> 
-      <tbody>
-        <tr class="h-9 hover:bg-gray-200" *ngFor="let role of roles"  (click)="onRoleClick(role)">
-          <td>{{ role.role_name }}</td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="overflow-y-auto overflow-x-hidden" style="height: calc(740px - 7rem);"> <!-- Adjust height calculation -->
+      <table class="table-auto ml-10 w-full"> 
+        <tbody>
+          <tr class="h-9 hover:bg-gray-200" *ngFor="let role of roles" (click)="onRoleClick(role)">
+            <td>{{ role.role_name }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
+  
   
   <div class="flex flex-col gap-10">
     <div class="w-[400px] h-[350px] shadow-xl rounded-xl" *ngIf="assignedRole">
