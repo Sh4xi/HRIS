@@ -303,7 +303,7 @@
                 </span>
               </td>
               <td class="py-3 px-6 text-center">
-                <button 
+                <button
                   (click)="!showModal && toggleUserAccess(user)"
                   class="relative inline-flex items-center w-11 h-6 rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                   [ngClass]="{
@@ -362,8 +362,8 @@
     </div>
     <table class="table-auto ml-10"> 
       <tbody>
-        <tr class="h-9 hover:bg-gray-200" *ngFor="let role of roles" (click)="onRoleClick(role)">
-          <td>{{ role }}</td>
+        <tr class="h-9 hover:bg-gray-200" *ngFor="let role of roles"  (click)="onRoleClick(role)">
+          <td>{{ role.role_name }}</td>
         </tr>
       </tbody>
     </table>
