@@ -144,6 +144,7 @@ export class UserManagementComponent implements OnInit {
 
   assignedEmployees: string[] = ['Kobe Bryant', 'Alice Guo', 'Carlo Sotto', 'Harry Roque'];
   showCheckboxes = false;
+  logAction: any;
 
   addNewRole() {
     this.showCheckboxes = !this.showCheckboxes;
