@@ -373,28 +373,37 @@
       <button class="bg-blue-500 text-white px-4 py-2 rounded mt-10 mr-10" (click)="openRolePopup()">Add Role</button>
     </div>
     <div class="overflow-y-auto overflow-x-hidden" style="height: calc(740px - 7rem);"> <!-- Adjust height calculation -->
-      <table class="table-auto ml-10 w-full"> 
+      <table class="table-auto ml-10 mt-5 w-[83%]"> 
         <tbody>
-          <tr class="h-9 hover:bg-gray-200" *ngFor="let role of roles" (click)="onRoleClick(role)">
+          <tr class="h-9 text-gray-600 text-sm font-light hover:bg-gray-200" *ngFor="let role of roles" (click)="onRoleClick(role)">
             <td>{{ role.role_name }}</td>
+            <td class="text-center">
+              <button class="text-blue-500 hover:text-blue-700">Edit</button>
+            </td>
+            <td class="text-center">
+              <button (click)="deleteRole(role)"  class="text-red-500 hover:text-red-700">Delete</button>
+            </td>
           </tr>
         </tbody>
       </table>
     </div>
-  </div>
+</div>
+
   
   
   <div class="flex flex-col gap-10">
     <div class="w-[400px] h-[350px] shadow-xl rounded-xl" *ngIf="assignedRole">
-      <p class="pl-10 pt-10 text-2xl pb-3 font-black"> Assigned for {{ assignedRole.role_name }}</p>
+      <p class="pl-10 pt-10 text-2xl pb-3 font-black">Assigned for {{ assignedRole.role_name }}</p>
       <table class="table-auto ml-10"> 
         <tbody>
-          <tr class="h-9" *ngFor="let employee of assignedEmployees">
-            <td>{{ employee }}</td>
+          <tr class="h-9" *ngFor="let user of paginatedUsers">
+            <td class="py-3 px-6 text-left">{{ user.name }}</td>
+            <td class="py-3 px-6 text-left">{{ user.position }}</td>
           </tr>
         </tbody>
       </table>
     </div>
+    
     <div class="w-[400px] h-[350px] shadow-xl rounded-xl">
     </div>
   </div>
