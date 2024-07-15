@@ -11,6 +11,7 @@ interface Parameter {
   parameter_date?: string | null;
   parameter_time?: string | null;
   parameter_time2?: string | null;
+  selected?: boolean;
 }
 
 @Component({
@@ -168,9 +169,21 @@ export class SystemManagementComponent implements OnInit {
     console.log('Editing parameter:', param);
   }
 
-  deleteSelectedParameters() {
-    // Implement delete logic here
+  async deleteSelectedParameters() {
+    try {
+      const selectedParams = this.filteredParameters.filter(param => param.selected);
+      const deletions = selectedParams.map(param =>
+        this.supabaseService.deleteParameter(param.parameter_name)
+      );
+      await Promise.all(deletions);
+      await this.loadParameters(); // Reload parameters after deletion
+      this.showMessage('Parameters deleted successfully');
+    } catch (error) {
+      console.error('Error deleting parameters:', error);
+      this.showMessage('Failed to delete parameters', true);
+    }
   }
+  
 
   updatePagination() {
     this.totalPages = Math.ceil(this.filteredParameters.length / this.itemsPerPage);
@@ -201,4 +214,6 @@ export class SystemManagementComponent implements OnInit {
       this.updatePagination();
     }
   }
+
+  
 }

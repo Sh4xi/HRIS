@@ -489,4 +489,15 @@ export class SupabaseService {
     if (error) throw error;
     return data;
   }
+
+  async deleteParameter(parameterName: string): Promise<void> {
+    const { error } = await this.supabase
+      .from('parameters')
+      .delete()
+      .eq('parameter_name', parameterName);
+  
+    if (error) {
+      throw error;
+    }
+  }
 }
