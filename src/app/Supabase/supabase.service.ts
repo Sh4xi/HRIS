@@ -435,7 +435,30 @@ export class SupabaseService {
     }
 }
 
+async fetchAuditLogs() {
+  const { data, error } = await this.supabase
+    .from('audit_trail')
+    .select('*')
+    .order('date', { ascending: false });
 
+  if (error) {
+    console.error('Error fetching audit logs:', error);
+    return [];
+  }
+
+  return data;
+}
+
+async logAction(Email: number, action: string) {
+  const { error } = await this.supabase
+    .from('auth_user')
+    .insert([{ Email: Email, action }]);
+
+  if (error) {
+    console.error('Error logging action:', error.message);
+    throw error;
+  }
+}
 
 
 
