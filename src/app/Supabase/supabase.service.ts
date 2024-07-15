@@ -453,11 +453,11 @@ export class SupabaseService {
       return false;
     }
   }
-  async getAuditLogs() {
+  async fetchAuditLogs() {
     const { data, error } = await this.supabase
-      .from('audit')
+      .from('audit_trail')
       .select('*')
-      .order('timestamp', { ascending: false });
+      .order('date', { ascending: false });
 
     if (error) {
       console.error('Error fetching audit logs:', error);
@@ -467,15 +467,17 @@ export class SupabaseService {
     return data;
   }
 
-  async logAction(userId: number, action: string) {
+  async logAction(Email: number, action: string) {
     const { error } = await this.supabase
-      .from('audit')
-      .insert([{ user_id: userId, action }]);
-
+      .from('auth_user')
+      .insert([{ Email: Email, action }]);
+  
     if (error) {
-      console.error('Error logging action:', error);
+      console.error('Error logging action:', error.message);
+      throw error;
     }
   }
+  
 
   //parameters
   async getParameters() {

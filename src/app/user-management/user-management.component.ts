@@ -141,6 +141,7 @@ export class UserManagementComponent implements OnInit {
 
   assignedEmployees: string[] = ['Kobe Bryant', 'Alice Guo', 'Carlo Sotto', 'Harry Roque'];
   showCheckboxes = false;
+  logAction: any;
 
   addNewRole() {
     this.showCheckboxes = !this.showCheckboxes;
@@ -392,16 +393,24 @@ export class UserManagementComponent implements OnInit {
     }
     this.filteredUsers = this.users;
     this.updatePagination();
+
+    try {
+      // Log action before updating in the database
+      await this.logAction(employee.Email, `Updated employee: ${employee.email}`);
   
-    // Update user in the database
-    const { data, error } = await this.supabaseService.updateEmployee(employee);
-    if (error) {
-      console.error('Error updating employee:', error.message);
-    } else {
-      console.log('Employee updated successfully:', data);
-      this.toggleModal();
-      this.resetForm();
-      this.loadEmployees(); //added feature
+      // Update user in the database
+      const { data, error } = await this.supabaseService.updateEmployee(employee);
+      if (error) {
+        console.error('Error updating employee:', error.message);
+      } else {
+        console.log('Employee updated successfully:', data);
+        this.toggleModal();
+        this.resetForm();
+        this.loadEmployees(); // Example: Refreshing employee list after update
+      }
+    } catch (error) {
+      console.error('Error updating employee:', error);
+      // Handle errors appropriately
     }
   }
   

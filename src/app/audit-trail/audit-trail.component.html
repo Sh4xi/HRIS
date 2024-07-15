@@ -30,13 +30,13 @@
                 <th class="px-4 py-3">Parameter</th>
                 <th class="px-4 py-3">Old Value</th>
                 <th class="px-4 py-3">New Value</th>
-              </tr>
+            </tr>
             </thead>
             <tbody class="text-slate-500">
               <tr *ngFor="let log of auditLogs" class="border-t border-gray-200">
-                <td class="px-4 py-3">{{ log.timestamp | date:'MMMM d, y' }}</td>
-                <td class="px-4 py-3">{{ log.timestamp | date:'h:mm a' }}</td>
-                <td class="px-4 py-3">{{ log.user }}</td>
+                <td class="px-4 py-3">{{ log.date | date:'MMMM d, y' }}</td>
+                <td class="px-4 py-3">{{ log.date | date:'h:mm a' }}</td>
+                <td class="px-4 py-3">{{ log.user_id }}</td>
                 <td class="px-4 py-3">{{ log.ip_address }}</td>
                 <td class="px-4 py-3">{{ log.affected_page }}</td>
                 <td class="px-4 py-3">{{ log.action }}</td>
