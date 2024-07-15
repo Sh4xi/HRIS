@@ -32,8 +32,6 @@ interface Employee {
   photoUrl?: string; // Add a new property for photo URL
 }
 
-
-
 interface Ticket {
   id: number;
   title: string;
@@ -65,7 +63,6 @@ export class UserManagementComponent implements OnInit {
   showEditPopup = false;
   employees: any[] = [];
   roles: any[] = [];
-  selectedRole: any = null;
 
   showAccessRightsPopup = false;
   showAddDepartmentPopup = false;
