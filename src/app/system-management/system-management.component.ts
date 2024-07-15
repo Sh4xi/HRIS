@@ -183,8 +183,19 @@ export class SystemManagementComponent implements OnInit {
   editParameter(parameter: Parameter) {
     this.isEdit = true;
     this.selectedParameter = { ...parameter };
+  
+    // Set fields to null based on parameter type
+    if (this.selectedParameter.parameter_type !== 'Holiday') {
+      this.selectedParameter.parameter_date = null;
+    }
+    if (this.selectedParameter.parameter_type !== 'Schedule') {
+      this.selectedParameter.parameter_time = null;
+      this.selectedParameter.parameter_time2 = null;
+    }
+  
     this.showPopup = true;
   }
+  
 
   async deleteSelectedParameters() {
     try {
@@ -237,6 +248,11 @@ export class SystemManagementComponent implements OnInit {
         throw new Error('No parameter selected');
       }
   
+      // Set properties to null if they are not provided
+      this.selectedParameter.parameter_date = this.selectedParameter.parameter_type === 'Holiday' ? this.selectedParameter.parameter_date : null;
+      this.selectedParameter.parameter_time = this.selectedParameter.parameter_type === 'Schedule' ? this.selectedParameter.parameter_time : null;
+      this.selectedParameter.parameter_time2 = this.selectedParameter.parameter_type === 'Schedule' ? this.selectedParameter.parameter_time2 : null;
+  
       if (this.isEdit) {
         await this.supabaseService.updateParameter(this.selectedParameter);
         this.showMessage('Parameter updated successfully');
@@ -250,5 +266,6 @@ export class SystemManagementComponent implements OnInit {
       console.error('Error saving/updating parameter:', error);
       this.showMessage('Failed to save/update parameter', true);
     }
-  }  
+  }
+  
 }
