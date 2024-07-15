@@ -47,14 +47,15 @@
   <table class="min-w-full text-sm text-center text-black dark:text-gray-700 border-collapse rounded-lg shadow-lg bg-white">
     <thead class="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-300 dark:text-black">
       <tr>
-        <th scope="col" class="p-4"><input type="checkbox" (click)="toggleAllTickets()"></th>
+        <th scope="col" class="p-4">
+          <input type="checkbox" (click)="toggleAllTickets()">
+        </th>
         <th scope="col" class="px-6 py-3">Ticket ID</th>
         <th scope="col" class="px-6 py-3">Title</th>
         <th scope="col" class="px-6 py-3">Email</th>
         <th scope="col" class="px-6 py-3">Description</th>
         <th scope="col" class="px-6 py-3">Status</th>
-        <th scope="col" class="px-6 py-3">Date</th>
-        <th scope="col" class="px-6 py-3">Actions</th>
+        <th scope="col" class="px-6 py-3">Date Created</th>
       </tr>
     </thead>
     <tbody>
@@ -70,13 +71,12 @@
           <span [ngClass]="{
             'text-green-700 bg-green-300 py-1 px-3 rounded-full text-xs': ticket.status === 'Open',
             'text-blue-700 bg-blue-300 py-1 px-3 rounded-full text-xs': ticket.status === 'In Progress',
-            'text-red-700 bg-red-300 py-1 px-3 rounded-full text-xs': ticket.status === 'Closed'}">{{ ticket.status }}
+            'text-red-700 bg-red-300 py-1 px-3 rounded-full text-xs': ticket.status === 'Closed'
+          }">{{ ticket.status }}
           </span>
         </td>
-        <td class="px-6 py-3">{{ ticket.dateTime | date:'MMMM d, yyyy' }}</td>        
-          <td class="px-6 py-3">
-          <button class="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded-lg" (click)="deleteTicket(ticket.id); $event.stopPropagation()">Delete</button>
-        </td>
+        <div>{{ ticket.dateTime | date:'hh:mm a' }}</div>
+        <div>{{ ticket.dateTime | date:'MMMM d, yyyy' }}</div>
       </tr>
     </tbody>
   </table>

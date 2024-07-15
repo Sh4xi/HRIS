@@ -33,7 +33,6 @@ interface Employee {
 }
 
 
-
 interface Ticket {
   id: number;
   title: string;
