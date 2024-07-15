@@ -406,9 +406,9 @@
 <div *ngIf="showRolePopup" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
   <div class="bg-white p-6 rounded-lg shadow-lg">
     <h2 class="text-xl font-bold mb-4">Add Role</h2>
-    <input [(ngModel)]="newManageRole" type="text" placeholder="Enter role" class="border p-2 mb-4 w-full"/>
+    <input type="text" id="role" [(ngModel)]="newRole" type="text" placeholder="Enter role" class="border p-2 mb-4 w-full"/>
     <div class="flex justify-end">
-      <button (click)="confirmRolePopup()" class="bg-blue-500 text-white px-4 py-2 rounded mr-2">Confirm</button>
+      <button (click)="addRole()" class="bg-blue-500 text-white px-4 py-2 rounded mr-2">Confirm</button>
       <button (click)="cancelRolePopup()" class="bg-gray-500 text-white px-4 py-2 rounded">Cancel</button>
     </div>
   </div>

@@ -319,12 +319,13 @@ export class UserManagementComponent implements OnInit {
     if (!this.newRole) {
       alert('Please enter a role name');
       return;
+      this.showRolePopup = false;
     }
   
-    if (this.departmentType === 'specific' && !this.selectedDepartments) {
-      alert('Please select a department');
-      return;
-    }
+    // if (this.departmentType === 'specific' && !this.selectedDepartments) {
+    //   alert('Please select a department');
+    //   return;
+    // }
   
     const roleData = {
       role_name: this.newRole,
