@@ -5,26 +5,46 @@ import { SupabaseService } from '../Supabase/supabase.service';
 @Component({
   selector: 'app-audit-trail',
   standalone: true,
-  imports: [CommonModule],  // Import CommonModule here
+  imports: [CommonModule],
   templateUrl: './audit-trail.component.html',
   styleUrls: ['./audit-trail.component.css']
 })
-export class AuditTrailComponent {
+export class AuditTrailComponent implements OnInit {
   auditLogs: any[] = [];
 
   constructor(private supabaseService: SupabaseService) {}
 
   async ngOnInit() {
-    const rawLogs = await this.supabaseService.getAuditLogs();
-    this.auditLogs = rawLogs.map(log => ({
-      ...log,
-      user: 'Some User',  // Replace with actual user fetching logic if available
-      ip_address: '127.0.0.1',  // Replace with actual IP if available
-      affected_page: 'User Management',  // Replace with actual affected page if available
-      parameter: 'N/A',  // Replace with actual parameter if available
-      old_value: 'N/A',  // Replace with actual old value if available
-      new_value: 'N/A',  // Replace with actual new value if available
-    }));
+    await this.fetchAuditLogs();
+  }
+
+  async fetchAuditLogs() {
+    try {
+      const logs = await this.supabaseService.getAuditLogs();
+      this.auditLogs = logs.map(log => ({
+        ...log,
+        user: log.user || 'Unknown User',
+        ip_address: log.ip_address || 'N/A',
+        affected_page: log.affected_page || 'N/A',
+        parameter: log.parameter || 'N/A',
+        old_value: log.old_value || 'N/A',
+        new_value: log.new_value || 'N/A',
+      }));
+    } catch (error) {
+      console.error('Error fetching audit logs:', error);
+      // Handle the error appropriately (e.g., show an error message to the user)
+    }
+  }
+
+  // Example method to log an action
+  async logUserAction(userId: number, action: string) {
+    try {
+      await this.supabaseService.logAction(userId, action);
+      // Optionally, refresh the audit logs after logging a new action
+      await this.fetchAuditLogs();
+    } catch (error) {
+      console.error('Error logging user action:', error);
+      // Handle the error appropriately
+    }
   }
 }
-
