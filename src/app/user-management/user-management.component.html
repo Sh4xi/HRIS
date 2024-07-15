@@ -414,7 +414,7 @@
       <div class="overflow-y-auto overflow-x-hidden" style="height: calc(350px - 7rem);">
         <table class="table-auto ml-10"> 
           <tbody>
-            <tr class="h-9 text-gray-600 text-sm font-light " *ngFor="let user of paginatedUsers">
+            <tr class="h-9 text-gray-600 text-sm font-light " *ngFor="let user of assignedUsers">
               <td>{{ user.name }}</td>
               <td>{{ user.position }}</td>
               <td>
@@ -460,49 +460,6 @@
     </div>
   </div>
 </div>
-        
-        <!-- <div class="flex grid-cols-1 md:grid-cols-2 gap-8 justify-center items-center">
-          <div class="bg-white shadow-lg rounded-lg p-4 w-1/2 max-w-2xl">
-            <table class=" w-full">
-              <thead>
-                <tr>
-                  <th class="text-left py-2">Name</th>
-                  <th class="text-left py-2">Designation</th> 
-                </tr>
-              </thead>
-              <tbody>
-                <tr class="border-t">
-                  <td class="py-4 flex items-center">
-                    <img src="" alt="Cheska Trinidad" class="w-10 h-10 rounded-full mr-4">
-                    <div>
-                      <p>Cheska Trinidad</p>
-                      <p class="text-sm text-gray-500">cheskatrinidad</p>
-                    </div>
-                  </td>
-                  <td class="py-4">
-                    <p>I.T Department</p>
-                    <p class="text-sm text-gray-500">Graphic Designer</p>
-                    <a href="#" class="text-blue-500 text-sm">Edit</a>
-                  </td>
-                </tr>
-                <tr class="border-t">
-                  <td class="py-4 flex items-center">
-                    <img src="" alt="Juan Dela Cruz" class="w-10 h-10 rounded-full mr-4">
-                    <div>
-                      <p>Juan Dela Cruz</p>
-                      <p class="text-sm text-gray-500">juandelacruzgmail.com</p>
-                    </div>
-                  </td>
-                  <td class="py-4">
-                    <p>Software Department</p>
-                    <p class="text-sm text-gray-500">Data Analyst</p>
-                    <a href="#" class="text-blue-500 text-sm">Edit</a>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>       
-        </div> -->
       </section>
 
 <!-- Popup Overlay -->

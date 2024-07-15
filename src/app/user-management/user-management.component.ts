@@ -65,6 +65,7 @@ export class UserManagementComponent implements OnInit {
   showEditPopup = false;
   employees: any[] = [];
   roles: any[] = [];
+  assignedUsers: any[] = [];
 
   showAccessRightsPopup = false;
   showAddDepartmentPopup = false;
@@ -173,21 +174,20 @@ export class UserManagementComponent implements OnInit {
     this.showRolePopup = false;
   }
 
-  deleteRole(roleToDelete: any) {
-    this.roles = this.roles.filter(role => role !== roleToDelete);
+  // Delete a role
+  async deleteRole(role: any) {
+    await this.supabaseService.deleteRole(role.role_name);
+    this.roles = this.roles.filter(r => r.role_name !== role.role_name);
   }
   
 
 
   // Handle clicking a role in the Manage Roles table
-  async onRoleClick(role: { role_id: number }) {
+  async onRoleClick(role: { role_id: number, role_name: string }) {
+    console.log('Role clicked:', role);
     this.assignedRole = role;
-    const { data, error } = await this.supabaseService.getAssignedEmployees(role.role_id);
-    if (error) {
-      console.error('Error loading assigned employees:', error.message);
-    } else {
-      this.assignedEmployees = data;
-    }
+    await this.loadAssignedUsers(role);
+    console.log('Assigned Role:', this.assignedRole);
   }
 
   // Mockdata for Tickets
@@ -369,6 +369,24 @@ export class UserManagementComponent implements OnInit {
       }
     });
   }
+  
+    // Load assigned users for the selected role
+    async loadAssignedUsers(role: { role_id: number, role_name: string }) {
+      this.assignedRole = role;
+      console.log('Loading assigned users for role:', this.assignedRole);
+    
+      try {
+        const users = await this.supabaseService.getUsersAssignedToRole(role.role_id);
+        this.assignedUsers = users;
+        console.log('Assigned users:', this.assignedUsers);
+      } catch (error) {
+        if (error instanceof Error) {
+          console.error('Error loading assigned users:', error.message);
+        } else {
+          console.error('An unknown error occurred');
+        }
+      }
+    }
   
 
   toggleUserSelection(user: User) {

@@ -246,6 +246,43 @@ export class SupabaseService {
     return response;
   }
 
+  async deleteRole(roleName: string): Promise<void> {
+    const { error } = await this.supabase
+      .from('roles')
+      .delete()
+      .eq('role_name', roleName);
+
+    if (error) {
+      console.error('Error deleting role:', error.message);
+    }
+  }
+
+  async getUsersAssignedToRole(roleId: number): Promise<any[]> {
+    const { data, error } = await this.supabase
+      .from('user_roles')
+      .select(`
+        user_id,
+        profile:profile (
+          first_name,
+          mid_name,
+          surname,
+          position
+        )
+      `)
+      .eq('role_id', roleId);
+  
+    if (error) {
+      console.error('Error fetching assigned users:', error.message);
+      return [];
+    }
+  
+    return data.map((userRole: any) => ({
+      id: userRole.user_id,
+      name: `${userRole.profile.first_name} ${userRole.profile.mid_name} ${userRole.profile.surname}`,
+      position: userRole.profile.position,
+    }));
+  }
+
   async createDepartment(departmentData: any): Promise<PostgrestSingleResponse<any>> {
     const response = await this.supabase.from('department').insert([
       {
