@@ -412,39 +412,76 @@ export class UserManagementComponent implements OnInit {
     return this.users.filter(user => user.selected);
   }
 
-  async updateEmployee(employee: any,) { // updateEmployee(employee: any, index: number) {
-    const updatedUser: Partial<User> = {
-      profile: this.photoPreviewUrl,
-      name: `${employee.firstname} ${employee.midname ? employee.midname + ' ' : ''}${employee.surname}`,
-      email: employee.email,
-      password: employee.password,
-      department: employee.department,
-      position: employee.position,
-      type: employee.type,
-      status: 'Active',
-      access: true
-
-    };
+  async updateEmployee(employee: any) {
+    try {
+      console.log('Updating employee:', employee);
   
-    // Update user locally
-    const index = this.users.findIndex(user => user.email === employee.email);
-    if (index !== -1) {
-      this.users[index] = updatedUser as User;
-    }
-    this.filteredUsers = this.users;
-    this.updatePagination();
+      // Upload the photo and get the URL
+      let photoUrl = null;
+      if (this.photoFile) {
+        photoUrl = await this.uploadPhoto();
+        console.log('New photo uploaded, URL:', photoUrl);
+      } else {
+        console.log('No new photo to upload');
+      }
   
-    // Update user in the database
-    const { data, error } = await this.supabaseService.updateEmployee(employee);
-    if (error) {
-      console.error('Error updating employee:', error.message);
-    } else {
-      console.log('Employee updated successfully:', data);
+      // Determine the profile picture URL
+      const profileUrl = photoUrl || this.photoPreviewUrl || employee.photo_url || 'path/to/default/image.png';
+      console.log('Profile URL to be used:', profileUrl);
+  
+      const updatedUser: Partial<User> = {
+        profile: profileUrl,
+        name: `${employee.firstname.trim()} ${employee.midname ? employee.midname.trim() + ' ' : ''}${employee.surname.trim()}`,
+        email: employee.email.trim(),
+        password: employee.password,
+        department: employee.department.trim(),
+        position: employee.position.trim(),
+        type: employee.type.trim(),
+        status: 'Active',
+        access: true
+      };
+  
+      console.log('Updated user object:', updatedUser);
+  
+      // Update user locally
+      const index = this.users.findIndex(user => user.email === employee.email);
+      if (index !== -1) {
+        this.users[index] = updatedUser as User;
+        console.log('Local user array updated');
+      } else {
+        console.warn('User not found in local array for update');
+      }
+      this.filteredUsers = this.users;
+      this.updatePagination();
+  
+      // Update user in the database
+      const { data, error } = await this.supabaseService.updateEmployee({
+        ...employee,
+        photo_url: profileUrl
+      });
+  
+      if (error) {
+        console.error('Error updating employee in Supabase:', error);
+        throw new Error(`Failed to update employee: ${error.message}`);
+      }
+  
+      console.log('Employee updated successfully in Supabase:', data);
+  
+      // Close modal and reset form
       this.toggleModal();
       this.resetForm();
-      this.loadEmployees(); //added feature
+  
+      // Reload employees to ensure consistency
+      await this.loadEmployees();
+  
+      return updatedUser;
+    } catch (error) {
+      console.error('Error in updateEmployee:', error);
+      // You might want to show an error message to the user here
+      throw error; // Re-throw the error so it can be handled by the caller if needed
     }
   }
+  
   
   resetForm() {
     this.employee = {
@@ -587,30 +624,56 @@ export class UserManagementComponent implements OnInit {
     }
   }
 
-  
+  //edit the photo here
   async loadEmployees() {
     try {
+      console.log('Fetching employees...');
       const { data, error } = await this.supabaseService.getEmployees();
+  
       if (error) {
         console.error('Error fetching employees:', error.message);
-      } else if (data) {
-        this.users = data.map((employee: any): User => ({
-          profile: 'https://via.placeholder.com/200x200',
-          name: `${employee.first_name} ${employee.mid_name ? employee.mid_name + ' ' : ''}${employee.surname}`,
-          email: employee.email,
-          password: employee.password, // Make sure this line is present
-          department: employee.department,
-          position: employee.position,
-          type: employee.types,
-          status: 'Active',
-          access: true
-          //term: '' // Add this property to match the User interface
-        }));
-        this.filteredUsers = this.users;
-        this.updatePagination();
+        throw error;
       }
+  
+      if (!data || data.length === 0) {
+        console.warn('No employee data received');
+        this.users = [];
+        this.filteredUsers = [];
+        this.updatePagination();
+        return;
+      }
+  
+      console.log(`Raw employee data (${data.length} employees):`, data);
+  
+      this.users = await Promise.all(data.map(async (employee: any, index: number): Promise<User> => {
+        const photoUrl = await this.supabaseService.getPhotoUrl(employee.id);
+        
+        const user: User = {
+          profile: employee.photo_url,
+          name: `${employee.first_name.trim()} ${employee.mid_name ? employee.mid_name.trim() + ' ' : ''}${employee.surname.trim()}`,
+          email: employee.email.trim(),
+          password: employee.password, // Consider if you really need to include the password here
+          department: employee.department?.trim() || 'Unassigned',
+          position: employee.position?.trim() || 'Unassigned',
+          type: employee.types?.trim() || 'Unassigned',
+          status: 'Active',
+          access: true,
+        };
+  
+        console.log(`Mapped user ${index + 1}:`, user);
+  
+        return user;
+      }));
+  
+      console.log(`Total users mapped: ${this.users.length}`);
+  
+      this.filteredUsers = this.users;
+      this.updatePagination();
+  
+      console.log('Employee loading complete');
     } catch (error) {
-      console.error('Error fetching employees:', error);
+      console.error('Unexpected error while fetching employees:', error);
+      // Here you might want to set some error state or show a user-facing error message
     }
   }
 

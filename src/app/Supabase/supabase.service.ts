@@ -352,6 +352,36 @@ async uploadFile(bucket: string, fileName: string, file: File): Promise<{ data: 
     }
   }
 
+  async getPhotoUrl(employeeId: string): Promise<string | null> {
+    try {
+      const { data, error } = await this.supabase
+        .from('profile') // Using 'profile' as the table name
+        .select('photo_url')
+        .eq('id', employeeId)
+        .single();
+
+      if (error) {
+        console.error('Error fetching photo URL:', error.message);
+        return null;
+      }
+
+      if (!data || !data.photo_url) {
+        console.warn(`No photo URL found for employee ID: ${employeeId}`);
+        return null;
+      }
+
+      console.log(`Photo URL fetched for employee ID ${employeeId}:`, data.photo_url);
+      return data.photo_url;
+    } catch (error) {
+      console.error('Unexpected error fetching photo URL:', error);
+      return null;
+    }
+  }
+
+
+
+
+
   async updateProfile(email: string, photoUrl: string): Promise<any> {
     const { data, error } = await this.supabase
       .from('profile')
