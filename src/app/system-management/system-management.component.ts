@@ -6,6 +6,7 @@ import { SidebarNavigationModule } from './../sidebar-navigation/sidebar-navigat
 import { SupabaseService } from '../Supabase/supabase.service';
 
 interface Parameter {
+  id?: number; // Add this line
   parameter_name: string;
   parameter_type: string;
   parameter_date?: string | null;
@@ -25,6 +26,7 @@ export class SystemManagementComponent implements OnInit {
   showPopup = false;
   showTable = false;
   showAll = true;
+  isEdit = false;
   isManageMode: boolean = false;
   parameterName: string = '';
   selectedType: string = '';
@@ -37,6 +39,7 @@ export class SystemManagementComponent implements OnInit {
   filteredParameters: Parameter[] = [];
   message: string = '';
   isError: boolean = false;
+  selectedParameter: Parameter | null = null;
   // Pagination variables
   currentPage = 1;
   itemsPerPage = 8; // Adjust the number of items per page as needed
@@ -57,12 +60,22 @@ export class SystemManagementComponent implements OnInit {
   }
 
   openPopup() {
+    this.isEdit = false;
+    this.selectedParameter = {
+      parameter_name: '',
+      parameter_type: this.types[0],
+      parameter_date: null,
+      parameter_time: null,
+      parameter_time2: null
+    };
     this.showPopup = true;
   }
 
   closePopup() {
     this.showPopup = false;
     this.resetForm();
+    this.selectedParameter = null;
+    this.isEdit = false;
   }
 
   resetForm() {
@@ -71,6 +84,13 @@ export class SystemManagementComponent implements OnInit {
     this.holidayDate = '';
     this.scheduleStartTime = '';
     this.scheduleEndTime = '';
+    this.selectedParameter = {
+      parameter_name: '',
+      parameter_type: '',
+      parameter_date: null,
+      parameter_time: null,
+      parameter_time2: null
+    };
   }
 
   goToAuditTrail() {
@@ -135,6 +155,7 @@ export class SystemManagementComponent implements OnInit {
       this.parameters = data;
       this.filteredParameters = data;
       this.updatePagination();
+      this.selectedParameter = null; // Reset selected parameter
     } catch (error) {
       console.error('Error loading parameters:', error);
       this.showMessage('Failed to load parameters', true);
@@ -165,9 +186,24 @@ export class SystemManagementComponent implements OnInit {
     this.isManageMode = !this.isManageMode;
   }
 
-  editParameter(param: any) {
-    console.log('Editing parameter:', param);
+  // editParameter(parameter: Parameter) {
+  //   this.isEdit = true;
+  //   this.selectedParameter = { ...parameter };
+  //   this.parameterName = parameter.parameter_name;
+  //   this.selectedType = parameter.parameter_type;
+  //   this.holidayDate = parameter.parameter_date || '';
+  //   this.scheduleStartTime = parameter.parameter_time || '';
+  //   this.scheduleEndTime = parameter.parameter_time2 || '';
+  //   this.showPopup = true;
+    
+  // }
+
+  editParameter(parameter: Parameter) {
+    this.isEdit = true;
+    this.selectedParameter = { ...parameter };
+    this.showPopup = true;
   }
+
 
   async deleteSelectedParameters() {
     try {
@@ -215,5 +251,40 @@ export class SystemManagementComponent implements OnInit {
     }
   }
 
+  // Function to update parameter
+  async updateParameter(updatedParameter: any) {
+    try {
+      const response = await this.supabaseService.updateParameter(updatedParameter);
+      console.log('Update response:', response);
+      // Optionally, update the local parameter list or reload data
+      // Reload data example: await this.loadParameters();
+      this.closePopup();
+    } catch (error) {
+      console.error('Error updating parameter:', error);
+    }
+  }
+
+
+  async saveOrUpdateParameter() {
+    try {
+      if (!this.selectedParameter) {
+        throw new Error('No parameter selected');
+      }
   
+      if (this.isEdit) {
+        // Updating existing parameter
+        await this.supabaseService.updateParameter(this.selectedParameter);
+        this.showMessage('Parameter updated successfully');
+      } else {
+        // Creating new parameter
+        await this.supabaseService.createParameter(this.selectedParameter);
+        this.showMessage('Parameter saved successfully');
+      }
+      await this.loadParameters();
+      this.closePopup();
+    } catch (error) {
+      console.error('Error saving/updating parameter:', error);
+      this.showMessage('Failed to save/update parameter', true);
+    }
+  }
 }

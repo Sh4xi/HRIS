@@ -505,4 +505,24 @@ export class SupabaseService {
       throw error;
     }
   }
+
+  async updateParameter(parameter: any) {
+    const { data, error } = await this.supabase
+      .from('parameters') // Replace 'parameters' with your actual table name
+      .update({
+        parameter_name: parameter.parameter_name,
+        parameter_type: parameter.parameter_type,
+        parameter_date: parameter.parameter_date,
+        parameter_time: parameter.parameter_time,
+        parameter_time2: parameter.parameter_time2
+        // Add any other fields that your parameter object has
+      })
+      .eq('id', parameter.id); // Assuming 'id' is the unique identifier
+
+    if (error) {
+      throw error;
+    }
+
+    return data;
+  }
 }
