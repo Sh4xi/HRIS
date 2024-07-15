@@ -755,38 +755,47 @@ export class UserManagementComponent implements OnInit {
     this.showPassword = !this.showPassword;
   }
   // Delete user
-deleteUsers() {
-  const selectedUsers = this.getSelectedUsers();
-  if (selectedUsers.length === 0) {
-    console.log("No users selected for deletion");
-    return;
-  }
-
-  // Selecting users to delete
-  selectedUsers.forEach(selectedUser => {
-    this.supabaseService.deleteUser(selectedUser.email)
-      .then(response => {
+  async deleteUsers() {
+    const selectedUsers = this.getSelectedUsers();
+    if (selectedUsers.length === 0) {
+      console.log("No users selected for deletion");
+      return;
+    }
+  
+    // Initialize a counter for successful deletions
+    let successfulDeletions = 0;
+  
+    // Select users to delete
+    for (const selectedUser of selectedUsers) {
+      try {
+        // Delete user profile and associated photo
+        const response = await this.supabaseService.deleteUser(selectedUser.email);
+        
         if (response.error) {
           console.error('Error deleting user:', response.error.message);
         } else {
           console.log(`User ${selectedUser.email} deleted successfully`);
+          successfulDeletions++;
+          
+          // Remove the user locally
+          this.users = this.users.filter(user => user.email !== selectedUser.email);
+          this.filteredUsers = this.filteredUsers.filter(user => user.email !== selectedUser.email);
         }
-      })
-      .catch(error => console.error('Error deleting user:', error));
-  });
-
-  // Remove users locally
-  this.users = this.users.filter(user => !selectedUsers.includes(user));
-  this.filteredUsers = this.filteredUsers.filter(user => !selectedUsers.includes(user));
-
-  console.log(`Deleted ${selectedUsers.length} users`);
-
-  // Update pagination
-  this.updatePagination();
-
-  // // Refresh the page
-  // window.location.reload();
-}
+      } catch (error) {
+        console.error('Error deleting user:', error);
+      }
+    }
+  
+    console.log(`Deleted ${successfulDeletions} users`);
+  
+    // Update pagination
+    this.updatePagination();
+  
+    // Optionally refresh the page
+    // window.location.reload();
+  }
+  
+  
 
 
   clearSelections() {
