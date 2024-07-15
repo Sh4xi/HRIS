@@ -370,7 +370,6 @@ export class UserManagementComponent implements OnInit {
     });
   }
   
-
   toggleUserSelection(user: User) {
     user.selected = !user.selected;
   }
@@ -975,11 +974,26 @@ openTicketDetails(ticket: any) {
 }
 
  // Method to update ticket priority
- updateTicketPriority(ticket: Ticket, event: Event): void {
+// In your component file
+
+async updateTicketPriority(ticket: Ticket, event: Event): Promise<void> {
   const selectElement = event.target as HTMLSelectElement;
   const newPriority = selectElement.value as 'Low' | 'Medium' | 'High' | 'Urgent';
-  ticket.priority = newPriority;
-  // Add logic to save the updated ticket priority, e.g., update the backend or state
+  
+  try {
+    // Update in Supabase
+    await this.supabaseService.updateTicketPriority(ticket.id, newPriority);
+    
+    // If successful, update local state
+    ticket.priority = newPriority;
+    
+    console.log(`Ticket ${ticket.id} priority updated to ${newPriority}`);
+  } catch (error) {
+    console.error('Failed to update ticket priority:', error);
+    // Revert the select element to the previous value
+    selectElement.value = ticket.priority;
+    // Optionally, show an error message to the user
+  }
 }
 
 closeModal() {

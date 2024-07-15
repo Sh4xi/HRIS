@@ -80,7 +80,9 @@
         <td class="px-6 py-3 text-sm">{{ ticket.dateTime | date:'hh:mm a' }}<br>{{ ticket.dateTime | date:'MMMM d, yyyy' }}</td>
         <td class="px-6 py-3">
           <div (click)="$event.stopPropagation()">
-            <select class="hover:bg-blue-600 text-black py-2 pl-3 pr-10 rounded-lg" [(ngModel)]="ticket.priority" (change)="updateTicketPriority(ticket, $event)">Choose
+            <select class="hover:bg-blue-600 text-black py-2 pl-3 pr-10 rounded-lg" 
+                    [(ngModel)]="ticket.priority" 
+                    (change)="updateTicketPriority(ticket, $event)">
               <option value="Low" [selected]="ticket.priority === 'Low'">Low</option>
               <option value="Medium" [selected]="ticket.priority === 'Medium'">Medium</option>
               <option value="High" [selected]="ticket.priority === 'High'">High</option>
