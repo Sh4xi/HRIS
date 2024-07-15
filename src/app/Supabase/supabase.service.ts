@@ -415,8 +415,6 @@ export class SupabaseService {
     return data;
   }
 
-
-
   async deleteTicket(ticketId: number) {
     return await this.supabase
       .from('ticket')
@@ -435,6 +433,20 @@ export class SupabaseService {
         return { data: [], error };
       }
       return { data, error };
+    }
+
+    async updateTicketPriority(ticketId: number, priority: string) {
+      const { data, error } = await this.supabase
+        .from('ticket')  // Replace with your actual table name
+        .update({ priority: priority })
+        .eq('id', ticketId);
+    
+      if (error) {
+        console.error('Error updating ticket priority:', error);
+        throw error;
+      }
+    
+      return data;
     }
   
   async uploadImage(file: File): Promise<{ data: { url: string } | null, error: Error | null }> {
