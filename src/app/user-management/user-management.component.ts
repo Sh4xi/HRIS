@@ -909,45 +909,28 @@ this.selectedTickets = this.selectedTickets.filter((_, index) => !this.selectedT
     }
 }
 
-// Method to prompt user for filter options
-promptFilterOptions() {
-const markAsRead = confirm("Mark all tickets as read? Click 'Cancel' to mark all as unread.");
-if (markAsRead) {
-  this.markAllAsRead();
-  } else {
-  this.markAllAsUnread();
-  }
-}
-
-// Method to mark all tickets as read
-markAllAsRead() {
-  this.tickets.forEach(ticket => ticket.status = 'Read');
-  this.filteredTickets = [...this.tickets];
-  this.ticketUpdatePagination();
-}
-
-// Method to mark all tickets as unread
-markAllAsUnread() {
-  this.tickets.forEach(ticket => ticket.status = 'Unread');
-  this.filteredTickets = [...this.tickets];
-  this.ticketUpdatePagination();
-}
-
 // Method to filter tickets based on selected option
 filterTickets() {
-switch (this.filterOption) {
-  case 'read':
-    this.filteredTickets = this.tickets.filter(ticket => ticket.status.toLowerCase() === 'read');
-    break;
-  case 'unread':
-    this.filteredTickets = this.tickets.filter(ticket => ticket.status.toLowerCase() === 'unread');
-    break;
-  default:
-    this.filteredTickets = [...this.tickets];
-    break;
+  switch (this.filterOption.toLowerCase()) {
+    case 'low':
+      this.filteredTickets = this.tickets.filter(ticket => ticket.priority.toLowerCase() === 'low');
+      break;
+    case 'medium':
+      this.filteredTickets = this.tickets.filter(ticket => ticket.priority.toLowerCase() === 'medium');
+      break;
+    case 'high':
+      this.filteredTickets = this.tickets.filter(ticket => ticket.priority.toLowerCase() === 'high');
+      break;
+    case 'urgent':
+      this.filteredTickets = this.tickets.filter(ticket => ticket.priority.toLowerCase() === 'urgent');
+      break;
+    default:
+      this.filteredTickets = [...this.tickets];
+      break;
   }
   this.ticketUpdatePagination();
 }
+
 
 // Pagination Methods for Support Tickets
 ticketTotalPages(): number {
@@ -1030,11 +1013,39 @@ replyTicket(): void {
   }
 }
 
+
+
+//DO NOT DELETE: These codes below might be useful in the future
+
   // doneTicket(){
   //   // Mark selectedTicket as done
   //   this.selectedTicket.status = 'Done';
   //   this.updateTicket(this.selectedTicket);
   //   this.closeModal();
   // }
+
+  // Method to prompt user for filter options
+//   promptFilterOptions() {
+//   const markAsRead = confirm("Mark all tickets as read? Click 'Cancel' to mark all as unread.");
+//   if (markAsRead) {
+//     this.markAllAsRead();
+//     } else {
+//     this.markAllAsUnread();
+//     }
+//   }
+
+//   // Method to mark all tickets as read
+//   markAllAsRead() {
+//     this.tickets.forEach(ticket => ticket.status = 'Read');
+//     this.filteredTickets = [...this.tickets];
+//     this.ticketUpdatePagination();
+//   }
+
+//   // Method to mark all tickets as unread
+//   markAllAsUnread() {
+//     this.tickets.forEach(ticket => ticket.status = 'Unread');
+//     this.filteredTickets = [...this.tickets];
+//     this.ticketUpdatePagination();
+//   }
 }
 
