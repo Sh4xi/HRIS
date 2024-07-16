@@ -12,6 +12,17 @@ interface Ticket {
   adminViewedDateTime?: Date; // Optional field indicating when admin viewed/opened the ticket
 }
 
+interface AuditLogEntry {
+  user_id: string;
+  action: string;
+  affected_page: string;
+  parameter: string;
+  old_value: string;
+  new_value: string;
+  ip_address: string;
+  date?: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -488,6 +499,18 @@ export class SupabaseService {
     }
 }
 
+async logAction(logEntry: AuditLogEntry) {
+  const { error } = await this.supabase
+    .from('audit_trail')
+    .insert([logEntry]);
+
+  if (error) {
+    console.error('Error logging action:', error.message);
+    throw error;
+  }
+}
+
+// Your existing fetchAuditLogs method
 async fetchAuditLogs() {
   const { data, error } = await this.supabase
     .from('audit_trail')
@@ -500,17 +523,6 @@ async fetchAuditLogs() {
   }
 
   return data;
-}
-
-async logAction(Email: number, action: string) {
-  const { error } = await this.supabase
-    .from('auth_user')
-    .insert([{ Email: Email, action }]);
-
-  if (error) {
-    console.error('Error logging action:', error.message);
-    throw error;
-  }
 }
 
 
