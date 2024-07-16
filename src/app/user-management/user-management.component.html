@@ -79,24 +79,23 @@
           }">{{ ticket.status }}
           </span>
         </td>
-        <td class="px-6 py-3 text-sm">{{ ticket.dateTime | date:'hh:mm a' }}<br>{{ ticket.dateTime | date:'MMMM d, yyyy' }}</td>
+        <td class="bpx-6 py-3 text-sm">{{ ticket.dateTime | date:'hh:mm a' }}<br>{{ ticket.dateTime | date:'MMMM d, yyyy' }}</td>
         <td class="px-6 py-3">
           <div (click)="$event.stopPropagation()">
-            <select class="hover:bg-blue-600 text-black py-2 pl-3 pr-10 rounded-lg" 
+            <select class="py-2 pl-3 pr-10 rounded-lg font-bold shadow-md"
                     [(ngModel)]="ticket.priority" 
                     (change)="updateTicketPriority(ticket, $event)">
-              <option value="Low" [selected]="ticket.priority === 'Low'">Low</option>
-              <option value="Medium" [selected]="ticket.priority === 'Medium'">Medium</option>
-              <option value="High" [selected]="ticket.priority === 'High'">High</option>
-              <option value="Urgent" [selected]="ticket.priority === 'Urgent'">Urgent</option>
+              <option value="Low" [selected]="ticket.priority === 'Low'" style="font-weight: 600; color: green;">Low</option>
+              <option value="Medium" [selected]="ticket.priority === 'Medium'" style="font-weight: 600; color: yellow;">Medium</option>
+              <option value="High" [selected]="ticket.priority === 'High'" style="font-weight: 600; color: orange;">High</option>
+              <option value="Urgent" [selected]="ticket.priority === 'Urgent'" style="font-weight: 600; color: red;">Urgent</option>
             </select>
-          </div>
-        </td>
+          </div>               
+        </td>          
       </tr>
     </tbody>
   </table>
-</div>
-
+ </div>
 
 </section>
 
