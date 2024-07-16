@@ -842,47 +842,47 @@ deleteUsers() {
     }
   }
 
- // Method to search tickets
+ //Ticket Management Functions: Method to search tickets
   searchTicketTable() {
     const searchTerm = this.searchTicketTerm.toLowerCase();
     this.filteredTickets = this.tickets.filter(ticket =>
       ticket.title.toLowerCase().includes(searchTerm) ||
       ticket.description.toLowerCase().includes(searchTerm) ||
-      ticket.status.toLowerCase().includes(searchTerm)
+      ticket.status.toLowerCase().includes(searchTerm) ||
+      ticket.email.toLowerCase().includes(searchTerm)
     );
     this.ticketUpdatePagination();
   }
 
-// Method to toggle all tickets selection
-toggleAllTickets() { 
-    const selectAll = this.selectedTickets.every(selected => selected);
-    this.selectedTickets.fill(!selectAll);
-  }
-
+// Method to toggle selection of all tickets
+toggleAllTickets() {
+  const selectAll = this.selectedTickets.every(selected => selected); // Check if all tickets are selected
+  this.selectedTickets.fill(!selectAll); // Toggle selection status for all tickets
+}
 
 // Method to get selected tickets
 getSelectedTickets(): Ticket[] {
-  return this.tickets.filter((ticket, index) => this.selectedTickets[index]);
+  return this.tickets.filter((ticket, index) => this.selectedTickets[index]); // Return selected tickets
 }
 
 // Method to update a ticket
 updateTicket(updatedTicket: Ticket) {
-const index = this.tickets.findIndex(ticket => ticket.id === updatedTicket.id);
-if (index !== -1) {
-  this.tickets[index] = updatedTicket;
-  this.filteredTickets = [...this.tickets];
-  this.ticketUpdatePagination();
+  const index = this.tickets.findIndex(ticket => ticket.id === updatedTicket.id); // Find index of ticket to update
+  if (index !== -1) {
+    this.tickets[index] = updatedTicket; // Update ticket in main list
+    this.filteredTickets = [...this.tickets]; // Update filtered list
+    this.ticketUpdatePagination(); // Update pagination
   }
 }
 
 // Method to delete a ticket
 deleteTicket(ticketId: number) {
-const index = this.tickets.findIndex(ticket => ticket.id === ticketId);
-if (index !== -1) {
-  this.tickets.splice(index, 1);
-  this.filteredTickets = [...this.tickets];
-  this.selectedTickets.splice(index, 1);
-  this.ticketUpdatePagination();
+  const index = this.tickets.findIndex(ticket => ticket.id === ticketId); // Find index of ticket to delete
+  if (index !== -1) {
+    this.tickets.splice(index, 1); // Remove ticket from main list
+    this.filteredTickets = [...this.tickets]; // Update filtered list
+    this.selectedTickets.splice(index, 1); // Remove selection status
+    this.ticketUpdatePagination(); // Update pagination
   }
 }
 
@@ -940,10 +940,9 @@ filterTickets() {
   this.ticketUpdatePagination();
 }
 
-
-// Pagination Methods for Support Tickets
+// Pagination Methods for Support Tickets: Method to calculate total number of pages
 ticketTotalPages(): number {
-  return Math.ceil(this.filteredTickets.length / this.ticket_itemsPerPage);
+  return Math.ceil(this.filteredTickets.length / this.ticket_itemsPerPage); // Calculate total pages
 }
 
 ticketUpdatePagination() {
@@ -951,36 +950,41 @@ ticketUpdatePagination() {
   this.ticketPaginate();
 }
 
+// Method to paginate tickets based on current page
 ticketPaginate(): Ticket[] {
-  const start = (this.ticket_currentPage - 1) * this.ticket_itemsPerPage;
-  const end = start + this.ticket_itemsPerPage;
-  return this.filteredTickets.slice(start, end);
+  const start = (this.ticket_currentPage - 1) * this.ticket_itemsPerPage; // Calculate start index
+  const end = start + this.ticket_itemsPerPage; // Calculate end index (exclusive)
+  return this.filteredTickets.slice(start, end); // Extract tickets for the current page
 }
 
+// Method to navigate to the previous page
 ticketPrevPage() {
-if (this.ticket_currentPage > 1) {
-  this.ticket_currentPage--;
-  this.ticketPaginate();
+  if (this.ticket_currentPage > 1) {
+    this.ticket_currentPage--; // Decrease current page number
+    this.ticketPaginate(); // Update displayed tickets
   }
 }
 
+// Method to navigate to the next page
 ticketNextPage() {
-if (this.ticket_currentPage < this.ticketTotalPages()) {
-  this.ticket_currentPage++;
-  this.ticketPaginate();
+  if (this.ticket_currentPage < this.ticketTotalPages()) {
+    this.ticket_currentPage++; // Increase current page number
+    this.ticketPaginate(); // Update displayed tickets
   }
 }
 
+
+// Method to update datetime for tickets
 updateDateTimeForTickets() {
-  // Update dateTime property for each ticket
   this.tickets.forEach(ticket => {
-    ticket.dateTime = new Date(); // Assign current date and time
+    ticket.dateTime = new Date(); // Update datetime for each ticket
   });
 }
 
+// Method to open ticket details in modal
 openTicketDetails(ticket: any) {
-  this.selectedTicket = ticket;
-  this.isModalVisible = true;
+  this.selectedTicket = ticket; // Set selected ticket
+  this.isModalVisible = true; // Show modal
 }
 
  // Method to update ticket priority
