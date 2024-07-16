@@ -381,69 +381,64 @@
         <div class="flex justify-between mb-6">
           <input type="text" placeholder="Search..." class="w-half p-2 border rounded-lg">
           <div>
-            <button class="px-4 py-2 bg-blue-500 text-white rounded mr-2">Edit</button>
-            <button (click)="toggleManagePopup()" class="px-4 py-2 bg-black text-white rounded">Manage</button>
+            <button class="px-4 py-2 bg-blue-500 text-white rounded mr-2" (click)="toggleManageMode()">Manage</button>
+            <!-- <button (click)="toggleManagePopup()" class="px-4 py-2 bg-black text-white rounded hidden">Manage</button> -->
           </div>      
         </div>
         
-<div class="flex gap-10 justify-center">
-  <div class="w-[400px] h-[740px] shadow-xl rounded-xl">
+<div class="flex justify-between">
+  <div class="w-[33%] h-[400px] shadow-xl rounded-xl">
     <div class="flex justify-between items-center">
       <p class="pl-10 pt-10 text-2xl font-black">Manage Roles</p>
       <button class="bg-blue-500 text-white px-4 py-2 rounded mt-10 mr-10" (click)="openRolePopup()">Add Role</button>
     </div>
-    <div class="overflow-y-auto overflow-x-hidden" style="height: calc(740px - 7rem);"> <!-- Adjust height calculation -->
+    <div class="overflow-y-auto overflow-x-hidden" style="height: calc(400px - 8rem);">
       <table class="table-auto ml-10 mt-5 w-[83%]">
         <tbody>
           <tr class="h-9 text-gray-600 text-sm font-light" *ngFor="let role of roles" (click)="onRoleClick(role)">
-            <td 
-              class="hover:bg-gray-200" 
-              [ngClass]="{'bg-gray-200': clickedRoleId === role.role_id}">
+            <td class="hover:bg-gray-200" [ngClass]="{'bg-gray-200': clickedRoleId === role.role_id}">
               {{ role.role_name }}
             </td>
-            <td class="text-center">
+            <td *ngIf="isManageMode" class="text-center">
               <button class="text-blue-500 hover:text-blue-700">Edit</button>
             </td>
-            <td class="text-center">
+            <td *ngIf="isManageMode" class="text-center">
               <button (click)="deleteRole(role)" class="text-red-500 hover:text-red-700">Delete</button>
             </td>
           </tr>
         </tbody>
       </table>
-      
-    </div>
-</div>
-
-  
-  
-  <div class="flex flex-col gap-10">
-    <div class="w-[400px] h-[350px] shadow-xl rounded-xl" *ngIf="assignedRole">
-      <div class="flex justify-between items-center">
-        <p class="pl-10 pt-10 text-2xl pb-3 font-black">Assigned for {{ assignedRole.role_name }}</p>
-        <button class="bg-blue-500 text-white px-4 py-2 rounded mt-10 mr-10" (click)="openAssignPopup()">Assign</button>
-      </div>
-      <div class="overflow-y-auto overflow-x-hidden" style="height: calc(350px - 7rem);">
-        <table class="table-auto ml-10 mr-10"> 
-          <tbody>
-            <tr class="h-9 text-gray-600 text-sm font-light " *ngFor="let user of assignedUsers">
-              <td>{{ user.name }}</td>
-              <td>
-                <button class="text-red-500 hover:text-red-700">Delete</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-    
-    <div class="w-[400px] h-[350px] shadow-xl rounded-xl">
     </div>
   </div>
   
-  <div class="w-[400px] h-[740px] shadow-xl rounded-xl">
-    <div class="flex justify-between items-center">
-      <p class="pl-10 pt-10 text-2xl font-black">All Employees</p>
+  <div class="flex flex-col gap-10">
+    <div class="w-[400px] h-[400px] shadow-xl rounded-xl">
+      <div *ngIf="assignedRole">
+        <div class="flex justify-between items-center">
+          <p class="pl-10 pt-10 text-2xl pb-3 font-black">Assigned for<br>{{ assignedRole.role_name }}</p>
+          <button class="bg-blue-500 text-white px-4 py-2 rounded mr-10" (click)="openAssignPopup()">Assign</button>
+        </div>
+        <div class="overflow-y-auto overflow-x-hidden" style="height: calc(400px - 10rem);">
+          <table class="table-auto ml-10 mr-10">
+            <tbody>
+              <tr class="h-9 text-gray-600 text-sm font-light" *ngFor="let user of assignedUsers">
+                <td>{{ user.name }}</td>
+                <td>
+                  <button class="text-red-500 hover:text-red-700" *ngIf="isManageMode">Delete</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
+  </div>
+  
+  <div class="w-[33%] h-[400px] shadow-xl rounded-xl">
+    <div class="flex justify-between items-center">
+      <p class="pl-10 pt-10 text-2xl font-black">Access Rights</p>
+    </div>
+    <div class="overflow-y-auto overflow-x-hidden" style="height: calc(400px - 8rem);">
     <table class="table-auto ml-10"> 
       <tbody>
         <tr class="h-9 text-gray-600 text-sm font-light" *ngFor="let emp of employees">
@@ -451,6 +446,7 @@
         </tr>
       </tbody>
     </table>
+    </div>
   </div>
 </div>
 
@@ -469,9 +465,9 @@
 <div *ngIf="showAssignPopup" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
   <div class="w-[400px] h-[500px] shadow-xl rounded-xl bg-white flex flex-col">
     <div class="flex justify-between items-center">
-      <p class="pl-10 pt-10 text-2xl font-black">Assign for {{ assignedRole.role_name }}</p>
+      <p class="pl-10 pt-10 text-2xl font-black">Assign for{{ assignedRole.role_name }}</p>
     </div>
-    <div class="overflow-y-auto overflow-x-hidden flex-grow" style="height: calc(500px - 7rem);">
+    <div class="overflow-y-auto overflow-x-hidden flex-grow" style="height: calc(500px - 8rem);">
       <table class="table-auto ml-10"> 
         <tbody>
           <tr class="h-9 text-gray-600 text-sm font-light" *ngFor="let emp of employees">
