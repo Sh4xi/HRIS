@@ -180,12 +180,13 @@ export class UserManagementComponent implements OnInit {
     this.roles = this.roles.filter(r => r.role_name !== role.role_name);
   }
   
+  
+  clickedRoleId: number | null = null;
 
-
-  // Handle clicking a role in the Manage Roles table
   async onRoleClick(role: { role_id: number, role_name: string }) {
     console.log('Role clicked:', role);
     this.assignedRole = role;
+    this.clickedRoleId = this.clickedRoleId === role.role_id ? null : role.role_id; // Toggle clicked state
     await this.loadAssignedUsers(role);
     console.log('Assigned Role:', this.assignedRole);
   }
@@ -332,7 +333,6 @@ export class UserManagementComponent implements OnInit {
     if (!this.newRole) {
       alert('Please enter a role name');
       return;
-      this.showRolePopup = false;
     }
   
     // if (this.departmentType === 'specific' && !this.selectedDepartments) {
