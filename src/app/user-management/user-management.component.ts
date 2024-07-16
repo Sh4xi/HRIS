@@ -152,6 +152,7 @@ export class UserManagementComponent implements OnInit {
   assignedRole: any = null;
   showRolePopup: boolean = false;
   newManageRole: string = '';
+  showAssignPopup: boolean = false;
 
   openRolePopup() {
     this.showRolePopup = true;
@@ -159,6 +160,14 @@ export class UserManagementComponent implements OnInit {
 
   closeRolePopup() {
     this.showRolePopup = false;
+  }
+
+  openAssignPopup() {
+    this.showAssignPopup = true;
+  }
+
+  closeAssignPopup() {
+    this.showAssignPopup = false;
   }
 
   confirmRolePopup() {
