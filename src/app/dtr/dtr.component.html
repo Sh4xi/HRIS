@@ -1,68 +1,80 @@
-<div class="flex justify-center items-center min-h-screen bg-white">
-    <div class="flex flex-col px-4 py-3 text-sm">
-        <div class="overflow-x-auto bg-slate-50 border border-slate-300 rounded-xl">
-        <table class="w-full text-left">
-            <thead class="bg-slate-50">
-            <tr>
-                <th class="px-4 py-3">Date</th>
-                <th class="px-4 py-3">Name</th>
-                <th class="px-4 py-3">Time In</th>
-                <th class="px-4 py-3">Time Out</th>
-                <th class="px-4 py-3">OT In</th>
-                <th class="px-4 py-3">OT Out</th>
-            </tr>
-            </thead>
-            <tbody class="text-slate-500">
-                <tr class="border-t border-gray-200">
-                <td class="px-4 py-2 text-neutral-900">2 days ago</td>
-                <td class="px-4 py-2">Jennifer Davis</td>
-                <td class="px-4 py-2">Set</td>
-                <td class="px-4 py-2">Email</td>
-                <td class="px-4 py-2">jenniferacmeinc.com</td>
-                <td class="px-4 py-2">jennyacmeinc.com</td>
-            </tr>
-            <tr class="border-t border-gray-200">
-                <td class="px-4 py-2 text-neutral-900">2 days ago</td>
-                <td class="px-4 py-2">Jennifer Davis</td>
-                <td class="px-4 py-2">Set</td>
-                <td class="px-4 py-2">Email</td>
-                <td class="px-4 py-2">jenniferacmeinc.com</td>
-                <td class="px-4 py-2">jennyacmeinc.com</td>
-            </tr>
-            <tr class="border-t border-gray-200">
-                <td class="px-4 py-2 text-neutral-900">1 week ago</td>
-                <td class="px-4 py-2">Jennifer Davis</td>
-                <td class="px-4 py-2">Set</td>
-                <td class="px-4 py-2">First name</td>
-                <td class="px-4 py-2">Jenny</td>
-                <td class="px-4 py-2">Jennifer</td>
-            </tr>
-            <tr class="border-t border-gray-200">
-                <td class="px-4 py-2 text-neutral-900">3 weeks ago</td>
-                <td class="px-4 py-2">Jennifer Davis</td>
-                <td class="px-4 py-2">Set</td>
-                <td class="px-4 py-2">Email</td>
-                <td class="px-4 py-2">jennyacmeinc.com</td>
-                <td class="px-4 py-2">jenniferacmeinc.com</td>
-            </tr>
-            <tr class="border-t border-gray-200">
-                <td class="px-4 py-2 text-neutral-900">1 month ago</td>
-                <td class="px-4 py-2">Jennifer Davis</td>
-                <td class="px-4 py-2">Set</td>
-                <td class="px-4 py-2">Last name</td>
-                <td class="px-4 py-2">Davis</td>
-                <td class="px-4 py-2">Davies</td>
-            </tr>
-            <tr class="border-t border-gray-200">
-                <td class="px-4 py-2 text-neutral-900">2 months ago</td>
-                <td class="px-4 py-2">Jennifer Davis</td>
-                <td class="px-4 py-2">Set</td>
-                <td class="px-4 py-2">Email</td>
-                <td class="px-4 py-2">jenniferacmeinc.com</td>
-                <td class="px-4 py-2">jennyacmeinc.com</td>
-            </tr>
-            </tbody>
-        </table>
+<div class="flex">
+    <app-sidebar-navigation></app-sidebar-navigation>
+
+    <div *ngIf="showTable" class="flex flex-col w-full bg-white pt-8 px-6">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font text-neutral-900">Daily Time-In Records</h2>
+            <div class="flex">
+                <button (click)="goToAuditTrail()" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-300 ml-4">Back</button>
+            </div>
         </div>
+
+        <p class="text-sm text-gray-500 mb-6">View parameters made into your data</p>
+        <!-- Search input -->
+        <div class="mb-6">
+            <div class="flex items-center space-x-4">
+                <div class="relative flex-grow">
+                    <input type="text" placeholder="Search parameters" class="w-full py-3 px-4 pr-10 rounded-lg bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" [(ngModel)]="searchTerm" (keyup)="applySearch()">
+                    <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                        <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                </div>
+                <button *ngIf="isManageMode" (click)="deleteSelectedAttendances()" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition duration-300 ml-4">Delete</button>
+                <button (click)="toggleManageMode()" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-300">Manage</button>
+            </div>
+        </div>
+  
+        <div class="overflow-x-auto bg-white shadow-md rounded-lg">
+            <table class="w-full text-left border-collapse" *ngIf="paginatedAttendances && paginatedAttendances.length > 0">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th *ngIf="isManageMode" class="px-3 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Select</th>
+                        <th class="px-3 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                        <th class="px-3 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                        <th class="px-3 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Schedule</th>
+                        <th class="px-3 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Clock In</th>
+                        <th class="px-3 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Clock Out</th>
+                        <th class="px-3 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">OT-IN</th>
+                        <th class="px-3 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">OT-OUT</th>
+                        <th *ngIf="isManageMode" class="px-3 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    <tr *ngFor="let attendance of paginatedAttendances">
+                        <td *ngIf="isManageMode" class="px-3 py-4 whitespace-nowrap">
+                            <input type="checkbox" [(ngModel)]="attendance.selected" class="form-checkbox h-4 w-4 text-blue-600 transition duration-150 ease-in-out">
+                        </td>
+                        <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">{{ attendance.employeeName || 'N/A' }}</td>
+                        <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-500">{{ attendance.status || 'N/A' }}</td>
+                        <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-500">{{ attendance.schedule || 'N/A' }}</td>
+                        <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-500">{{ attendance.clockIn }}</td>
+                        <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-500">{{ attendance.clockOut }}</td>
+                        <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-500">{{ attendance.otIn }}</td>
+                        <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-500">{{ attendance.otOut }}</td>
+                        <td *ngIf="isManageMode" class="px-3 py-4 whitespace-nowrap text-sm font-medium">
+                            <button (click)="editAttendance(attendance)" class="text-blue-600 hover:text-blue-800">
+                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 013.536 3.536L7.5 18.5H3v-4.5L16.732 3.732z"></path>
+                                </svg>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>              
+            </table>
+            <div *ngIf="!paginatedAttendances || paginatedAttendances.length === 0" class="p-4 text-center text-gray-500">
+                No parameters found.
+            </div>
+        </div>   
+        <div class="flex justify-between items-center mt-4">
+            <div class="flex">
+                <button (click)="prevPage()" [disabled]="currentPage === 1" class="px-3 py-1 bg-gray-200 rounded disabled:opacity-50">Previous</button>
+            </div>
+            <div>Page {{ currentPage }} of {{ totalPages }}</div>
+            <div class="flex">
+                <button (click)="nextPage()" [disabled]="currentPage === totalPages" class="px-3 py-1 bg-gray-200 rounded disabled:opacity-50">Next</button>
+            </div>
+        </div>       
     </div>
 </div>
