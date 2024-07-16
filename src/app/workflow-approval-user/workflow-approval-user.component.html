@@ -105,28 +105,60 @@
     </section>
   </div>
 
-  <!-- Upload Modal -->
-  <div *ngIf="showUploadModal" class="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50">
-    <div class="bg-white p-4 rounded-md max-w-md w-full">
-      <h2 class="text-xl font-bold mb-4">Submit Workflow Request</h2>
-      <form (ngSubmit)="submitWorkflowRequest()">
-        <div class="mb-4">
-          <label class="block text-sm font-medium text-gray-700">Reviewer</label>
-          <input [(ngModel)]="newWorkflow.reviewer" name="reviewer" required class="mt-1 p-2 border border-gray-300 rounded-md w-full" />
+ <!-- Upload Modal -->
+<div *ngIf="showUploadModal" class="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50">
+  <div class="bg-white p-4 rounded-md max-w-md w-full">
+    <h2 class="text-xl font-bold mb-4">Submit Workflow Request</h2>
+    <form (ngSubmit)="submitWorkflowRequest()">
+      <div class="grid grid-cols-2 gap-4">
+        <!-- Approvers Section -->
+        <div>
+          <input type="text" [(ngModel)]="searchApprover" (input)="filterApprovers()" name="searchApprover" placeholder="Search Approver" class="w-full p-2 mb-2 border rounded">
+          <div class="border rounded p-2 h-48 overflow-y-auto">
+            <h3 class="font-bold mb-2">List of Approvers</h3>
+            <ul>
+              @for (approver of filteredApprovers; track approver) {
+                <li class="cursor-pointer hover:bg-gray-100 p-1" (click)="selectApprover(approver)">{{ approver }}</li>
+              }
+            </ul>
+          </div>
         </div>
-        <div class="mb-4">
-          <label class="block text-sm font-medium text-gray-700">Submitted For</label>
-          <input [(ngModel)]="newWorkflow.submitted_for" name="submitted_for" required class="mt-1 p-2 border border-gray-300 rounded-md w-full" />
+        
+        <!-- Reviewers Section -->
+        <div>
+          <input type="text" [(ngModel)]="searchReviewer" (input)="filterReviewers()" name="searchReviewer" placeholder="Search Reviewer" class="w-full p-2 mb-2 border rounded">
+          <div class="border rounded p-2 h-48 overflow-y-auto">
+            <h3 class="font-bold mb-2">List of Reviewers</h3>
+            <ul>
+              @for (reviewer of filteredReviewers; track reviewer) {
+                <li class="cursor-pointer hover:bg-gray-100 p-1" (click)="selectReviewer(reviewer)">{{ reviewer }}</li>
+              }
+            </ul>
+          </div>
         </div>
-        <div class="mb-4">
-          <label class="block text-sm font-medium text-gray-700">Request</label>
-          <textarea [(ngModel)]="newWorkflow.request" name="request" required class="mt-1 p-2 border border-gray-300 rounded-md w-full"></textarea>
-        </div>
-        <div class="flex justify-end">
-          <button type="button" (click)="closeUploadModal()" class="mr-2 px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">Cancel</button>
-          <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Submit</button>
-        </div>
-      </form>
-    </div>
+      </div>
+      
+      <!-- Type of Request Dropdown -->
+      <div class="mt-4">
+        <select [(ngModel)]="newWorkflow.requestType" name="requestType" class="w-full p-2 border rounded">
+          <option value="" disabled selected>Type of request</option>
+          <option value="Promotion">Promotion</option>
+          <option value="Workflow Request">Workflow Request</option>
+          <option value="Leave Request">Leave Request</option>
+        </select>
+      </div>
+      
+      <!-- File Selection -->
+      <div class="mt-4">
+        <input type="file" (change)="onFileSelected($event)" class="hidden" #fileInput>
+        <button type="button" (click)="fileInput.click()" class="w-full p-2 bg-gray-200 rounded">Choose File</button>
+        <span *ngIf="selectedFile" class="mt-2 text-sm text-gray-600">{{ selectedFile.name }}</span>
+      </div>
+      
+      <!-- Submit Button -->
+      <div class="mt-4">
+        <button type="submit" class="w-full p-2 bg-blue-500 text-white rounded">Submit</button>
+      </div>
+    </form>
   </div>
-</main>
+</div>

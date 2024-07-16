@@ -18,16 +18,26 @@ export class WorkflowApprovalUserComponent implements OnInit {
   filteredWorkflows: any[] = [];
   paginatedWorkflows: any[] = [];
   showUploadModal = false;
-  newWorkflow: any = {
-    reviewer: '',
-    submitted_for: '',
-    request: ''
-  };
   selectedStatus: string = '';
   searchTerm: string = '';
   currentPage: number = 1;
   totalPages: number = 1;
   itemsPerPage: number = 10;
+
+  approvers: string[] = ['Approver 1', 'Approver 2', 'Approver 3'];
+  reviewers: string[] = ['Reviewer 1', 'Reviewer 2', 'Reviewer 3'];
+  filteredApprovers: string[] = [];
+  filteredReviewers: string[] = [];
+  searchApprover: string = '';
+  searchReviewer: string = '';
+  selectedFile: File | null = null;
+
+  newWorkflow: any = {
+    reviewer: '',
+    submitted_for: '',
+    request: '',
+    requestType: ''
+  };
 
   constructor(private router: Router) {
     console.log('Initializing Supabase client...');
@@ -49,6 +59,8 @@ export class WorkflowApprovalUserComponent implements OnInit {
 
   ngOnInit() {
     this.fetchUserWorkflows();
+    this.filteredApprovers = [...this.approvers];
+    this.filteredReviewers = [...this.reviewers];
   }
 
   async fetchUserWorkflows() {
@@ -189,11 +201,41 @@ export class WorkflowApprovalUserComponent implements OnInit {
     this.newWorkflow = {
       reviewer: '',
       submitted_for: '',
-      request: ''
+      request: '',
+      requestType: ''
     };
+    this.selectedFile = null;
   }
 
   goHome() {
     this.router.navigate(['/system-management']);
+  }
+
+  filterApprovers() {
+    this.filteredApprovers = this.approvers.filter(approver =>
+      approver.toLowerCase().includes(this.searchApprover.toLowerCase())
+    );
+  }
+
+  filterReviewers() {
+    this.filteredReviewers = this.reviewers.filter(reviewer =>
+      reviewer.toLowerCase().includes(this.searchReviewer.toLowerCase())
+    );
+  }
+
+  selectApprover(approver: string) {
+    this.newWorkflow.submitted_for = approver;
+  }
+
+  selectReviewer(reviewer: string) {
+    this.newWorkflow.reviewer = reviewer;
+  }
+
+  onFileSelected(event: Event) {
+    const element = event.target as HTMLInputElement;
+    const file = element.files ? element.files[0] : null;
+    if (file) {
+      this.selectedFile = file;
+    }
   }
 }
