@@ -141,6 +141,7 @@ export class WorkflowApprovalUserComponent implements OnInit {
       const workflowData = {
         ...this.newWorkflow,
         requested_by: user.email,
+        status: 'Pending'
       };
       console.log('Workflow data to be submitted:', workflowData);
 
