@@ -16,7 +16,8 @@ import { AuditTrailComponent } from './audit-trail/audit-trail.component';
     DashboardComponent,
     UserManagementComponent,
     LoginFailedComponent,
-    AuditTrailComponent
+    AuditTrailComponent,
+    SidebarNavigationComponent
   ],
 })
 export class AppModule { }

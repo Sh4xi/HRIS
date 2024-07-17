@@ -20,20 +20,19 @@ describe('authGuard', () => {
   });
 
   it('should allow access when user is logged in', () => {
-    authService.isLoggedIn.and.returnValue(true);
-    
-    const result = TestBed.runInInjectionContext(authGuard);
-    
-    expect(result).toBe(true);
-    expect(router.navigate).not.toHaveBeenCalled();
+    authService.isLoggedIn.and.returnValue(Promise.resolve(true));
+  
+    TestBed.runInInjectionContext(authGuard).then((result) => {
+      expect(result).toBe(true);
+      expect(router.navigate).not.toHaveBeenCalled();
+    });
   });
-
   it('should redirect to login when user is not logged in', () => {
-    authService.isLoggedIn.and.returnValue(false);
+    authService.isLoggedIn.and.returnValue(Promise.resolve(false));
     
-    const result = TestBed.runInInjectionContext(authGuard);
-    
-    expect(result).toBe(false);
+    TestBed.runInInjectionContext(authGuard).then((result) => {
+      expect(result).toBe(false);
     expect(router.navigate).toHaveBeenCalledWith(['/login']);
   });
+});
 });
