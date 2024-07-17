@@ -1,6 +1,6 @@
 <div class="flex h-screen">
   <!-- Sidebar -->
-  <div class="bg-white shadow-xl transition-all duration-200 ease-in-out fixed top-0 left-0 h-full overflow-y-auto flex flex-col"
+  <div class="bg-white shadow-xl transition-all duration-200 ease-in-out fixed top-0 left-0 h-full overflow-y-auto flex flex-col z-50"
     [ngClass]="{'w-64': isExpanded, 'w-16': !isExpanded}"
     (mouseenter)="expandSidebar()"
     (mouseleave)="collapseSidebar()">
@@ -20,7 +20,7 @@
         <li *ngFor="let item of sidebarItems">
           <a (click)="navigateTo(item.route)"
             routerLinkActive="bg-blue-100 text-blue-600"
-            class="flex items-center py-3 px-4 text-gray-600 hover:bg-blue-50 hover:text-blue-600 transition-all duration-300 ease-in-out"
+            class="flex items-center py-3 px-4 text-gray-600 hover:bg-blue-50 hover:text-blue-600 transition-all duration-300 ease-in-out cursor-pointer"
             [ngClass]="{'justify-center': !isExpanded}">
             <span class="material-icons text-xl transition-transform duration-300 ease-in-out"
                   [ngClass]="{'mr-3': isExpanded, 'scale-125': !isExpanded}">
@@ -50,9 +50,10 @@
 </div>
 
   <!-- Main Content -->
-  <div class="flex-1 p-4 transition-all duration-300 ease-in-out"
-       [ngClass]="{'ml-16': !isExpanded, 'ml-64': isExpanded}">
+  <div class="flex-1 p-4 transition-all duration-300 ease-in-out ml-10">
+       
     <!-- Your main content goes here -->
     <router-outlet></router-outlet>
   </div>
 </div>
+<!--[ngClass]="{'ml-16': !isExpanded, 'ml-64': isExpanded}">-->

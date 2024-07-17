@@ -17,7 +17,7 @@ interface DashboardCard {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule,SidebarNavigationModule],
+  imports: [CommonModule, RouterModule, SidebarNavigationModule],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
@@ -26,7 +26,7 @@ export class DashboardComponent implements OnInit {
   
   dashboardCards: DashboardCard[] = [
     { title: 'Total Employees', value: 0 },
-    { title: 'Leaves Pending', value: 5 },
+    { title: 'DTR', value: 5 },
     { title: 'New Applications', value: 8 }
   ];
 
@@ -43,7 +43,7 @@ export class DashboardComponent implements OnInit {
         const totalEmployees = response.data.length;
         this.dashboardCards = [
           { title: 'Total Employees', value: totalEmployees },
-          { title: 'Leaves Pending', value: 7 },
+          { title: 'DTR', value: 7 },
           { title: 'New Applications', value: 10 }
         ];
       } else {
@@ -83,14 +83,13 @@ export class DashboardComponent implements OnInit {
     }
   }
 
-}
+  timeIn() {
+    console.log('Time In button clicked');
+    // Add your logic here for Time In
+  }
 
-// async signOut() {
-//   try {
-//     await this.supabaseService.signOut();
-//     this.router.navigate(['/login']);
-//   } catch (error) {
-//     console.error('Error signing out:', error);
-//   }
-// }
-// }
+  timeOut() {
+    console.log('Time Out button clicked');
+    // Add your logic here for Time Out
+  }
+}
