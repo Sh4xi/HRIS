@@ -72,13 +72,14 @@
         <td class="px-6 py-3">{{ ticket.email }}</td>
         <td class="px-6 py-3 overflow-hidden max-w-xs whitespace-nowrap overflow-ellipsis">{{ ticket.description }}</td>
         <td class="px-6 py-3">
-          <span [ngClass]="{
-            'text-green-700 bg-green-300 py-1 px-3 rounded-full text-xs': ticket.status === 'Open',
-            'text-blue-700 bg-blue-300 py-1 px-3 rounded-full text-xs': ticket.status === 'In Progress',
-            'text-red-700 bg-red-300 py-1 px-3 rounded-full text-xs': ticket.status === 'Closed'
-          }">{{ ticket.status }}
+          <span class="bg-green-300 py-1 px-3 rounded-full text-xs">
+            <span [ngClass]="{
+              'text-green-800': ticket.status === 'Open',
+              'text-blue-800': ticket.status === 'In Progress',
+              'text-red-800': ticket.status === 'Closed'
+            }">{{ ticket.status }}</span>
           </span>
-        </td>
+        </td>        
         <td class="bpx-6 py-3 text-sm">{{ ticket.dateTime | date:'hh:mm a' }}<br>{{ ticket.dateTime | date:'MMMM d, yyyy' }}</td>
         <td class="px-6 py-3">
           <div (click)="$event.stopPropagation()">
