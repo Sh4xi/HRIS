@@ -161,6 +161,32 @@ export class UserManagementComponent implements OnInit {
 
   isManageMode = false; // Add this line
 
+  editingRoleId: number | null = null;
+  originalRoleName: string | null = null;
+
+
+  startEdit(role: any) {
+  this.editingRoleId = role.role_id;
+  this.originalRoleName = role.role_name; // Store the original name
+}
+
+saveRole(role: any) {
+  // Implement your save logic here, e.g., update the role in your backend
+  this.editingRoleId = null; // Exit edit mode
+  this.originalRoleName = null; // Clear the original name
+}
+
+cancelEdit() {
+  if (this.originalRoleName !== null && this.editingRoleId) {
+    const roleToEdit = this.searchroletab.find(r => r.role_id === this.editingRoleId);
+    if (roleToEdit) {
+      roleToEdit.role_name = this.originalRoleName; // Revert to the original name
+    }
+  }
+  this.editingRoleId = null; // Exit edit mode
+  this.originalRoleName = null; // Clear the original name
+}
+
   toggleManageMode() { // Add this method
     this.isManageMode = !this.isManageMode;
   }
@@ -691,6 +717,12 @@ export class UserManagementComponent implements OnInit {
     );
   }
   
+  get searchroletab() {
+    return this.roles.filter(role => 
+      role.role_name.toLowerCase().includes(this.searchRoleTerm.toLowerCase())
+    );
+  }
+
   getContractType(position: string): string {
     const positionLower = position.toLowerCase();
     switch (positionLower) {
@@ -794,6 +826,7 @@ nextPage() {
 
   setActiveTab(tab: string) {
     this.activeTab = tab;
+    this.searchRoleTerm = '';
   }
 
   toggleEditMode() {

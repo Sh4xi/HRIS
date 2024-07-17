@@ -24,7 +24,7 @@
   <section id="ticket-list" class="flex flex-col h-full">
     <div class="mb-4 flex flex-col md:flex-row justify-between items-center">
       <div class="w-full md:w-1/2 mb-4 md:mb-0">
-        <input type="text" [(ngModel)]="searchTicketTerm" (input)="searchTicketTable()" placeholder="Search..." class="w-full p-2 border rounded-lg">
+        <input type="text" [(ngModel)]="searchTicketTerm" (input)="searchTicketTable()" placeholder="Search Tickets..." class="w-full p-2 border rounded-lg">
       </div>
       <div class="flex items-center">
         <div class="relative ml-4">
@@ -154,7 +154,7 @@
 <div *ngIf="activeTab === 'users'" class="flex flex-col h-screen">
   <section id="user-list" class="flex flex-col h-full">
     <div class="mb-4 flex flex-col md:flex-row md:justify-between md:items-center">
-      <input type="text" [(ngModel)]="searchTerm" (input)="searchTable()" placeholder="Search..." class="w-full md:w-1/2 p-2 border rounded-lg mb-2 md:mb-0">
+      <input type="text" [(ngModel)]="searchTerm" (input)="searchTable()" placeholder="Search Employees..." class="w-full md:w-1/2 p-2 border rounded-lg mb-2 md:mb-0">
       <div class="flex space-x-4">
         <!-- Delete button only displayed when in editing mode -->
         <button *ngIf="isEditing" class="bg-red-500 text-white px-4 py-2 rounded-lg" (click)="deleteUsers()">
@@ -381,7 +381,7 @@
     <div *ngIf="activeTab === 'roles'">
       <section id="user-list">
         <div class="flex justify-between mb-6">
-          <input type="text" placeholder="Search..." class="w-half p-2 border rounded-lg">
+          <input type="text" [(ngModel)]="searchRoleTerm" placeholder="Search Roles..." class="w-half p-2 border rounded-lg">          
           <div>
             <button class="px-4 py-2 bg-blue-500 text-white rounded mr-2" (click)="toggleManageMode()">Manage</button>
             <!-- <button (click)="toggleManagePopup()" class="px-4 py-2 bg-black text-white rounded hidden">Manage</button> -->
@@ -389,27 +389,58 @@
         </div>
         
         <div class="flex justify-between">
-          <div class="flex-1 h-[450px] shadow-xl rounded-xl mx-2 border border-gray-300">
+          <div class="flex-1 h-[450px] shadow-xl rounded-xl border border-gray-300">
             <div class="m-10">
               <div class="flex justify-between items-center">
-                <p class="text-2xl font-black">Manage Roles</p>
+                <p class="text-2xl font-black">Roles</p>
                 <button class="bg-blue-500 text-white px-4 py-2 rounded" (click)="openRolePopup()">Add Role</button>
               </div>
               <div class="custom-scrollbar overflow-y-auto overflow-x-hidden" style="height: calc(450px - 8rem);">
                 <table class="table-auto w-[100%]">
                   <tbody>
-                    <tr class="h-9 text-gray-600 text-sm font-light" *ngFor="let role of roles" (click)="onRoleClick(role)">
-                      <td class="hover:bg-gray-200 w-full" [ngClass]="{'bg-gray-200': clickedRoleId === role.role_id}">
-                        {{ role.role_name }}
-                      </td>
-                      <td *ngIf="isManageMode" class="text-center pr-3">
-                        <button class="text-blue-500 hover:text-blue-700"><i class="fa fa-pencil" aria-hidden="true"></i>
-                        </button>
-                      </td>
-                      <td *ngIf="isManageMode" class="text-center">
-                        <button (click)="deleteRole(role)" class="text-red-500 hover:text-red-700 pr-1"><i class="fa fa-trash" aria-hidden="true"></i></button>
-                      </td>
-                    </tr>
+                    <ng-container *ngIf="searchroletab.length > 0; else noMatch">
+                      <tr class="h-9 text-gray-600 text-sm font-light" *ngFor="let role of searchroletab" (click)="onRoleClick(role)">
+                        <td class="hover:bg-gray-100 w-full" [ngClass]="{'bg-gray-100': clickedRoleId === role.role_id}">
+                          <ng-container *ngIf="editingRoleId === role.role_id; else displayRoleName">
+                            <input [(ngModel)]="role.role_name" class="border rounded outline-none" />
+                          </ng-container>
+                          <ng-template #displayRoleName>
+                            {{ role.role_name }}
+                          </ng-template>
+                        </td>
+                        <td *ngIf="isManageMode" class="text-center" style="min-width: 35px;">
+                          <ng-container *ngIf="editingRoleId === role.role_id; else editIcon">
+                            <button (click)="saveRole(role)" class="text-green-500 hover:text-green-700" style="padding: 0;">
+                              <i class="fa fa-check" aria-hidden="true"></i>
+                            </button>
+                          </ng-container>
+                          <ng-template #editIcon>
+                            <button (click)="startEdit(role)" class="text-blue-500 hover:text-blue-700" style="padding: 0;">
+                              <i class="fa fa-pencil" aria-hidden="true"></i>
+                            </button>
+                          </ng-template>
+                        </td>
+                        <td *ngIf="isManageMode" class="text-center" style="min-width: 35px;">
+                          <ng-container *ngIf="editingRoleId === role.role_id; else deleteIcon">
+                            <button (click)="cancelEdit()" class="text-gray-500 hover:text-gray-700" style="padding: 0;">
+                              <i class="fa fa-ban" aria-hidden="true"></i>
+                            </button>
+                          </ng-container>
+                          <ng-template #deleteIcon>
+                            <button (click)="deleteRole(role)" class="text-red-500 hover:text-red-700 pr-1" style="padding: 0;">
+                              <i class="fa fa-trash" aria-hidden="true"></i>
+                            </button>
+                          </ng-template>
+                        </td>
+                      </tr>
+                      
+                                                                   
+                    </ng-container>
+                    <ng-template #noMatch>
+                      <tr class="h-9 text-gray-600 text-sm font-light">
+                        <td colspan="3" class="text-center p-4">No matching roles found</td>
+                      </tr>
+                    </ng-template>
                   </tbody>
                 </table>
               </div>
@@ -440,7 +471,13 @@
           <div class="flex-1 h-[450px] shadow-xl rounded-xl mx-2 border border-gray-300">
             <div class="m-10">
               <div class="flex justify-between items-center">
-                <p class=" text-2xl font-black">Access Rights</p>
+                <p class="text-2xl font-black">
+                  Access Rights &nbsp;
+                  <span class="text-lg text-blue-600" style="width: 24px; display: inline-block;" *ngIf="isManageMode">
+                    <i class="fa fa-pencil" aria-hidden="true"></i>
+                  </span>
+                  <span class="text-lg text-blue-600" style="width: 24px; display: inline-block;" *ngIf="!isManageMode">&nbsp;</span>
+                </p>
               </div>
               <div class="overflow-y-auto overflow-x-hidden custom-scrollbar" style="height: calc(450px - 8rem);">
                 <table class="table-auto w-full">
@@ -452,18 +489,18 @@
                     </tr>
                     <tr class="h-7 text-gray-600 text-sm font-light">
                       <td class="w-full">Users</td>
-                      <td class="whitespace-nowrap text-center px-6"><input type="checkbox"></td>
-                      <td class="whitespace-nowrap text-center"><input type="checkbox"></td>
+                      <td class="whitespace-nowrap text-center px-6"><input type="checkbox" [disabled]="!isManageMode"></td>
+                      <td class="whitespace-nowrap text-center"><input type="checkbox" [disabled]="!isManageMode"></td>
                     </tr>
                     <tr class="h-7 text-gray-600 text-sm font-light">
                       <td class="w-full">Roles</td>
-                      <td class="whitespace-nowrap text-center px-6"><input type="checkbox"></td>
-                      <td class="whitespace-nowrap text-center"><input type="checkbox"></td>
+                      <td class="whitespace-nowrap text-center px-6"><input type="checkbox" [disabled]="!isManageMode"></td>
+                      <td class="whitespace-nowrap text-center"><input type="checkbox" [disabled]="!isManageMode"></td>
                     </tr>
                     <tr class="h-7 text-gray-600 text-sm font-light">
                       <td class="w-full">Support Tickets</td>
-                      <td class="whitespace-nowrap text-center px-6"><input type="checkbox"></td>
-                      <td class="whitespace-nowrap text-center"><input type="checkbox"></td>
+                      <td class="whitespace-nowrap text-center px-6"><input type="checkbox" [disabled]="!isManageMode"></td>
+                      <td class="whitespace-nowrap text-center"><input type="checkbox" [disabled]="!isManageMode"></td>
                     </tr>
 
                     <tr class="h-9 text-gray-600 text-sm font-light">
@@ -471,8 +508,8 @@
                     </tr>
                     <tr class="h-7 text-gray-600 text-sm font-light">
                       <td class="w-full">Paremeters</td>
-                      <td class="whitespace-nowrap text-center px-6"><input type="checkbox"></td>
-                      <td class="whitespace-nowrap text-center"><input type="checkbox"></td>
+                      <td class="whitespace-nowrap text-center px-6"><input type="checkbox" [disabled]="!isManageMode"></td>
+                      <td class="whitespace-nowrap text-center"><input type="checkbox" [disabled]="!isManageMode"></td>
                     </tr>
 
                     <tr class="h-9 text-gray-600 text-sm font-light">
@@ -480,18 +517,18 @@
                     </tr>
                     <tr class="h-7 text-gray-600 text-sm font-light">
                       <td class="w-full">Daily</td>
-                      <td class="whitespace-nowrap text-center px-6"><input type="checkbox"></td>
-                      <td class="whitespace-nowrap text-center"><input type="checkbox"></td>
+                      <td class="whitespace-nowrap text-center px-6"><input type="checkbox" [disabled]="!isManageMode"></td>
+                      <td class="whitespace-nowrap text-center"><input type="checkbox" [disabled]="!isManageMode"></td>
                     </tr>
                     <tr class="h-7 text-gray-600 text-sm font-light">
                       <td class="w-full">Monthly</td>
-                      <td class="whitespace-nowrap text-center px-6"><input type="checkbox"></td>
-                      <td class="whitespace-nowrap text-center"><input type="checkbox"></td>
+                      <td class="whitespace-nowrap text-center px-6"><input type="checkbox" [disabled]="!isManageMode"></td>
+                      <td class="whitespace-nowrap text-center"><input type="checkbox" [disabled]="!isManageMode"></td>
                     </tr>
                     <tr class="h-7 text-gray-600 text-sm font-light">
                       <td class="w-full">Weekly</td>
-                      <td class="whitespace-nowrap text-center px-6"><input type="checkbox"></td>
-                      <td class="whitespace-nowrap text-center"><input type="checkbox"></td>
+                      <td class="whitespace-nowrap text-center px-6"><input type="checkbox" [disabled]="!isManageMode"></td>
+                      <td class="whitespace-nowrap text-center"><input type="checkbox" [disabled]="!isManageMode"></td>
                     </tr>
 
                     <tr class="h-9 text-gray-600 text-sm font-light">
@@ -499,8 +536,8 @@
                     </tr>
                     <tr class="h-7 text-gray-600 text-sm font-light">
                       <td class="w-full">Entries</td>
-                      <td class="whitespace-nowrap text-center px-6"><input type="checkbox"></td>
-                      <td class="whitespace-nowrap text-center"><input type="checkbox"></td>
+                      <td class="whitespace-nowrap text-center px-6"><input type="checkbox" [disabled]="!isManageMode"></td>
+                      <td class="whitespace-nowrap text-center"><input type="checkbox" [disabled]="!isManageMode"></td>
                     </tr>
                   </tbody>
                 </table>
@@ -514,7 +551,7 @@
         <div *ngIf="showRolePopup" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
           <div class="bg-white p-6 rounded-lg shadow-lg w-[30%] h-[80%]">
             <p class="text-2xl font-black mb-4">Add Role</p>
-            <input type="text" id="role" [(ngModel)]="newRole" placeholder="Enter role" class="border p-2 mb-4 w-full"/>
+            <input type="text" id="role" [(ngModel)]="newRole" placeholder="Enter role name" class="border p-2 mb-4 w-full"/>
             
             <!-- Add the table here -->
             <div class="overflow-y-auto overflow-x-hidden custom-scrollbar" style="height: calc(80% - 2rem);">
@@ -589,32 +626,40 @@
         </div>
         
 
-<div *ngIf="showAssignPopup" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
-  <div class="w-[30%] h-[70%] shadow-xl rounded-lg bg-white flex flex-col">
-    <div class="flex flex-col h-full p-6">
-      <div class="flex justify-start flex-col">
-        <p class="text-2xl font-black">Assign for {{ assignedRole.role_name }}</p>
-        <input type="text" [(ngModel)]="searchTerm" placeholder="Search..." class="w-full p-2 border rounded-lg">
-      </div>
-      <div class="overflow-y-auto overflow-x-hidden custom-scrollbar">
-        <table class="table-auto w-full">
-          <tbody>
-            <tr class="h-9 text-gray-600 text-sm font-light" *ngFor="let emp of searchEmpRole">
-              <td>
-                <input type="checkbox" (change)="onCheckboxChange(emp.user_id, $event)">
-              </td>
-              <td class ="w-full">{{ emp.firstname }} {{ emp.midname }} {{ emp.surname }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>      
-      <div class="flex gap-2 justify-start mt-5">
-        <button class="bg-green-500 text-white px-4 py-2 rounded" (click)="assignRole()">Assign</button>
-        <button class="bg-gray-500 text-white px-4 py-2 rounded" (click)="closeAssignPopup()">Cancel</button>
-      </div>
-    </div>
-  </div>
-</div>
+        <div *ngIf="showAssignPopup" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
+          <div class="w-[25%] h-[70%] shadow-xl rounded-lg bg-white flex flex-col">
+            <div class="flex flex-col h-full p-6">
+              <div class="flex justify-start flex-col mb-3">
+                <p class="text-2xl font-black">Assign for <span class="text-blue-600">{{ assignedRole.role_name }}</span></p>
+                <input type="text" [(ngModel)]="searchTerm" placeholder="Search Employees..." class="w-full p-2 border rounded-lg">
+              </div>
+              <div class="overflow-y-auto overflow-x-hidden custom-scrollbar flex-grow">
+                <table class="table-auto w-full">
+                  <tbody>
+                    <ng-container *ngIf="searchEmpRole.length > 0; else noMatch">
+                      <tr class="h-9 text-gray-600 text-sm font-light" *ngFor="let emp of searchEmpRole">
+                        <td>
+                          <input type="checkbox" (change)="onCheckboxChange(emp.user_id, $event)">
+                        </td>
+                        <td class="w-full">{{ emp.firstname }} {{ emp.midname }} {{ emp.surname }}</td>
+                      </tr>
+                    </ng-container>
+                    <ng-template #noMatch>
+                      <tr class="h-9 text-gray-600 text-sm font-light">
+                        <td colspan="2" class="text-center p-4">No matching employees found</td>
+                      </tr>
+                    </ng-template>
+                  </tbody>
+                </table>
+              </div>
+              <div class="flex gap-2 justify-start mt-3">
+                <button class="bg-green-500 text-white px-4 py-2 rounded" (click)="assignRole()">Assign</button>
+                <button class="bg-gray-500 text-white px-4 py-2 rounded" (click)="closeAssignPopup()">Cancel</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
 
 
 
