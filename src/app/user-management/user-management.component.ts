@@ -600,6 +600,12 @@ export class UserManagementComponent implements OnInit {
     try {
       this.roles = await this.supabaseService.getRoles();
       this.filteredRoles = this.roles;
+
+      if (this.roles.length > 0) { /*checks if there is a role and displays the first row when you load the page */ 
+        this.clickedRoleId = this.roles[0].role_id;
+        this.assignedRole = this.roles[0];
+        await this.loadAssignedUsers(this.roles[0]);
+      }
     } catch (error) {
       console.error('Error fetching roles:', error);
     }
