@@ -19,7 +19,7 @@
     </div>
     
 
-  <!-- Support tickets -->
+<!-- Support tickets -->
 <div *ngIf="activeTab === 'support tickets'">
   <section id="ticket-list" class="flex flex-col h-full">
     <div class="mb-4 flex flex-col md:flex-row justify-between items-center">
@@ -42,6 +42,7 @@
           </div>
         </div>
         <button class="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg ml-4" (click)="deleteSelectedTickets()">Delete</button>
+        <button class="bg-green-600 hover:bg-green-600 text-white py-2 px-4 rounded-lg ml-4" (click)="deleteSelectedTickets()">Refresh</button>
       </div>
     </div>
       
@@ -69,7 +70,7 @@
         </td>
         <td class="px-6 py-3">{{ ticket.id }}</td>
         <td class="px-6 py-3 font-semibold">{{ ticket.title }}</td>
-        <td class="px-6 py-3">{{ ticket.email }}</td>
+        <td class="px-6 py-3 flex justify-start">{{ ticket.email }}</td>
         <td class="px-6 py-3 overflow-hidden max-w-xs whitespace-nowrap overflow-ellipsis">{{ ticket.description }}</td>
         <td class="px-6 py-3">
           <span class="bg-green-200 py-1 px-3 rounded-full text-xs">
@@ -102,9 +103,9 @@
 
 <!-- Paginations for tickets -->
     <div class="flex justify-between items-center mt-4">
-        <button class="bg-gray-500 text-white px-4 py-2 rounded" (click)="prevPage()" [disabled]="currentPage === 1">Previous</button>
-        <span class="text-gray-600">Page {{ currentPage }} of {{ totalPages }}</span>
-        <button class="bg-gray-500 text-white px-4 py-2 rounded" (click)="nextPage()" [disabled]="currentPage === totalPages">Next</button>
+        <button class="bg-gray-500 text-white px-4 py-2 rounded" (click)="ticketPrevPage()" [disabled]="ticket_currentPage === 1">Previous</button>
+        <span class="text-gray-600">Page {{ ticket_currentPage }} of {{ ticket_totalPages }}</span>
+        <button class="bg-gray-500 text-white px-4 py-2 rounded" (click)="ticketNextPage()" [disabled]="ticket_currentPage === totalPages">Next</button>
       </div>
    </div>
     

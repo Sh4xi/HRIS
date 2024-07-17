@@ -87,9 +87,11 @@ export class UserManagementComponent implements OnInit {
   searchTicketTerm: string = '';
   ticket_currentPage: number = 1;
   ticket_itemsPerPage: number = 10;
+  ticket_totalPages: number = 1;
+  
 
-  filteredTickets: Ticket[] = [];
-  selectedTickets: boolean[] = [];
+  filteredTickets: Ticket[] = []; // Array to hold the tickets after applying any filters
+  selectedTickets: boolean[] = []; // Array to keep track of selected state for each ticket (true if selected, false otherwise)  
   filterOption: string = 'all'; // Default filter option
 
   selectedTicket: any = null;
@@ -706,7 +708,8 @@ export class UserManagementComponent implements OnInit {
   togglePasswordVisibility() {
     this.showPassword = !this.showPassword;
   }
-  // Delete user
+  
+// Delete user
 deleteUsers() {
   const selectedUsers = this.getSelectedUsers();
   if (selectedUsers.length === 0) {
@@ -740,36 +743,40 @@ deleteUsers() {
   // window.location.reload();
 }
 
+clearSelections() {
+  // Clear selection for each user in the array
+  this.users.forEach(user => user.selected = false);
+}
 
-  clearSelections() {
-    this.users.forEach(user => user.selected = false);
-  }
+updatePagination() {
+  // Update pagination information based on filtered user list
+  this.totalPages = Math.ceil(this.filteredUsers.length / this.itemsPerPage); // Calculate total pages
+  this.currentPage = 1; // Reset current page to 1
+  this.paginate(); // Paginate to display users on the first page
+}
 
-  updatePagination() {
-    this.totalPages = Math.ceil(this.filteredUsers.length / this.itemsPerPage);
-    this.currentPage = 1;
-    this.paginate();
-  }
+paginate() {
+  // Paginate the filtered user list based on current page and items per page
+  const start = (this.currentPage - 1) * this.itemsPerPage; // Calculate start index
+  const end = start + this.itemsPerPage; // Calculate end index (exclusive)
+  this.paginatedUsers = this.filteredUsers.slice(start, end); // Extract users for the current page
+}
 
-  paginate() {
-    const start = (this.currentPage - 1) * this.itemsPerPage;
-    const end = start + this.itemsPerPage;
-    this.paginatedUsers = this.filteredUsers.slice(start, end);
+prevPage() {
+  // Navigate to the previous page if current page is greater than 1
+  if (this.currentPage > 1) {
+    this.currentPage--; // Decrease current page number
+    this.paginate(); // Update paginated users
   }
+}
 
-  prevPage() {
-    if (this.currentPage > 1) {
-      this.currentPage--;
-      this.paginate();
-    }
+nextPage() {
+  // Navigate to the next page if current page is less than total pages
+  if (this.currentPage < this.totalPages) {
+    this.currentPage++; // Increase current page number
+    this.paginate(); // Update paginated users
   }
-
-  nextPage() {
-    if (this.currentPage < this.totalPages) {
-      this.currentPage++;
-      this.paginate();
-    }
-  }
+}
 
   setActiveTab(tab: string) {
     this.activeTab = tab;
@@ -1026,14 +1033,23 @@ filterTickets() {
   this.ticketUpdatePagination();
 }
 
-// Pagination Methods for Support Tickets: Method to calculate total number of pages
+// Method to calculate the total number of pages
 ticketTotalPages(): number {
-  return Math.ceil(this.filteredTickets.length / this.ticket_itemsPerPage); // Calculate total pages
+  if (!this.ticket_itemsPerPage || this.ticket_itemsPerPage <= 0) {
+    console.error('Invalid ticket_itemsPerPage value:', this.ticket_itemsPerPage);
+    return 0;
+  }
+
+  const totalFilteredTickets = this.filteredTickets.length;
+  return Math.ceil(totalFilteredTickets / this.ticket_itemsPerPage);
 }
 
+
+// Method to update pagination and calculate the total number of pages
 ticketUpdatePagination() {
-  this.ticket_currentPage = 1;
-  this.ticketPaginate();
+  this.ticket_totalPages = this.ticketTotalPages(); // Update total pages
+  this.ticket_currentPage = 1; // Reset current page to 1
+  this.ticketPaginate(); // Paginate to display tickets on the first page
 }
 
 // Method to paginate tickets based on current page
