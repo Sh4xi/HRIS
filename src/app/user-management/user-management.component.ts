@@ -153,6 +153,7 @@ export class UserManagementComponent implements OnInit {
   showRolePopup: boolean = false;
   newManageRole: string = '';
   showAssignPopup: boolean = false;
+  searchRoleTerm: string = '';
 
   isManageMode = false; // Add this line
 
@@ -193,6 +194,15 @@ export class UserManagementComponent implements OnInit {
   async deleteRole(role: any) {
     await this.supabaseService.deleteRole(role.role_name);
     this.roles = this.roles.filter(r => r.role_name !== role.role_name);
+  }
+  
+  filteredRoles: any[] = [];
+
+  searchRoleTable() {
+    const searchTerm = this.searchTerm.toLowerCase();
+    this.filteredRoles = this.roles.filter(role =>
+      role.role_name.toLowerCase().includes(searchTerm)
+    );
   }
   
   
@@ -514,12 +524,14 @@ export class UserManagementComponent implements OnInit {
     this.loadTickets();
     this.loadEmployeeNames();
     this.loadRoles();
+    this.filteredRoles = this.roles;
 
   } 
 
   async loadRoles() {
     try {
       this.roles = await this.supabaseService.getRoles();
+      this.filteredRoles = this.roles;
     } catch (error) {
       console.error('Error fetching roles:', error);
     }
