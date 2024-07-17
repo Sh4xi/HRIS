@@ -592,21 +592,22 @@
 <div *ngIf="showAssignPopup" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
   <div class="w-[30%] h-[70%] shadow-xl rounded-lg bg-white flex flex-col">
     <div class="flex flex-col h-full p-6">
-      <div class="flex justify-between items-center">
+      <div class="flex justify-start flex-col">
         <p class="text-2xl font-black">Assign for {{ assignedRole.role_name }}</p>
+        <input type="text" [(ngModel)]="searchTerm" placeholder="Search..." class="w-full p-2 border rounded-lg">
       </div>
-      <div class="overflow-y-auto overflow-x-hidden">
+      <div class="overflow-y-auto overflow-x-hidden custom-scrollbar">
         <table class="table-auto w-full">
           <tbody>
-            <tr class="h-9 text-gray-600 text-sm font-light" *ngFor="let emp of employees">
+            <tr class="h-9 text-gray-600 text-sm font-light" *ngFor="let emp of searchEmpRole">
               <td>
                 <input type="checkbox" (change)="onCheckboxChange(emp.user_id, $event)">
               </td>
-              <td>{{ emp.firstname }} {{ emp.midname }} {{ emp.surname }}</td>
+              <td class ="w-full">{{ emp.firstname }} {{ emp.midname }} {{ emp.surname }}</td>
             </tr>
           </tbody>
         </table>
-      </div>
+      </div>      
       <div class="flex gap-2 justify-start mt-5">
         <button class="bg-green-500 text-white px-4 py-2 rounded" (click)="assignRole()">Assign</button>
         <button class="bg-gray-500 text-white px-4 py-2 rounded" (click)="closeAssignPopup()">Cancel</button>

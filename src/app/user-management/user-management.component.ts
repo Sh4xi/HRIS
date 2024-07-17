@@ -682,6 +682,14 @@ export class UserManagementComponent implements OnInit {
     );
     this.updatePagination();
   }
+
+  get searchEmpRole() {
+    return this.employees.filter(emp => 
+      `${emp.firstname} ${emp.midname} ${emp.surname}`
+        .toLowerCase()
+        .includes(this.searchTerm.toLowerCase())
+    );
+  }
   
   getContractType(position: string): string {
     const positionLower = position.toLowerCase();
