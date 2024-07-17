@@ -65,7 +65,6 @@ export class UserManagementComponent implements OnInit {
   showEditPopup = false;
   employees: any[] = [];
   roles: any[] = [];
-  assignedUsers: any[] = [];
 
   showAccessRightsPopup = false;
   showAddDepartmentPopup = false;
@@ -151,11 +150,14 @@ export class UserManagementComponent implements OnInit {
     this.showCheckboxes = !this.showCheckboxes;
   }
 
-  assignedRole: any = null;
+  // assignedRole: any = null;
   showRolePopup: boolean = false;
   newManageRole: string = '';
   showAssignPopup: boolean = false;
   searchRoleTerm: string = '';
+  assignedUsers: any[] = [];
+  assignedRole: { role_id: number; role_name: string } = { role_id: 0, role_name: '' };  // Default value
+  selectedUserIds: Set<number> = new Set();
 
   isManageMode = false; // Add this line
 
@@ -177,6 +179,7 @@ export class UserManagementComponent implements OnInit {
 
   closeAssignPopup() {
     this.showAssignPopup = false;
+    this.selectedUserIds.clear();
   }
 
   confirmRolePopup() {
@@ -399,17 +402,80 @@ export class UserManagementComponent implements OnInit {
   }
   
     // Load assigned users for the selected role
-    async loadAssignedUsers(role: { role_id: number, role_name: string }) {
+    // async loadAssignedUsers(role: { role_id: number; role_name: string }): Promise<void> {
+    //   this.assignedRole = role;
+    //   console.log('Loading assigned users for role:', this.assignedRole);
+  
+    //   try {
+    //     const users = await this.supabaseService.getUsersAssignedToRole(role.role_id);
+    //     this.assignedUsers = users;
+    //     console.log('Assigned users:', this.assignedUsers);
+    //   } catch (error) {
+    //     if (error instanceof Error) {
+    //       console.error('Error loading assigned users:', error.message);
+    //     } else {
+    //       console.error('An unknown error occurred');
+    //     }
+    //   }
+    // }
+    async loadAssignedUsers(role: { role_id: number; role_name: string }): Promise<void> {
       this.assignedRole = role;
       console.log('Loading assigned users for role:', this.assignedRole);
     
       try {
         const users = await this.supabaseService.getUsersAssignedToRole(role.role_id);
-        this.assignedUsers = users;
+        this.assignedUsers = users; // Directly assign the fetched users
+        // this.assignedUsers = users.map(user => ({
+        //   ...user,
+        //   profile: user.profile || { first_name: '', mid_name: '', surname: '' }
+        // }));
         console.log('Assigned users:', this.assignedUsers);
       } catch (error) {
         if (error instanceof Error) {
           console.error('Error loading assigned users:', error.message);
+        } else {
+          console.error('An unknown error occurred');
+        }
+      }
+    }
+
+    //used in the assigning of role in "Roles" tab
+    onCheckboxChange(userId: number, event: any): void {
+      if (event.target.checked) {
+        this.selectedUserIds.add(userId);
+      } else {
+        this.selectedUserIds.delete(userId);
+      }
+    }
+
+    //Used to assign checked user names in the second container in "Roles" tab
+    async assignRole(): Promise<void> {
+      if (!this.assignedRole || !this.selectedUserIds.size) {
+        console.error('No role or users selected.');
+        return;
+      }
+  
+      try {
+        await this.supabaseService.assignRoleToUsers(this.assignedRole.role_id, Array.from(this.selectedUserIds));
+        console.log('Role assigned successfully.');
+        this.closeAssignPopup();
+      } catch (error) {
+        if (error instanceof Error) {
+          console.error('Error assigning role:', error.message);
+        } else {
+          console.error('An unknown error occurred');
+        }
+      }
+    }
+
+    async unassignUser(userId: number, roleId: number): Promise<void> {
+      try {
+        await this.supabaseService.unassignUserFromRole(userId, roleId);
+        console.log('User unassigned successfully.');
+        this.loadAssignedUsers(this.assignedRole);
+      } catch (error) {
+        if (error instanceof Error) {
+          console.error('Error unassigning user:', error.message);
         } else {
           console.error('An unknown error occurred');
         }
@@ -542,8 +608,9 @@ export class UserManagementComponent implements OnInit {
     // Added method to fetch employee names
     loadEmployeeNames(): void {
       this.supabaseService.getEmployeeNames().then(data => {
-        if (data) {  // Ensure data is not null
+        if (data) {
           this.employees = data.map(emp => ({
+            user_id: emp.user_id,
             firstname: emp.first_name,
             midname: emp.mid_name,
             surname: emp.surname

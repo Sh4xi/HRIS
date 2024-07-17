@@ -78,12 +78,12 @@ export class SupabaseService {
   async getEmployeeNames() {
     let { data, error } = await this.supabase
       .from('profile')
-      .select('first_name, mid_name, surname');
-
+      .select('user_id, first_name, mid_name, surname');
+  
     if (error) {
       throw new Error(error.message);
     }
-
+  
     return data;
   }
 
@@ -137,11 +137,6 @@ export class SupabaseService {
   }
 
   private handleDatabaseChange(): void {
-    // if (isPlatformBrowser(this.platformId)) {
-    //   window.location.reload();
-    // } else {
-    //   console.log('Database change detected, but not in browser environment');
-    // }
     this.databaseChangeSubject.next(true);
   }
 
@@ -213,6 +208,7 @@ export class SupabaseService {
   return response;
   }
 
+  //Writes in the "user_roles" table in Supabase. Relates a user_id to an assigned role_id
   async assignUserRole(userId: number, roleId: number): Promise<PostgrestSingleResponse<any>> {
     const response = await this.supabase
       .from('user_roles')
@@ -223,6 +219,29 @@ export class SupabaseService {
     }
   
     return response;
+  }
+
+  //Used to assign checked user names in the second container in "Roles" tab
+  async assignRoleToUsers(roleId: number, userIds: number[]): Promise<void> {
+    const { error } = await this.supabase
+      .from('user_roles')
+      .insert(userIds.map(userId => ({ role_id: roleId, user_id: userId })));
+
+    if (error) {
+      throw new Error('Error assigning role to users: ' + error.message);
+    }
+  }
+
+  async unassignUserFromRole(userId: number, roleId: number): Promise<void> {
+    const { error } = await this.supabase
+      .from('user_roles')
+      .delete()
+      .eq('user_id', userId)
+      .eq('role_id', roleId);
+
+    if (error) {
+      throw new Error('Error unassigning user from role: ' + error.message);
+    }
   }
 
   async createRole(roleData: any): Promise<PostgrestSingleResponse<any>> {
@@ -246,6 +265,7 @@ export class SupabaseService {
     return response;
   }
 
+  //Deletes the selected role in the "Roles" tab, only if no users are assigned to it
   async deleteRole(roleName: string): Promise<void> {
     const { error } = await this.supabase
       .from('roles')
@@ -257,18 +277,14 @@ export class SupabaseService {
     }
   }
 
+  //Displays the name assigned to the Role clicked in the first container in "Roles" tab
   async getUsersAssignedToRole(roleId: number): Promise<any[]> {
     const { data, error } = await this.supabase
       .from('user_roles')
       .select(`
-        user_id,
-        profile:profile (
-          first_name,
-          mid_name,
-          surname,
-          position
-        )
-      `)
+      user_id,
+      profile:profile(first_name, mid_name, surname)
+    `)
       .eq('role_id', roleId);
   
     if (error) {
@@ -276,11 +292,16 @@ export class SupabaseService {
       return [];
     }
   
-    return data.map((userRole: any) => ({
-      id: userRole.user_id,
-      name: `${userRole.profile.first_name} ${userRole.profile.mid_name} ${userRole.profile.surname}`,
-      position: userRole.profile.position,
-    }));
+    // return data.map((userRole: any) => ({
+    //   id: userRole.user_id,
+    //   name: `${userRole.profile.first_name} ${userRole.profile.mid_name} ${userRole.profile.surname}`,
+    //   position: userRole.profile.position,
+    // }));
+      // Flatten the data to directly include user information in the returned array
+  return data.map(user => ({
+    user_id: user.user_id,
+    ...user.profile
+  }));
   }
 
   async createDepartment(departmentData: any): Promise<PostgrestSingleResponse<any>> {
