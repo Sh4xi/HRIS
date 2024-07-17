@@ -227,17 +227,17 @@ export class WorkflowApprovalUserComponent implements OnInit {
     this.router.navigate(['/system-management']);
   }
 
-  filterApprovers() {
-    this.filteredApprovers = this.allUsers.filter(user =>
-      user.toLowerCase().includes(this.searchApprover.toLowerCase())
-    );
-  }
+  // filterApprovers() {
+  //   this.filteredApprovers = this.allUsers.filter(user =>
+  //     user.toLowerCase().includes(this.searchApprover.toLowerCase())
+  //   );
+  // }
 
-  filterReviewers() {
-    this.filteredReviewers = this.allUsers.filter(user =>
-      user.toLowerCase().includes(this.searchReviewer.toLowerCase())
-    );
-  }
+  // filterReviewers() {
+  //   this.filteredReviewers = this.allUsers.filter(user =>
+  //     user.toLowerCase().includes(this.searchReviewer.toLowerCase())
+  //   );
+  // }
 
   selectApprover(approver: string) {
     this.newWorkflow.submitted_for = approver;
