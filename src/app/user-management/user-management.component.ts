@@ -154,6 +154,12 @@ export class UserManagementComponent implements OnInit {
   newManageRole: string = '';
   showAssignPopup: boolean = false;
 
+  isManageMode = false; // Add this line
+
+  toggleManageMode() { // Add this method
+    this.isManageMode = !this.isManageMode;
+  }
+
   openRolePopup() {
     this.showRolePopup = true;
   }
@@ -188,6 +194,7 @@ export class UserManagementComponent implements OnInit {
     await this.supabaseService.deleteRole(role.role_name);
     this.roles = this.roles.filter(r => r.role_name !== role.role_name);
   }
+  
   
   
   clickedRoleId: number | null = null;
@@ -377,6 +384,7 @@ export class UserManagementComponent implements OnInit {
         this.closeAddPopup();
       }
     });
+    this.showRolePopup = false;
   }
   
     // Load assigned users for the selected role
