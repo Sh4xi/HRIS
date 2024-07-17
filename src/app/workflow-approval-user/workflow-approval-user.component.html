@@ -121,8 +121,8 @@
           <!-- Approvers Section -->
           <div>
             <input type="text" [(ngModel)]="searchApprover" (input)="filterApprovers()" name="searchApprover" placeholder="Search Approver" class="w-full p-2 mb-2 border rounded">
+            <h3 class="font-bold mb-2">List of Approvers</h3>
             <div class="border rounded p-2 h-48 overflow-y-auto">
-              <h3 class="font-bold mb-2">List of Approvers</h3>
               <ul>
                 @for (user of filteredApprovers; track user) {
                   <li class="cursor-pointer hover:bg-gray-100 p-1" (click)="selectApprover(user)">{{ user }}</li>
@@ -134,8 +134,8 @@
           <!-- Reviewers Section -->
           <div>
             <input type="text" [(ngModel)]="searchReviewer" (input)="filterReviewers()" name="searchReviewer" placeholder="Search Reviewer" class="w-full p-2 mb-2 border rounded">
+            <h3 class="font-bold mb-2">List of Reviewers</h3>
             <div class="border rounded p-2 h-48 overflow-y-auto">
-              <h3 class="font-bold mb-2">List of Reviewers</h3>
               <ul>
                 @for (user of filteredReviewers; track user) {
                   <li class="cursor-pointer hover:bg-gray-100 p-1" (click)="selectReviewer(user)">{{ user }}</li>

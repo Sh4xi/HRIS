@@ -24,13 +24,12 @@ export class WorkflowApprovalUserComponent implements OnInit {
   totalPages: number = 1;
   itemsPerPage: number = 10;
 
-  approvers: string[] = ['Approver 1', 'Approver 2', 'Approver 3'];
-  reviewers: string[] = ['Reviewer 1', 'Reviewer 2', 'Reviewer 3'];
   filteredApprovers: string[] = [];
   filteredReviewers: string[] = [];
   searchApprover: string = '';
   searchReviewer: string = '';
   selectedFile: File | null = null;
+  allUsers: string[] = [];
 
   newWorkflow: any = {
     reviewer: '',
@@ -58,9 +57,31 @@ export class WorkflowApprovalUserComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.fetchAllUsers();
     this.fetchUserWorkflows();
-    this.filteredApprovers = [...this.approvers];
-    this.filteredReviewers = [...this.reviewers];
+
+  }
+
+  async fetchAllUsers() {
+    if (!this.supabase) {
+      console.error('Supabase client is not initialized');
+      return;
+    }
+    try {
+      console.log('fetching all users...')
+      const { data, error } = await this.supabase
+        .from('profile')
+        .select('first_name, surname')
+  
+      if (error) throw error;
+  
+      this.allUsers = data.map(user => `${user.first_name} ${user.surname}`);
+      this.filteredApprovers = [...this.allUsers];
+      this.filteredReviewers = [...this.allUsers];
+      console.log('Fetched users:', this.allUsers);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+    }
   }
 
   async fetchUserWorkflows() {
@@ -101,8 +122,7 @@ export class WorkflowApprovalUserComponent implements OnInit {
       console.error('Error fetching workflows:', error);
     }
   }
-  
-  filterWorkflows() {
+     filterWorkflows() {
     this.filteredWorkflows = this.userWorkflows.filter(workflow =>
       (this.searchTerm ? 
         workflow.submitted_for.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
@@ -209,14 +229,14 @@ export class WorkflowApprovalUserComponent implements OnInit {
   }
 
   filterApprovers() {
-    this.filteredApprovers = this.approvers.filter(approver =>
-      approver.toLowerCase().includes(this.searchApprover.toLowerCase())
+    this.filteredApprovers = this.allUsers.filter(user =>
+      user.toLowerCase().includes(this.searchApprover.toLowerCase())
     );
   }
 
   filterReviewers() {
-    this.filteredReviewers = this.reviewers.filter(reviewer =>
-      reviewer.toLowerCase().includes(this.searchReviewer.toLowerCase())
+    this.filteredReviewers = this.allUsers.filter(user =>
+      user.toLowerCase().includes(this.searchReviewer.toLowerCase())
     );
   }
 
