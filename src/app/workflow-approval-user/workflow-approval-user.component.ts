@@ -31,6 +31,8 @@ export class WorkflowApprovalUserComponent implements OnInit {
   searchApprover: string = '';
   searchReviewer: string = '';
   selectedFile: File | null = null;
+  allUsers: string[] = [];
+
 
   newWorkflow: any = {
     reviewer: '',
@@ -56,11 +58,33 @@ export class WorkflowApprovalUserComponent implements OnInit {
       this.supabase = undefined;
     }
   }
-
+//tite
   ngOnInit() {
+    this.fetchAllUsers();
     this.fetchUserWorkflows();
-    this.filteredApprovers = [...this.approvers];
-    this.filteredReviewers = [...this.reviewers];
+
+  }
+  async fetchAllUsers() {
+    if (!this.supabase) {
+      console.error('Supabase client is not initialized');
+      return;
+    }
+    try {
+      console.log('fetching all users...')
+      const { data, error } = await this.supabase
+        .from('auth/v1/users') // Assuming you have a 'users' table
+        .select('email')
+        .order('email');
+
+      if (error) throw error;
+
+      this.allUsers = data.map(user => user.email);
+      this.filteredApprovers = [...this.allUsers];
+      this.filteredReviewers = [...this.allUsers];
+      console.log('Fetched users:', this.allUsers);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+    }
   }
 
   async fetchUserWorkflows() {
@@ -99,6 +123,33 @@ export class WorkflowApprovalUserComponent implements OnInit {
       this.updatePaginatedWorkflows(); 
     } catch (error) {
       console.error('Error fetching workflows:', error);
+    }
+  }
+  filterApprovers() {
+    this.filteredApprovers = this.allUsers.filter(user =>
+      user.toLowerCase().includes(this.searchApprover.toLowerCase())
+    );
+  }
+
+  filterReviewers() {
+    this.filteredReviewers = this.allUsers.filter(user =>
+      user.toLowerCase().includes(this.searchReviewer.toLowerCase())
+    );
+  }
+
+  selectApprover(approver: string) {
+    this.newWorkflow.submitted_for = approver;
+  }
+
+  selectReviewer(reviewer: string) {
+    this.newWorkflow.reviewer = reviewer;
+  }
+
+  onFileSelected(event: Event) {
+    const element = event.target as HTMLInputElement;
+    const file = element.files ? element.files[0] : null;
+    if (file) {
+      this.selectedFile = file;
     }
   }
   
@@ -210,33 +261,5 @@ export class WorkflowApprovalUserComponent implements OnInit {
 
   goHome() {
     this.router.navigate(['/system-management']);
-  }
-
-  filterApprovers() {
-    this.filteredApprovers = this.approvers.filter(approver =>
-      approver.toLowerCase().includes(this.searchApprover.toLowerCase())
-    );
-  }
-
-  filterReviewers() {
-    this.filteredReviewers = this.reviewers.filter(reviewer =>
-      reviewer.toLowerCase().includes(this.searchReviewer.toLowerCase())
-    );
-  }
-
-  selectApprover(approver: string) {
-    this.newWorkflow.submitted_for = approver;
-  }
-
-  selectReviewer(reviewer: string) {
-    this.newWorkflow.reviewer = reviewer;
-  }
-
-  onFileSelected(event: Event) {
-    const element = event.target as HTMLInputElement;
-    const file = element.files ? element.files[0] : null;
-    if (file) {
-      this.selectedFile = file;
-    }
   }
 }
