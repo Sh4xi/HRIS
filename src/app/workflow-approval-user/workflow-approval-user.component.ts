@@ -31,8 +31,6 @@ export class WorkflowApprovalUserComponent implements OnInit {
   searchApprover: string = '';
   searchReviewer: string = '';
   selectedFile: File | null = null;
-  allUsers: string[] = [];
-
 
   newWorkflow: any = {
     reviewer: '',
@@ -58,33 +56,11 @@ export class WorkflowApprovalUserComponent implements OnInit {
       this.supabase = undefined;
     }
   }
-//tite
+
   ngOnInit() {
-    this.fetchAllUsers();
     this.fetchUserWorkflows();
-
-  }
-  async fetchAllUsers() {
-    if (!this.supabase) {
-      console.error('Supabase client is not initialized');
-      return;
-    }
-    try {
-      console.log('fetching all users...')
-      const { data, error } = await this.supabase
-        .from('auth/v1/users') // Assuming you have a 'users' table
-        .select('email')
-        .order('email');
-
-      if (error) throw error;
-
-      this.allUsers = data.map(user => user.email);
-      this.filteredApprovers = [...this.allUsers];
-      this.filteredReviewers = [...this.allUsers];
-      console.log('Fetched users:', this.allUsers);
-    } catch (error) {
-      console.error('Error fetching users:', error);
-    }
+    this.filteredApprovers = [...this.approvers];
+    this.filteredReviewers = [...this.reviewers];
   }
 
   async fetchUserWorkflows() {
@@ -125,33 +101,6 @@ export class WorkflowApprovalUserComponent implements OnInit {
       console.error('Error fetching workflows:', error);
     }
   }
-  filterApprovers() {
-    this.filteredApprovers = this.allUsers.filter(user =>
-      user.toLowerCase().includes(this.searchApprover.toLowerCase())
-    );
-  }
-
-  filterReviewers() {
-    this.filteredReviewers = this.allUsers.filter(user =>
-      user.toLowerCase().includes(this.searchReviewer.toLowerCase())
-    );
-  }
-
-  selectApprover(approver: string) {
-    this.newWorkflow.submitted_for = approver;
-  }
-
-  selectReviewer(reviewer: string) {
-    this.newWorkflow.reviewer = reviewer;
-  }
-
-  onFileSelected(event: Event) {
-    const element = event.target as HTMLInputElement;
-    const file = element.files ? element.files[0] : null;
-    if (file) {
-      this.selectedFile = file;
-    }
-  }
   
   filterWorkflows() {
     this.filteredWorkflows = this.userWorkflows.filter(workflow =>
@@ -181,31 +130,36 @@ export class WorkflowApprovalUserComponent implements OnInit {
     }
 
     try {
-      console.log('Starting workflow submission...');
-
       const { data: { user }, error: userError } = await this.supabase.auth.getUser();
       if (userError) throw new Error(`Authentication error: ${userError.message}`);
       if (!user) throw new Error('No authenticated user found');
 
-      console.log('User email:', user.email);
+      let fileName = '';
+      // Upload file to bucket
+      if (this.selectedFile) {
+        const fileExt = this.selectedFile.name.split('.').pop();
+        fileName = `${Math.random().toString(36).substring(2)}${Date.now().toString()}.${fileExt}`;
+        const filePath = `${user.id}/${fileName}`;
+
+        const { error: uploadError } = await this.supabase.storage
+          .from('workflowproposals')
+          .upload(filePath, this.selectedFile);
+
+        if (uploadError) throw uploadError;
+      }
 
       const workflowData = {
         ...this.newWorkflow,
         requested_by: user.email,
-        status: 'Pending'
+        status: 'Pending',
+        request: fileName // Set the file name as the request
       };
-      console.log('Workflow data to be submitted:', workflowData);
 
       const { data, error } = await this.supabase
         .from('workflow')
         .insert([workflowData]);
 
-      if (error) {
-        console.error('Supabase error:', error.message);
-        throw error;
-      }
-
-      console.log('Workflow submitted successfully:', data);
+      if (error) throw error;
 
       this.closeUploadModal();
       await this.fetchUserWorkflows();
@@ -213,16 +167,7 @@ export class WorkflowApprovalUserComponent implements OnInit {
       alert('Workflow request submitted successfully!');
     } catch (error) {
       console.error('Error submitting workflow request:', error);
-
-      let errorMessage = 'Error submitting workflow request. ';
-      if (error instanceof Error) {
-        errorMessage += error.message;
-        console.error('Error stack:', error.stack);
-      } else {
-        errorMessage += 'Please try again.';
-      }
-
-      alert(errorMessage);
+      alert('Error submitting workflow request. Please try again.');
     }
   }
 
@@ -261,5 +206,34 @@ export class WorkflowApprovalUserComponent implements OnInit {
 
   goHome() {
     this.router.navigate(['/system-management']);
+  }
+
+  filterApprovers() {
+    this.filteredApprovers = this.approvers.filter(approver =>
+      approver.toLowerCase().includes(this.searchApprover.toLowerCase())
+    );
+  }
+
+  filterReviewers() {
+    this.filteredReviewers = this.reviewers.filter(reviewer =>
+      reviewer.toLowerCase().includes(this.searchReviewer.toLowerCase())
+    );
+  }
+
+  selectApprover(approver: string) {
+    this.newWorkflow.submitted_for = approver;
+  }
+
+  selectReviewer(reviewer: string) {
+    this.newWorkflow.reviewer = reviewer;
+  }
+
+  onFileSelected(event: Event) {
+    const element = event.target as HTMLInputElement;
+    const file = element.files ? element.files[0] : null;
+    if (file) {
+      this.selectedFile = file;
+      this.newWorkflow.request = file.name; // Set the file name in the newWorkflow object
+    }
   }
 }
