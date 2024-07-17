@@ -387,13 +387,13 @@
         </div>
         
         <div class="flex justify-between">
-          <div class="flex-1 h-[400px] shadow-xl rounded-xl mx-2">
+          <div class="flex-1 h-[450px] shadow-xl rounded-xl mx-2 border border-gray-300">
             <div class="m-10">
               <div class="flex justify-between items-center">
                 <p class="text-2xl font-black">Manage Roles</p>
                 <button class="bg-blue-500 text-white px-4 py-2 rounded" (click)="openRolePopup()">Add Role</button>
               </div>
-              <div class="overflow-y-auto overflow-x-hidden" style="height: calc(400px - 8rem);">
+              <div class="overflow-y-auto overflow-x-hidden" style="height: calc(450px - 8rem);">
                 <table class="table-auto w-[100%]">
                   <tbody>
                     <tr class="h-9 text-gray-600 text-sm font-light" *ngFor="let role of roles" (click)="onRoleClick(role)">
@@ -413,13 +413,13 @@
             </div>
           </div>
           
-          <div class="flex-1 h-[400px] shadow-xl rounded-xl mx-2">
+          <div class="flex-1 h-[450px] shadow-xl rounded-xl mx-2 border border-gray-300">
             <div class="m-10" *ngIf="assignedRole">
               <div class="flex justify-between items-center">
                 <p class=" text-2xl font-black">{{ assignedRole.role_name }}</p>
                 <button class="bg-blue-500 text-white px-4 py-2 rounded" (click)="openAssignPopup()">Assign</button>
               </div>
-              <div class="overflow-y-auto overflow-x-hidden" style="height: calc(400px - 8rem);">
+              <div class="overflow-y-auto overflow-x-hidden" style="height: calc(450px - 8rem);">
                 <table class="table-auto w-[100%]">
                   <tbody>
                     <tr class="h-9 text-gray-600 text-sm font-light" *ngFor="let user of assignedUsers">
@@ -434,19 +434,51 @@
             </div>
           </div>
           
-          <div class="flex-1 h-[400px] shadow-xl rounded-xl mx-2">
+          <div class="flex-1 h-[450px] shadow-xl rounded-xl mx-2 border border-gray-300">
             <div class="m-10">
               <div class="flex justify-between items-center">
                 <p class=" text-2xl font-black">Access Rights</p>
               </div>
-              <div class="overflow-y-auto overflow-x-hidden" style="height: calc(400px - 8rem);">
-                <table class="table-auto width-[100%]"> 
+              <div class="overflow-y-auto overflow-x-hidden" style="height: calc(450px - 8rem);">
+                <table class="table-auto w-full">
                   <tbody>
-                    <tr class="h-9 text-gray-600 text-sm font-light" *ngFor="let emp of employees">
-                      <td>{{ emp.firstname }} {{ emp.midname }} {{ emp.surname }}</td>
+                    <tr class="h-9 text-gray-600 text-sm font-light">
+                      <td class="font-black w-full">User Management</td>
+                      <td class="whitespace-nowrap text-center px-6">View</td>
+                      <td class="whitespace-nowrap text-center">Edit</td>
+                    </tr>
+                    <tr class="h-7 text-gray-600 text-sm font-light">
+                      <td class="w-full">Users</td>
+                      <td class="whitespace-nowrap text-center px-6"><input type="checkbox"></td>
+                      <td class="whitespace-nowrap text-center"><input type="checkbox"></td>
+                    </tr>
+                    <tr class="h-7 text-gray-600 text-sm font-light">
+                      <td class="w-full">Roles</td>
+                      <td class="whitespace-nowrap text-center px-6"><input type="checkbox"></td>
+                      <td class="whitespace-nowrap text-center"><input type="checkbox"></td>
+                    </tr>
+                    <tr class="h-7 text-gray-600 text-sm font-light">
+                      <td class="w-full">Support Tickets</td>
+                      <td class="whitespace-nowrap text-center px-6"><input type="checkbox"></td>
+                      <td class="whitespace-nowrap text-center"><input type="checkbox"></td>
+                    </tr>
+
+                    <tr class="h-9 text-gray-600 text-sm font-light">
+                      <td class="font-black w-full">System management</td>
+                      <td class="whitespace-nowrap text-center px-6">View</td>
+                      <td class="whitespace-nowrap text-center">Edit</td>
+                    </tr>
+                    <tr class="h-7 text-gray-600 text-sm font-light">
+                      <td class="w-full">Paremeters</td>
+                      <td class="whitespace-nowrap text-center px-6"><input type="checkbox"></td>
+                      <td class="whitespace-nowrap text-center"><input type="checkbox"></td>
                     </tr>
                   </tbody>
                 </table>
+                
+                
+                
+                
               </div>
             </div>
           </div>
