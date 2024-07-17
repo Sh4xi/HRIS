@@ -509,16 +509,83 @@
         
 
         <!-- Popup Modal -->
-<div *ngIf="showRolePopup" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
-  <div class="bg-white p-6 rounded-lg shadow-lg">
-    <h2 class="text-xl font-bold mb-4">Add Role</h2>
-    <input type="text" id="role" [(ngModel)]="newRole" type="text" placeholder="Enter role" class="border p-2 mb-4 w-full"/>
-    <div class="flex justify-end">
-      <button (click)="addRole()" class="bg-blue-500 text-white px-4 py-2 rounded mr-2">Confirm</button>
-      <button (click)="cancelRolePopup()" class="bg-gray-500 text-white px-4 py-2 rounded">Cancel</button>
-    </div>
-  </div>
-</div>
+        <div *ngIf="showRolePopup" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
+          <div class="bg-white p-6 rounded-lg shadow-lg w-[30%]">
+            <p class="text-2xl font-black mb-4">Add Role</p>
+            <input type="text" id="role" [(ngModel)]="newRole" placeholder="Enter role" class="border p-2 mb-4 w-full"/>
+            
+            <!-- Add the table here -->
+            <div class="overflow-y-auto overflow-x-hidden custom-scrollbar" style="height: calc(450px - 8rem);">
+            <table class="table-auto w-full mb-4">
+              <tbody>
+                <tr class="h-9 text-gray-600 text-sm font-light">
+                  <td class="font-black w-full">User Management</td>
+                  <td class="whitespace-nowrap text-center px-6">View</td>
+                  <td class="whitespace-nowrap text-center">Edit</td>
+                </tr>
+                <tr class="h-7 text-gray-600 text-sm font-light">
+                  <td class="w-full">Users</td>
+                  <td class="whitespace-nowrap text-center px-6"><input type="checkbox"></td>
+                  <td class="whitespace-nowrap text-center"><input type="checkbox"></td>
+                </tr>
+                <tr class="h-7 text-gray-600 text-sm font-light">
+                  <td class="w-full">Roles</td>
+                  <td class="whitespace-nowrap text-center px-6"><input type="checkbox"></td>
+                  <td class="whitespace-nowrap text-center"><input type="checkbox"></td>
+                </tr>
+                <tr class="h-7 text-gray-600 text-sm font-light">
+                  <td class="w-full">Support Tickets</td>
+                  <td class="whitespace-nowrap text-center px-6"><input type="checkbox"></td>
+                  <td class="whitespace-nowrap text-center"><input type="checkbox"></td>
+                </tr>
+        
+                <tr class="h-9 text-gray-600 text-sm font-light">
+                  <td class="font-black w-full">System Management</td>
+                </tr>
+                <tr class="h-7 text-gray-600 text-sm font-light">
+                  <td class="w-full">Paremeters</td>
+                  <td class="whitespace-nowrap text-center px-6"><input type="checkbox"></td>
+                  <td class="whitespace-nowrap text-center"><input type="checkbox"></td>
+                </tr>
+        
+                <tr class="h-9 text-gray-600 text-sm font-light">
+                  <td class="font-black w-full">Daily Time Record</td>
+                </tr>
+                <tr class="h-7 text-gray-600 text-sm font-light">
+                  <td class="w-full">Daily</td>
+                  <td class="whitespace-nowrap text-center px-6"><input type="checkbox"></td>
+                  <td class="whitespace-nowrap text-center"><input type="checkbox"></td>
+                </tr>
+                <tr class="h-7 text-gray-600 text-sm font-light">
+                  <td class="w-full">Monthly</td>
+                  <td class="whitespace-nowrap text-center px-6"><input type="checkbox"></td>
+                  <td class="whitespace-nowrap text-center"><input type="checkbox"></td>
+                </tr>
+                <tr class="h-7 text-gray-600 text-sm font-light">
+                  <td class="w-full">Weekly</td>
+                  <td class="whitespace-nowrap text-center px-6"><input type="checkbox"></td>
+                  <td class="whitespace-nowrap text-center"><input type="checkbox"></td>
+                </tr>
+        
+                <tr class="h-9 text-gray-600 text-sm font-light">
+                  <td class="font-black w-full">Audit Trail</td>
+                </tr>
+                <tr class="h-7 text-gray-600 text-sm font-light">
+                  <td class="w-full">Entries</td>
+                  <td class="whitespace-nowrap text-center px-6"><input type="checkbox"></td>
+                  <td class="whitespace-nowrap text-center"><input type="checkbox"></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+            
+            <div class="flex justify-end">
+              <button (click)="addRole()" class="bg-blue-500 text-white px-4 py-2 rounded mr-2">Confirm</button>
+              <button (click)="cancelRolePopup()" class="bg-gray-500 text-white px-4 py-2 rounded">Cancel</button>
+            </div>
+          </div>
+        </div>
+        
 
 <div *ngIf="showAssignPopup" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
   <div class="w-[400px] h-[500px] shadow-xl rounded-xl bg-white flex flex-col">
@@ -539,7 +606,7 @@
         </table>
       </div>
       <div class="flex gap-2 justify-start mt-10">
-        <button class="bg-green-500 text-white px-4 py-2 rounded" (click)="assignRole()">Save</button>
+        <button class="bg-green-500 text-white px-4 py-2 rounded" (click)="assignRole()">Assign</button>
         <button class="bg-gray-500 text-white px-4 py-2 rounded" (click)="closeAssignPopup()">Cancel</button>
       </div>
     </div>
