@@ -380,7 +380,7 @@
     <div *ngIf="activeTab === 'roles'">
       <section id="user-list">
         <div class="flex justify-between mb-6">
-          <input type="text" placeholder="Search..." class="w-half p-2 border rounded-lg">
+          <input type="text" [(ngModel)]="searchTerm" (input)="searchRoleTable()" placeholder="Search..." class="w-half p-2 border rounded-lg">
           <div>
             <button class="px-4 py-2 bg-blue-500 text-white rounded mr-2" (click)="toggleManageMode()">Manage</button>
             <!-- <button (click)="toggleManagePopup()" class="px-4 py-2 bg-black text-white rounded hidden">Manage</button> -->
@@ -397,7 +397,7 @@
               <div class="overflow-y-auto overflow-x-hidden" style="height: calc(450px - 8rem);">
                 <table class="table-auto w-[100%]">
                   <tbody>
-                    <tr class="h-9 text-gray-600 text-sm font-light" *ngFor="let role of roles" (click)="onRoleClick(role)">
+                    <tr class="h-9 text-gray-600 text-sm font-light" *ngFor="let role of filteredRoles" (click)="onRoleClick(role)">
                       <td class="hover:bg-gray-200" [ngClass]="{'bg-gray-200': clickedRoleId === role.role_id}">
                         {{ role.role_name }}
                       </td>
