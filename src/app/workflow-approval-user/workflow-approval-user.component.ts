@@ -157,9 +157,8 @@ export class WorkflowApprovalUserComponent implements OnInit {
       let fileName = '';
       // Upload file to bucket
       if (this.selectedFile) {
-        const fileExt = this.selectedFile.name.split('.').pop();
-        fileName = `${Math.random().toString(36).substring(2)}${Date.now().toString()}.${fileExt}`;
-        const filePath = `${user.id}/${fileName}`;
+        fileName = this.selectedFile.name;
+        const filePath = `${user.email}/${fileName}`;
 
         const { error: uploadError } = await this.supabase.storage
           .from('workflowproposals')

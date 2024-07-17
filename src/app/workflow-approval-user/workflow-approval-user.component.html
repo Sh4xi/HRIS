@@ -125,7 +125,11 @@
             <div class="border rounded p-2 h-48 overflow-y-auto">
               <ul>
                 @for (user of filteredApprovers; track user) {
-                  <li class="cursor-pointer hover:bg-gray-100 p-1" (click)="selectApprover(user)">{{ user }}</li>
+                  <li class="cursor-pointer p-1 transition-colors duration-300 hover:bg-gray-100"
+                      [class.bg-gray-200]="newWorkflow.submitted_for === user"
+                      (click)="selectApprover(user)">
+                    {{ user }}
+                  </li>
                 }
               </ul>
             </div>
@@ -138,7 +142,11 @@
             <div class="border rounded p-2 h-48 overflow-y-auto">
               <ul>
                 @for (user of filteredReviewers; track user) {
-                  <li class="cursor-pointer hover:bg-gray-100 p-1" (click)="selectReviewer(user)">{{ user }}</li>
+                  <li class="cursor-pointer p-1 transition-colors duration-300 hover:bg-gray-100"
+                      [class.bg-gray-200]="newWorkflow.reviewer === user"
+                      (click)="selectReviewer(user)">
+                    {{ user }}
+                  </li>
                 }
               </ul>
             </div>
