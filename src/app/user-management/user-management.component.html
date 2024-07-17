@@ -531,7 +531,7 @@
           <tbody>
             <tr class="h-9 text-gray-600 text-sm font-light" *ngFor="let emp of employees">
               <td>
-                <input type="checkbox">
+                <input type="checkbox" (change)="onCheckboxChange(emp.user_id, $event)">
               </td>
               <td>{{ emp.firstname }} {{ emp.midname }} {{ emp.surname }}</td>
             </tr>
@@ -539,7 +539,7 @@
         </table>
       </div>
       <div class="flex gap-2 justify-start mt-10">
-        <button class="bg-green-500 text-white px-4 py-2 rounded" (click)="closeAssignPopup()">Save</button>
+        <button class="bg-green-500 text-white px-4 py-2 rounded" (click)="assignRole()">Save</button>
         <button class="bg-gray-500 text-white px-4 py-2 rounded" (click)="closeAssignPopup()">Cancel</button>
       </div>
     </div>
