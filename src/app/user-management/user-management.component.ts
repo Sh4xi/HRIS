@@ -302,7 +302,6 @@ export class UserManagementComponent implements OnInit {
         types: this.employee.type,
         access: true,
         photo_url: photoUrl || this.photoPreviewUrl
-        // status field removed
       };
   
       console.log('Employee data to be sent:', employeeData);
@@ -312,6 +311,14 @@ export class UserManagementComponent implements OnInit {
       if (this.isEditing) {
         console.log('Updating employee:', employeeData);
         response = await this.supabaseService.updateEmployee(employeeData);
+  
+        if (response.error) {
+          console.error('Error updating employee:', response.error);
+          alert('Error updating employee. Please try again.');
+          return;
+        } else {
+          console.log('Employee updated successfully:', response.data);
+        }
       } else {
         const emailExists = await this.supabaseService.checkEmailExists(this.employee.email);
         if (emailExists) {
@@ -322,23 +329,27 @@ export class UserManagementComponent implements OnInit {
   
         console.log('Creating employee:', employeeData);
         response = await this.supabaseService.createEmployee(employeeData);
+  
+        if (response.error) {
+          console.error('Error creating employee:', response.error);
+          alert('Error creating employee. Please try again.');
+          return;
+        } else {
+          console.log('Employee created successfully:', response.data);
+        }
       }
   
-      if (response.error) {
-        console.error(`Error ${this.isEditing ? 'updating' : 'creating'} employee:`, response.error);
-        alert(`Error ${this.isEditing ? 'updating' : 'creating'} employee. Please try again.`);
-      } else {
-        console.log(`Employee ${this.isEditing ? 'updated' : 'created'} successfully:`, response.data);
-        alert(`Employee ${this.isEditing ? 'updated' : 'created'} successfully.`);
-        this.toggleModal();
-        this.resetForm();
-        this.loadEmployees();
-      }
+      alert(`Employee ${this.isEditing ? 'updated' : 'created'} successfully.`);
+      this.toggleModal();
+      this.resetForm();
+      this.loadEmployees();
+  
     } catch (error) {
       console.error('Error in onSubmit:', error);
       alert('An unexpected error occurred. Please try again.');
     }
   }
+  
   
   
   async uploadPhoto(): Promise<string | null> {

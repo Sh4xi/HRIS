@@ -346,25 +346,27 @@ export class SupabaseService {
     const response = await this.supabase
       .from('profile')
       .update({
-        first_name: employee.firstname,
-        mid_name: employee.midname,
-        password: employee.password,
+        first_name: employee.first_name,
+        mid_name: employee.mid_name,
         surname: employee.surname,
+        password: employee.password,
         department: employee.department,
         position: employee.position,
-        types: employee.type
+        types: employee.types,
+        photo_url: employee.photo_url // Ensure this field is also updated if needed
       })
       .eq('email', employee.email);
-
+  
     if (response.error) {
       console.error('Error updating employee:', response.error.message);
     } else {
       console.log('Employee updated successfully:', response.data);
       await this.refreshSession();
     }
-
+  
     return response;
   }
+  
 
   async getWorkflows() {
     const { data, error } = await this.supabase
