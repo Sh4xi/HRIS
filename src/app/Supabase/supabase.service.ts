@@ -137,11 +137,6 @@ export class SupabaseService {
   }
 
   private handleDatabaseChange(): void {
-    // if (isPlatformBrowser(this.platformId)) {
-    //   window.location.reload();
-    // } else {
-    //   console.log('Database change detected, but not in browser environment');
-    // }
     this.databaseChangeSubject.next(true);
   }
 
@@ -237,6 +232,18 @@ export class SupabaseService {
     }
   }
 
+  async unassignUserFromRole(userId: number, roleId: number): Promise<void> {
+    const { error } = await this.supabase
+      .from('user_roles')
+      .delete()
+      .eq('user_id', userId)
+      .eq('role_id', roleId);
+
+    if (error) {
+      throw new Error('Error unassigning user from role: ' + error.message);
+    }
+  }
+
   async createRole(roleData: any): Promise<PostgrestSingleResponse<any>> {
     const response = await this.supabase.from('roles').insert([
       {
@@ -275,14 +282,9 @@ export class SupabaseService {
     const { data, error } = await this.supabase
       .from('user_roles')
       .select(`
-        user_id,
-        profile:profile (
-          first_name,
-          mid_name,
-          surname,
-          position
-        )
-      `)
+      user_id,
+      profile:profile(first_name, mid_name, surname)
+    `)
       .eq('role_id', roleId);
   
     if (error) {
@@ -290,11 +292,16 @@ export class SupabaseService {
       return [];
     }
   
-    return data.map((userRole: any) => ({
-      id: userRole.user_id,
-      name: `${userRole.profile.first_name} ${userRole.profile.mid_name} ${userRole.profile.surname}`,
-      position: userRole.profile.position,
-    }));
+    // return data.map((userRole: any) => ({
+    //   id: userRole.user_id,
+    //   name: `${userRole.profile.first_name} ${userRole.profile.mid_name} ${userRole.profile.surname}`,
+    //   position: userRole.profile.position,
+    // }));
+      // Flatten the data to directly include user information in the returned array
+  return data.map(user => ({
+    user_id: user.user_id,
+    ...user.profile
+  }));
   }
 
   async createDepartment(departmentData: any): Promise<PostgrestSingleResponse<any>> {

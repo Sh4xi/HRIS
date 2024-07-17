@@ -424,9 +424,9 @@
                 <table class="table-auto w-[100%]">
                   <tbody>
                     <tr class="h-9 text-gray-600 text-sm font-light" *ngFor="let user of assignedUsers">
-                      <td>{{ user.name }}</td>
+                      <td>{{ user.first_name }} {{ user.mid_name }} {{ user.surname }}</td>
                       <td>
-                        <button class="text-red-500 hover:text-red-700" *ngIf="isManageMode">Delete</button>
+                        <button class="text-red-500 hover:text-red-700" *ngIf="isManageMode" (click)="unassignUser(user.user_id, assignedRole.role_id)">Delete</button>
                       </td>
                     </tr>
                   </tbody>

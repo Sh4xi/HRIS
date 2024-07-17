@@ -65,7 +65,6 @@ export class UserManagementComponent implements OnInit {
   showEditPopup = false;
   employees: any[] = [];
   roles: any[] = [];
-  // assignedUsers: any[] = [];
 
   showAccessRightsPopup = false;
   showAddDepartmentPopup = false;
@@ -401,13 +400,33 @@ export class UserManagementComponent implements OnInit {
   }
   
     // Load assigned users for the selected role
+    // async loadAssignedUsers(role: { role_id: number; role_name: string }): Promise<void> {
+    //   this.assignedRole = role;
+    //   console.log('Loading assigned users for role:', this.assignedRole);
+  
+    //   try {
+    //     const users = await this.supabaseService.getUsersAssignedToRole(role.role_id);
+    //     this.assignedUsers = users;
+    //     console.log('Assigned users:', this.assignedUsers);
+    //   } catch (error) {
+    //     if (error instanceof Error) {
+    //       console.error('Error loading assigned users:', error.message);
+    //     } else {
+    //       console.error('An unknown error occurred');
+    //     }
+    //   }
+    // }
     async loadAssignedUsers(role: { role_id: number; role_name: string }): Promise<void> {
       this.assignedRole = role;
       console.log('Loading assigned users for role:', this.assignedRole);
-  
+    
       try {
         const users = await this.supabaseService.getUsersAssignedToRole(role.role_id);
-        this.assignedUsers = users;
+        this.assignedUsers = users; // Directly assign the fetched users
+        // this.assignedUsers = users.map(user => ({
+        //   ...user,
+        //   profile: user.profile || { first_name: '', mid_name: '', surname: '' }
+        // }));
         console.log('Assigned users:', this.assignedUsers);
       } catch (error) {
         if (error instanceof Error) {
@@ -441,6 +460,20 @@ export class UserManagementComponent implements OnInit {
       } catch (error) {
         if (error instanceof Error) {
           console.error('Error assigning role:', error.message);
+        } else {
+          console.error('An unknown error occurred');
+        }
+      }
+    }
+
+    async unassignUser(userId: number, roleId: number): Promise<void> {
+      try {
+        await this.supabaseService.unassignUserFromRole(userId, roleId);
+        console.log('User unassigned successfully.');
+        this.loadAssignedUsers(this.assignedRole);
+      } catch (error) {
+        if (error instanceof Error) {
+          console.error('Error unassigning user:', error.message);
         } else {
           console.error('An unknown error occurred');
         }
