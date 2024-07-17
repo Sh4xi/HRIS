@@ -403,10 +403,11 @@
                         {{ role.role_name }}
                       </td>
                       <td *ngIf="isManageMode" class="text-center pr-3">
-                        <button class="text-blue-500 hover:text-blue-700">Edit</button>
+                        <button class="text-blue-500 hover:text-blue-700"><i class="fa fa-pencil" aria-hidden="true"></i>
+                        </button>
                       </td>
                       <td *ngIf="isManageMode" class="text-center">
-                        <button (click)="deleteRole(role)" class="text-red-500 hover:text-red-700 pr-1">Delete</button>
+                        <button (click)="deleteRole(role)" class="text-red-500 hover:text-red-700 pr-1"><i class="fa fa-trash" aria-hidden="true"></i></button>
                       </td>
                     </tr>
                   </tbody>
@@ -427,7 +428,7 @@
                     <tr class="h-9 text-gray-600 text-sm font-light w-full" *ngFor="let user of assignedUsers">
                       <td class = "w-full">{{ user.first_name }} {{ user.mid_name }} {{ user.surname }}</td>
                       <td>
-                        <button class="text-red-500 hover:text-red-700 pr-1" *ngIf="isManageMode" (click)="unassignUser(user.user_id, assignedRole.role_id)">Delete</button>
+                        <button class="text-red-500 hover:text-red-700 pr-1" *ngIf="isManageMode" (click)="unassignUser(user.user_id, assignedRole.role_id)"><i class="fa fa-trash" aria-hidden="true"></i></button>
                       </td>
                     </tr>
                   </tbody>
