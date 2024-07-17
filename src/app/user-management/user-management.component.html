@@ -510,12 +510,12 @@
 
         <!-- Popup Modal -->
         <div *ngIf="showRolePopup" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
-          <div class="bg-white p-6 rounded-lg shadow-lg w-[30%]">
+          <div class="bg-white p-6 rounded-lg shadow-lg w-[30%] h-[80%]">
             <p class="text-2xl font-black mb-4">Add Role</p>
             <input type="text" id="role" [(ngModel)]="newRole" placeholder="Enter role" class="border p-2 mb-4 w-full"/>
             
             <!-- Add the table here -->
-            <div class="overflow-y-auto overflow-x-hidden custom-scrollbar" style="height: calc(450px - 8rem);">
+            <div class="overflow-y-auto overflow-x-hidden custom-scrollbar" style="height: calc(80% - 2rem);">
             <table class="table-auto w-full mb-4">
               <tbody>
                 <tr class="h-9 text-gray-600 text-sm font-light">
@@ -579,7 +579,7 @@
             </table>
           </div>
             
-            <div class="flex justify-end">
+            <div class="flex justify-start">
               <button (click)="addRole()" class="bg-blue-500 text-white px-4 py-2 rounded mr-2">Confirm</button>
               <button (click)="cancelRolePopup()" class="bg-gray-500 text-white px-4 py-2 rounded">Cancel</button>
             </div>
@@ -588,12 +588,12 @@
         
 
 <div *ngIf="showAssignPopup" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
-  <div class="w-[400px] h-[500px] shadow-xl rounded-xl bg-white flex flex-col">
-    <div class="flex flex-col h-full p-10">
-      <div class="flex justify-between items-center mb-4">
+  <div class="w-[30%] h-[70%] shadow-xl rounded-lg bg-white flex flex-col">
+    <div class="flex flex-col h-full p-6">
+      <div class="flex justify-between items-center">
         <p class="text-2xl font-black">Assign for {{ assignedRole.role_name }}</p>
       </div>
-      <div class="overflow-y-auto overflow-x-hidden flex-grow">
+      <div class="overflow-y-auto overflow-x-hidden">
         <table class="table-auto w-full">
           <tbody>
             <tr class="h-9 text-gray-600 text-sm font-light" *ngFor="let emp of employees">
@@ -605,7 +605,7 @@
           </tbody>
         </table>
       </div>
-      <div class="flex gap-2 justify-start mt-10">
+      <div class="flex gap-2 justify-start mt-5">
         <button class="bg-green-500 text-white px-4 py-2 rounded" (click)="assignRole()">Assign</button>
         <button class="bg-gray-500 text-white px-4 py-2 rounded" (click)="closeAssignPopup()">Cancel</button>
       </div>
