@@ -618,4 +618,24 @@ export class SupabaseService {
       throw error;
     }
   }
+
+  async getAttendances(): Promise<any[]> {
+    try {
+      const { data, error } = await this.supabase
+        .from('DTR')
+        .select('*')
+        .order('id', { ascending: true });
+
+      if (error) {
+        throw error;
+      }
+
+      console.log('Fetched data from Supabase:', data);
+      return data;
+    } catch (error) {
+      console.error('Error fetching attendances from Supabase:', error);
+      throw error; // Propagate the error back to the caller
+    }
+  }
+  
 }

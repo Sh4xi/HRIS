@@ -821,11 +821,15 @@
                 <p class="text-2xl font-black">Assign for <span class="text-blue-600">{{ assignedRole.role_name }}</span></p>
                 <input type="text" [(ngModel)]="searchTerm" placeholder="Search Employees..." class="w-full p-2 border rounded-lg">
               </div>
-              <div class="overflow-y-auto overflow-x-hidden custom-scrollbar flex-grow">
+              <p *ngIf="selectedUserIds.size > 0" class="text-gray-400 text-sm">
+                <button type="button" class="focus:outline-none text-red-700" (click)="deselectAllCheckboxes()">Deselect All</button> 
+                {{selectedUserIds.size}} assigned
+              </p>
+              <div class="overflow-y-auto overflow-x-hidden custom-scrollbar">
                 <table class="table-auto w-full">
                   <tbody>
                     <ng-container *ngIf="searchEmpRole.length > 0; else noMatch">
-                      <tr class="h-9 text-gray-600 text-sm font-light" *ngFor="let emp of searchEmpRole">
+                      <tr class="h-7 text-gray-600 text-sm font-light" *ngFor="let emp of searchEmpRole">
                         <td>
                           <input type="checkbox" (change)="onCheckboxChange(emp.user_id, $event)">
                         </td>
@@ -840,12 +844,12 @@
                   </tbody>
                 </table>
               </div>
-              <div class="flex gap-2 justify-start mt-3">
+              <div class="flex gap-2 justify-start">
                 <button class="bg-green-500 text-white px-4 py-2 rounded" (click)="assignRole()">Assign</button>
                 <button class="bg-gray-500 text-white px-4 py-2 rounded" (click)="closeAssignPopup()">Cancel</button>
               </div>
-            </div>
-          </div>
+            </div>            
+          </div>                   
         </div>
       </section>
 

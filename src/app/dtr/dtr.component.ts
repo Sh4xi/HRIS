@@ -3,16 +3,18 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { SidebarNavigationModule } from './../sidebar-navigation/sidebar-navigation.module';
+import { SupabaseService } from '../Supabase/supabase.service';
 
 interface Attendance {
-  id?: number;
-  employeeName: string;
+  id: number;
+  name: string;
   status: string;
-  schedule: string;
-  clockIn: string;
-  clockOut: string;
-  otIn: string;
-  otOut: string;
+  schedule_in: string;
+  schedule_out: string;
+  clock_in: string;
+  clock_out: string;
+  OT_IN: string;
+  OT_OUT: string;
   selected?: boolean;
 }
 
@@ -24,7 +26,6 @@ interface Attendance {
   styleUrls: ['./dtr.component.css']
 })
 export class DtrComponent implements OnInit {
-
   showPopup = false;
   showTable = true;
   isEdit = false;
@@ -39,40 +40,47 @@ export class DtrComponent implements OnInit {
   itemsPerPage = 8;
   totalPages = 1;
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private supabaseService: SupabaseService) {}
 
   ngOnInit() {
-    this.generateMockData();
+    this.loadAttendances();
+  }
+
+  async loadAttendances() {
+    try {
+      this.attendances = await this.supabaseService.getAttendances();
+      this.filteredAttendances = this.attendances; // Initialize filteredAttendances
+      this.updatePagination(); // Update pagination after data load
+    } catch (error) {
+      console.error('Error loading attendances:', error);
+    }
+  }
+
+  applySearch() {
+    const term = this.searchTerm.toLowerCase().trim();
+    this.filteredAttendances = this.attendances.filter(attendance =>
+      attendance.name.toLowerCase().includes(term) ||
+      attendance.status.toLowerCase().includes(term)
+    );
     this.updatePagination();
   }
 
-  generateMockData() {
-    this.attendances = [
-      { id: 1, employeeName: 'John Doe', status: 'Present', schedule: '9:00 AM - 5:00 PM', clockIn: '9:00 AM', clockOut: '12:00 PM', otIn: '5:00 PM', otOut: '7:00 PM' },
-      { id: 1, employeeName: 'Lean Jedfrey Dedeque', status: 'Late', schedule: '9:00 AM - 5:00 PM', clockIn: '10:00 AM', clockOut: '12:00 PM', otIn: '5:00 PM', otOut: '7:00 PM' },
-      { id: 3, employeeName: 'Mark Johnson', status: 'Present', schedule: '9:00 AM - 5:00 PM', clockIn: '8:45 AM', clockOut: '12:15 PM', otIn: '', otOut: '' },
-      { id: 4, employeeName: 'Emily Davis', status: 'Late', schedule: '9:00 AM - 5:00 PM', clockIn: '9:15 AM', clockOut: '12:00 PM', otIn: '', otOut: '' },
-      { id: 5, employeeName: 'Michael Brown', status: 'Present', schedule: '9:00 AM - 5:00 PM', clockIn: '9:00 AM', clockOut: '12:00 PM', otIn: '5:00 PM', otOut: '6:00 PM' },
-      { id: 6, employeeName: 'Sarah Wilson', status: 'Absent', schedule: '9:00 AM - 5:00 PM', clockIn: '', clockOut: '', otIn: '', otOut: '' },
-      { id: 7, employeeName: 'David Martinez', status: 'Present', schedule: '9:00 AM - 5:00 PM', clockIn: '9:05 AM', clockOut: '12:05 PM', otIn: '', otOut: '' },
-      { id: 8, employeeName: 'Laura Garcia', status: 'Present', schedule: '9:00 AM - 5:00 PM', clockIn: '9:00 AM', clockOut: '12:00 PM', otIn: '5:00 PM', otOut: '7:00 PM' },
-      { id: 9, employeeName: 'Chris Lee', status: 'Late', schedule: '9:00 AM - 5:00 PM', clockIn: '9:20 AM', clockOut: '12:00 PM', otIn: '', otOut: '' },
-      { id: 10, employeeName: 'Anna Harris', status: 'Present', schedule: '9:00 AM - 5:00 PM', clockIn: '9:00 AM', clockOut: '12:00 PM', otIn: '5:00 PM', otOut: '6:00 PM' },
-    ];
-    this.filteredAttendances = [...this.attendances];
-    this.updatePagination();
+  formatSchedule(scheduleIn: string, scheduleOut: string): string {
+    return `${scheduleIn} - ${scheduleOut}`;
   }
 
   openPopup() {
     this.isEdit = false;
     this.selectedAttendance = {
-      employeeName: '',
+      id: 0,
+      name: '',
       status: '',
-      schedule: '',
-      clockIn: '',
-      clockOut: '',
-      otIn: '',
-      otOut: ''
+      schedule_in: '',
+      schedule_out: '',
+      clock_in: '',
+      clock_out: '',
+      OT_IN: '',
+      OT_OUT: ''
     };
     this.showPopup = true;
   }
@@ -86,13 +94,15 @@ export class DtrComponent implements OnInit {
 
   resetForm() {
     this.selectedAttendance = {
-      employeeName: '',
+      id: 0,
+      name: '',
       status: '',
-      schedule: '',
-      clockIn: '',
-      clockOut: '',
-      otIn: '',
-      otOut: ''
+      schedule_in: '',
+      schedule_out: '',
+      clock_in: '',
+      clock_out: '',
+      OT_IN: '',
+      OT_OUT: ''
     };
   }
 
@@ -105,14 +115,6 @@ export class DtrComponent implements OnInit {
     this.searchTerm = '';
     this.filteredAttendances = this.attendances;
     this.isManageMode = false;
-  }
-
-  applySearch() {
-    const term = this.searchTerm.toLowerCase().trim();
-    this.filteredAttendances = this.attendances.filter(attendance =>
-      attendance.employeeName.toLowerCase().includes(term)
-    );
-    this.updatePagination();
   }
 
   showMessage(msg: string, isError: boolean = false) {
@@ -165,10 +167,10 @@ export class DtrComponent implements OnInit {
   }
 
   async saveOrUpdateAttendance() {
-    // Logic to save or update attendance
+    // Implementation for saving or updating attendance
   }
 
   async deleteSelectedAttendances() {
-    // Logic to delete selected attendances
+    // Implementation for deleting selected attendances
   }
 }
