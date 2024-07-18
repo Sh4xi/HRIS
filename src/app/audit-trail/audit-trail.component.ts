@@ -1,93 +1,76 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { SupabaseService } from '../Supabase/supabase.service';
-
-interface AuditLog {
-  id?: number;
-  user_id: string;  // Changed from 'user' to 'user_id'
-  action?: string;
-  affected_page?: string;
-  parameter?: string;
-  old_value?: string;
-  new_value?: string;
-  ip_address?: string;
-  date?: string;
-}
+import { SidebarNavigationModule } from './../sidebar-navigation/sidebar-navigation.module';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-audit-trail',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, SidebarNavigationModule],
   templateUrl: './audit-trail.component.html',
   styleUrls: ['./audit-trail.component.css']
 })
-export class AuditTrailComponent implements OnInit {
-  auditLogs: AuditLog[] = [];
+export class AuditTrailComponent implements OnInit, OnDestroy {
+  auditLogs: any[] = [];
+  private subscription: Subscription;
 
   constructor(
     private supabaseService: SupabaseService,
     private router: Router
-  ) {}
-
-  async ngOnInit() {
-    await this.fetchAuditLogs();
+  ) {
+    this.subscription = new Subscription();
   }
+
+  ngOnInit() {
+    this.fetchAuditLogs();
+    //this.subscribeToAuditLogUpdates();
+  }
+
+  ngOnDestroy() {
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
+  }
+
+  // private subscribeToAuditLogUpdates() {
+  //   this.subscription = this.supabaseService.getAuditLogUpdates().subscribe(newLog => {
+  //     this.auditLogs.unshift(this.formatLogEntry(newLog));
+  //   });
+  // }
 
   async fetchAuditLogs() {
     try {
       const logs = await this.supabaseService.fetchAuditLogs();
       console.log('Fetched audit logs:', logs);
-      this.auditLogs = logs.map(log => ({
-        ...log,
-        user_id: log.user_id || 'Unknown User',
-        action: log.action || 'Unknown Action',
-        affected_page: log.affected_page || 'N/A',
-        parameter: log.parameter || 'N/A',
-        old_value: log.old_value || 'N/A',
-        new_value: log.new_value || 'N/A',
-        ip_address: log.ip_address || 'N/A',
-      }));
+      this.auditLogs = logs.map(log => this.formatLogEntry(log));
     } catch (error) {
       console.error('Error fetching audit logs:', error);
-      this.auditLogs = [];
+      // Handle the error appropriately (e.g., show an error message to the user)
     }
   }
 
-  async logAction(action: string, affectedPage: string, parameter: string, oldValue: string, newValue: string) {
-    try {
-      const ipAddress = await this.getIpAddress();
-      const userId = await this.getCurrentUserId();
-
-      await this.supabaseService.logAction({
-        user_id: userId,  // Changed from 'user' to 'user_id'
-        action,
-        affected_page: affectedPage,
-        parameter,
-        old_value: oldValue,
-        new_value: newValue,
-        ip_address: ipAddress
-      });
-
-      // Refresh the audit logs after logging a new action
-      await this.fetchAuditLogs();
-    } catch (error) {
-      console.error('Error logging action:', error);
-      // Handle the error appropriately
-    }
+  private formatLogEntry(log: any) {
+    return {
+      ...log,
+      user_id: log.user_id || 'Unknown User',
+      affected_page: log.affected_page || 'N/A',
+      action: log.action || 'N/A',
+      old_parameter: log.old_parameter || 'N/A',
+      new_parameter: log.new_parameter || 'N/A'
+    };
   }
 
-  private async getIpAddress(): Promise<string> {
-    // Implement logic to get the user's IP address
-    return 'User IP';
-  }
-
-  private async getCurrentUserId(): Promise<string> {
-    // Implement logic to get the current user's ID
-    return 'User ID';
-  }
-
-  goHome() {
-    this.router.navigate(['/system-management']);
-  }
+  // async logUserAction(userId: string, action: string, affectedPage: string, oldParameter: string, newParameter: string) {
+  //   try {
+  //     await this.supabaseService.logAction(userId, action, affectedPage, oldParameter, newParameter);
+  //     // The new log will be added automatically through the subscription
+  //   } catch (error) {
+  //     console.error('Error logging user action:', error);
+  //     // Handle the error appropriately
+  //   }
+  // }
 }
+
+
