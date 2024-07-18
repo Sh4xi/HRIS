@@ -20,6 +20,7 @@ export class SupabaseService {
 
   private databaseChangeSubject = new BehaviorSubject<boolean>(false);
   public databaseChange$ = this.databaseChangeSubject.asObservable();
+  http: any;
 
   uploadPhoto(photoFile: any) {
     throw new Error('Method not implemented.');
@@ -444,7 +445,7 @@ export class SupabaseService {
   }
 
     // Fetch tickets from the database
-    async getTickets() {
+  async getTickets() {
       const { data, error } = await this.supabase
         .from('ticket')
         .select('*')
@@ -456,8 +457,8 @@ export class SupabaseService {
       return { data, error };
     }
 
-    async updateTicketPriority(ticketId: number, priority: string) {
-      const { data, error } = await this.supabase
+  async updateTicketPriority(ticketId: number, priority: string) {
+     const { data, error } = await this.supabase
         .from('ticket')  // Replace with your actual table name
         .update({ priority: priority })
         .eq('id', ticketId);
@@ -469,6 +470,12 @@ export class SupabaseService {
     
       return data;
     }
+
+  //   // Method to send the admin reply
+  // async replyToTicket(ticketId: string, replyText: string): Promise<Observable<any>> {
+  //   const payload = { replyText };
+  //   return this.http.post(`${this.supabase}/tickets/${ticketId}/reply`, payload); // Adjust the endpoint according to your API
+  // }
   
   async uploadImage(file: File): Promise<{ data: { url: string } | null, error: Error | null }> {
     console.log('Uploading image...');
