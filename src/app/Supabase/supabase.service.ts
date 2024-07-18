@@ -590,4 +590,36 @@ export class SupabaseService {
 
     return data;
   }
+
+  //dtr
+  async insertDTRRecord(status: string, name: string) {
+    try {
+      console.log('Attempting to insert DTR record:', { status, name });
+      const { data, error } = await this.supabase
+        .from('DTR')
+        .insert([
+          {
+            status: status,
+            schedule_in: '09:00:00',  // 9:00 AM
+            schedule_out: '19:00:00', // 7:00 PM
+            clock_in: new Date().toISOString(),
+            clock_out: null,
+            'OT-IN': null,
+            'OT-OUT': null,
+            name: name
+          }
+        ]);
+  
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
+  
+      console.log('DTR record inserted successfully:', data);
+      return data;
+    } catch (error) {
+      console.error('Error in insertDTRRecord:', error);
+      throw error;
+    }
+  }
 }
