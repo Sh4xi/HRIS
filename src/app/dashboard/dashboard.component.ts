@@ -85,6 +85,7 @@ export class DashboardComponent implements OnInit {
 
   timeIn() {
     console.log('Time In button clicked');
+    alert ('TIME IN BUTTON CLICKED, NOW RUN FOR YOUR LIFE.');
     // Add your logic here for Time In
   }
 
