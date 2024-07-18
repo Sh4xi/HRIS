@@ -130,8 +130,10 @@ export class UserManagementComponent implements OnInit {
   editingRoleId: number | null = null;
   originalRoleName: string | null = null;
 
+  selectedCount: number = 0;
 
   deselectAllCheckboxes(): void {
+    this.selectedUserIds.clear();
     const checkboxes = document.querySelectorAll('input[type="checkbox"]');
     checkboxes.forEach((checkbox: any) => {
       checkbox.checked = false;
