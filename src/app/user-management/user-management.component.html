@@ -410,7 +410,7 @@
                         </td>
                         <td *ngIf="isManageMode" class="text-center" style="min-width: 35px;">
                           <ng-container *ngIf="editingRoleId === role.role_id; else editIcon">
-                            <button (click)="saveRole(role)" class="text-green-500 hover:text-green-700" style="padding: 0;">
+                            <button (click)="updateRoleName(role)" class="text-green-500 hover:text-green-700" style="padding: 0;">
                               <i class="fa fa-check" aria-hidden="true"></i>
                             </button>
                           </ng-container>
