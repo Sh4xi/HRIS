@@ -131,6 +131,13 @@ export class UserManagementComponent implements OnInit {
   originalRoleName: string | null = null;
 
 
+  deselectAllCheckboxes(): void {
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    checkboxes.forEach((checkbox: any) => {
+      checkbox.checked = false;
+    });
+  }
+
   startEdit(role: any) {
   this.editingRoleId = role.role_id;
   this.originalRoleName = role.role_name; // Store the original name
