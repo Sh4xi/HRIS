@@ -668,13 +668,13 @@
                     <td class="whitespace-nowrap text-center px-3"></td>
                     <td class="whitespace-nowrap text-center px-3"></td>
                     <td class="whitespace-nowrap text-center px-3">
-                      <input type="radio" name="users" value="none">
+                      <input type="radio" name="users"  [(ngModel)]="usersRights" value="none">
                     </td>
                     <td class="whitespace-nowrap text-center px-3">
-                      <input type="radio" name="users" value="view">
+                      <input type="radio" name="users"  [(ngModel)]="usersRights" value="view">
                     </td>
                     <td class="whitespace-nowrap text-center px-3">
-                      <input type="radio" name="users" value="edit">
+                      <input type="radio" name="users"  [(ngModel)]="usersRights" value="edit">
                     </td>
                   </tr>
                   <tr class="h-7 text-gray-600 text-sm font-light">
@@ -682,13 +682,13 @@
                     <td class="whitespace-nowrap text-center px-3"></td>
                     <td class="whitespace-nowrap text-center px-3"></td>
                     <td class="whitespace-nowrap text-center px-3">
-                      <input type="radio" name="roles" value="none">
+                      <input type="radio" name="roles" [(ngModel)]="rolesRights" value="none">
                     </td>
                     <td class="whitespace-nowrap text-center px-3">
-                      <input type="radio" name="roles" value="view">
+                      <input type="radio" name="roles" [(ngModel)]="rolesRights" value="view">
                     </td>
                     <td class="whitespace-nowrap text-center px-3">
-                      <input type="radio" name="roles" value="edit">
+                      <input type="radio" name="roles" [(ngModel)]="rolesRights" value="edit">
                     </td>
                   </tr>
                   <tr class="h-7 text-gray-600 text-sm font-light">
@@ -696,13 +696,13 @@
                     <td class="whitespace-nowrap text-center px-3"></td>
                     <td class="whitespace-nowrap text-center px-3"></td>
                     <td class="whitespace-nowrap text-center px-3">
-                      <input type="radio" name="supportTickets" value="none">
+                      <input type="radio" name="supportTickets" [(ngModel)]="supportRights" value="none">
                     </td>
                     <td class="whitespace-nowrap text-center px-3">
-                      <input type="radio" name="supportTickets" value="view">
+                      <input type="radio" name="supportTickets" [(ngModel)]="supportRights" value="view">
                     </td>
                     <td class="whitespace-nowrap text-center px-3">
-                      <input type="radio" name="supportTickets" value="edit">
+                      <input type="radio" name="supportTickets" [(ngModel)]="supportRights" value="edit">
                     </td>
                   </tr>
               
@@ -719,13 +719,13 @@
                     <td class="whitespace-nowrap text-center px-3"></td>
                     <td class="whitespace-nowrap text-center px-3"></td>
                     <td class="whitespace-nowrap text-center px-3">
-                      <input type="radio" name="parameters" value="none">
+                      <input type="radio" name="parameters" [(ngModel)]="parametersRights" value="none">
                     </td>
                     <td class="whitespace-nowrap text-center px-3">
-                      <input type="radio" name="parameters" value="view">
+                      <input type="radio" name="parameters" [(ngModel)]="parametersRights" value="view">
                     </td>
                     <td class="whitespace-nowrap text-center px-3">
-                      <input type="radio" name="parameters" value="edit">
+                      <input type="radio" name="parameters" [(ngModel)]="parametersRights" value="edit">
                     </td>
                   </tr>
               
@@ -742,13 +742,13 @@
                     <td class="whitespace-nowrap text-center px-3"></td>
                     <td class="whitespace-nowrap text-center px-3"></td>
                     <td class="whitespace-nowrap text-center px-3">
-                      <input type="radio" name="dailyTimeRecord" value="none">
+                      <input type="radio" name="dailyTimeRecord" [(ngModel)]="dailyRights" value="none">
                     </td>
                     <td class="whitespace-nowrap text-center px-3">
-                      <input type="radio" name="dailyTimeRecord" value="view">
+                      <input type="radio" name="dailyTimeRecord" [(ngModel)]="dailyRights" value="view">
                     </td>
                     <td class="whitespace-nowrap text-center px-3">
-                      <input type="radio" name="dailyTimeRecord" value="edit">
+                      <input type="radio" name="dailyTimeRecord" [(ngModel)]="dailyRights" value="edit">
                     </td>
                   </tr>
                   <tr class="h-7 text-gray-600 text-sm font-light">
@@ -756,13 +756,13 @@
                     <td class="whitespace-nowrap text-center px-3"></td>
                     <td class="whitespace-nowrap text-center px-3"></td>
                     <td class="whitespace-nowrap text-center px-3">
-                      <input type="radio" name="monthlyTimeRecord" value="none">
+                      <input type="radio" name="monthlyTimeRecord" [(ngModel)]="monthlyRights" value="none">
                     </td>
                     <td class="whitespace-nowrap text-center px-3">
-                      <input type="radio" name="monthlyTimeRecord" value="view">
+                      <input type="radio" name="monthlyTimeRecord" [(ngModel)]="monthlyRights" value="view">
                     </td>
                     <td class="whitespace-nowrap text-center px-3">
-                      <input type="radio" name="monthlyTimeRecord" value="edit">
+                      <input type="radio" name="monthlyTimeRecord" [(ngModel)]="monthlyRights" value="edit">
                     </td>
                   </tr>
                   <tr class="h-7 text-gray-600 text-sm font-light">
@@ -770,13 +770,13 @@
                     <td class="whitespace-nowrap text-center px-3"></td>
                     <td class="whitespace-nowrap text-center px-3"></td>
                     <td class="whitespace-nowrap text-center px-3">
-                      <input type="radio" name="weeklyTimeRecord" value="none">
+                      <input type="radio" name="weeklyTimeRecord" [(ngModel)]="weeklyRights" value="none">
                     </td>
                     <td class="whitespace-nowrap text-center px-3">
-                      <input type="radio" name="weeklyTimeRecord" value="view">
+                      <input type="radio" name="weeklyTimeRecord" [(ngModel)]="weeklyRights" value="view">
                     </td>
                     <td class="whitespace-nowrap text-center px-3">
-                      <input type="radio" name="weeklyTimeRecord" value="edit">
+                      <input type="radio" name="weeklyTimeRecord" [(ngModel)]="weeklyRights" value="edit">
                     </td>
                   </tr>
               
@@ -793,13 +793,13 @@
                     <td class="whitespace-nowrap text-center px-3"></td>
                     <td class="whitespace-nowrap text-center px-3"></td>
                     <td class="whitespace-nowrap text-center px-3">
-                      <input type="radio" name="entries" value="none" >
+                      <input type="radio" name="entries" [(ngModel)]="entriesRights" value="none" >
                     </td>
                     <td class="whitespace-nowrap text-center px-3">
-                      <input type="radio" name="entries" value="view" >
+                      <input type="radio" name="entries" [(ngModel)]="entriesRights" value="view" >
                     </td>
                     <td class="whitespace-nowrap text-center px-3">
-                      <input type="radio" name="entries" value="edit" >
+                      <input type="radio" name="entries" [(ngModel)]="entriesRights" value="edit" >
                     </td>
                   </tr>
                 </tbody>

@@ -250,6 +250,14 @@ export class SupabaseService {
     const response = await this.supabase.from('roles').insert([
       {
         role_name: roleData.role_name,
+        users_rights: roleData.users_rights,
+        roles_rights: roleData.roles_rights,
+        sup_rights: roleData.sup_rights,
+        par_rights: roleData.par_rights,
+        daily_rights: roleData.daily_rights,
+        monthly_rights: roleData.monthly_rights,
+        weekly_rights: roleData.weekly_rights,
+        entries: roleData.entries,
       },
     ]);
 

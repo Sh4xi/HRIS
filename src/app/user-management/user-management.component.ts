@@ -72,7 +72,17 @@ export class UserManagementComponent implements OnInit {
   showModal = false;
   photoPreviewUrl = 'https://via.placeholder.com/200x200';
   showPasswordGeneratedMessage: boolean = false;
+
   newRole = '';
+  usersRights: string = 'none';
+  rolesRights: string = 'none';
+  supportRights: string = 'none';
+  parametersRights: string = 'none';
+  dailyRights: string = 'none';
+  monthlyRights: string = 'none';
+  weeklyRights: string = 'none';
+  entriesRights: string = 'none';
+
   newDepartment = '';
   departmentType = 'all';
   selectedDepartments: string[] = [];
@@ -340,7 +350,15 @@ cancelEdit() {
       return;
     }
     const roleData = {
-      role_name: this.newRole
+      role_name: this.newRole,
+      users_rights: this.usersRights,
+      roles_rights: this.rolesRights,
+      sup_rights: this.supportRights,
+      par_rights: this.parametersRights,
+      daily_rights: this.dailyRights,
+      monthly_rights: this.monthlyRights,
+      weekly_rights: this.weeklyRights,
+      entries: this.entriesRights,
     };
     this.supabaseService.createRole(roleData)
     .then(response => {
@@ -356,6 +374,7 @@ cancelEdit() {
       }
     });
     this.showRolePopup = false;
+    this.loadRoles();
   }
   
     async loadAssignedUsers(role: { role_id: number; role_name: string }): Promise<void> {
