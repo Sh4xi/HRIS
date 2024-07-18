@@ -382,9 +382,14 @@
       <section id="user-list">
         <div class="flex justify-between mb-6">
           <input type="text" [(ngModel)]="searchRoleTerm" placeholder="Search Roles..." class="w-half p-2 border rounded-lg">          
-          <div>
-            <button class="px-4 py-2 bg-blue-500 text-white rounded mr-2" (click)="toggleManageMode()">Manage</button>
-            <!-- <button (click)="toggleManagePopup()" class="px-4 py-2 bg-black text-white rounded hidden">Manage</button> -->
+          <div class="mr-2">
+            <button 
+              class="px-6 py-2 text-white rounded" 
+              [ngClass]="{'bg-blue-500': !isManageMode, 'bg-red-500': isManageMode}" 
+              (click)="toggleManageMode()"
+            >
+            {{ isManageMode ? 'Stop Managing' : 'Manage Roles' }}
+            </button>
           </div>      
         </div>
         
