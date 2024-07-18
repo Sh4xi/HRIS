@@ -109,40 +109,6 @@ export class UserManagementComponent implements OnInit {
     type: ''
   };
 
-  modules = [
-    'Personnel Information Management',
-    'Payroll Management',
-    'Employee Information Management',
-    'Time & Attendance Management',
-    'Online Job Application Portal',
-    'Recruitment, Selection and PlaFrcement',
-    'Learning and Development (L&D)',
-    'Rewards and Recognition',
-    'Performance Management',
-    'Health and Wellness',
-    'Forms and Workflow',
-    'Reports',
-    'Data Exchange (Export and Import)',
-    'Data Visualization'
-  ];
-
-  reports = [
-    'Employee Performance Reports',
-    'Payroll Summaries',
-    'Recruitment Reports',
-    'Training Reports',
-    'No Access'
-  ];
-
-  dataAccess = [
-    'Employee Records',
-    'Financial Data',
-    'Attendance Records',
-    'Job Applications',
-    'Training Data',
-    'No Access'
-  ];
-
   assignedEmployees: string[] = ['Kobe Bryant', 'Alice Guo', 'Carlo Sotto', 'Harry Roque'];
   showCheckboxes = false;
 
@@ -244,21 +210,6 @@ cancelEdit() {
   // Mockdata for Tickets
   tickets: Ticket[] = [];
 
-  privileges = ['View', 'Edit', 'Delete', 'Approve'];
-
-  selectedModules: string[] = [];
-  selectedReports: string[] = [];
-  selectedDataAccess: string[] = [];
-  selectedPrivileges: string[] = [];
-
-  departmentAccessRights = [
-    'View Department Data',
-    'Edit Department Data',
-    'Manage Department Members',
-    'Approve Department Requests'
-  ];
-
-  departmentAccess: AccessRights = {};
   showPassword: any;
 
   constructor(private supabaseService: SupabaseService) {}
@@ -384,27 +335,9 @@ cancelEdit() {
       alert('Please enter a role name');
       return;
     }
-  
-    // if (this.departmentType === 'specific' && !this.selectedDepartments) {
-    //   alert('Please select a department');
-    //   return;
-    // }
-  
     const roleData = {
-      role_name: this.newRole,
-      mod_access: this.selectedModules.length > 0 ? this.selectedModules : [],
-      rep_access: this.selectedReports.length > 0 ? this.selectedReports : [],
-      data_access: this.selectedDataAccess.length > 0 ? this.selectedDataAccess : [],
-      privileges: this.selectedPrivileges.length > 0 ? this.selectedPrivileges : [],
-      department: this.departmentType === 'all'
-        ? ['All Departments']
-        : this.departmentType === 'specific'
-        ? this.selectedDepartments
-        : this.selectedDepartments.length > 0
-        ? this.selectedDepartments
-        : []
+      role_name: this.newRole
     };
-  
     this.supabaseService.createRole(roleData)
     .then(response => {
       if (response.error) {
@@ -428,10 +361,6 @@ cancelEdit() {
       try {
         const users = await this.supabaseService.getUsersAssignedToRole(role.role_id);
         this.assignedUsers = users; // Directly assign the fetched users
-        // this.assignedUsers = users.map(user => ({
-        //   ...user,
-        //   profile: user.profile || { first_name: '', mid_name: '', surname: '' }
-        // }));
         console.log('Assigned users:', this.assignedUsers);
       } catch (error) {
         if (error instanceof Error) {
@@ -842,12 +771,6 @@ nextPage() {
 
   resetAccessForm() {
     this.newRole = '';
-    this.departmentType = 'all';
-    this.selectedDepartments = [];
-    this.selectedModules = [];
-    this.selectedReports = [];
-    this.selectedDataAccess = [];
-    this.selectedPrivileges = [];
   }
 
 
@@ -886,88 +809,6 @@ nextPage() {
 
   closePopupOutside(event: MouseEvent): void {
     this.showManagePopup = false;
-  }
-
-  toggleAddDepartmentPopup() {
-    this.showAddDepartmentPopup = !this.showAddDepartmentPopup;
-    if (this.showAddDepartmentPopup) {
-      this.resetDepartmentForm();
-    }
-  }
-
-  closeAddDepartmentPopup() {
-    this.showAddDepartmentPopup = false;
-    this.resetDepartmentForm();
-  }
-
-  resetDepartmentForm() {
-    this.newDepartment = '';
-    this.departmentAccessRights.forEach(access => this.departmentAccess[access] = false);
-  }
-
-  saveDepartment() {
-    if (!this.newDepartment) {
-      alert('Please enter a department name');
-      return;
-    }
-
-    const departmentData = {
-      department_name: this.newDepartment,
-      mod_access: this.selectedModules.length > 0 ? this.selectedModules : [],
-      rep_access: this.selectedReports.length > 0 ? this.selectedReports : [],
-      data_access: this.selectedDataAccess.length > 0 ? this.selectedDataAccess : [],
-      privileges: this.selectedPrivileges.length > 0 ? this.selectedPrivileges : [],
-    };
-  
-    this.supabaseService.createDepartment(departmentData)
-    .then(response => {
-      if (response.error) {
-        console.error('Error creating department:', response.error.message);
-      } else {
-        if (response.data) {
-          console.log('Department created successfully:', response.data);
-        } else {
-          console.log('Department created successfully, but no data returned.');
-        }
-        this.closeAddDepartmentPopup();
-      }
-    });
-  }
-
-  updateSelectedModules(event: any) {
-    const value = event.target.value;
-    if (event.target.checked) {
-      this.selectedModules.push(value);
-    } else {
-      this.selectedModules = this.selectedModules.filter(module => module !== value);
-    }
-  }
-  
-  updateSelectedReports(event: any) {
-    const value = event.target.value;
-    if (event.target.checked) {
-      this.selectedReports.push(value);
-    } else {
-      this.selectedReports = this.selectedReports.filter(report => report !== value);
-    }
-  }
-  
-  updateSelectedDataAccess(event: any) {
-    const value = event.target.value;
-    if (event.target.checked) {
-      this.selectedDataAccess.push(value);
-    } else {
-      this.selectedDataAccess = this.selectedDataAccess.filter(data => data !== value);
-    }
-  }
-  
-  updateSelectedPrivileges(event: any) {
-    const value = event.target.value;
-    if (event.target.checked) {
-      this.selectedPrivileges.push(value);
-    } else {
-      this.selectedPrivileges = this.selectedPrivileges.filter(privilege => privilege !== value);
-    }
   }
 
  //Ticket Management Functions: Method to search tickets
