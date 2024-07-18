@@ -251,11 +251,6 @@ export class SupabaseService {
     const response = await this.supabase.from('roles').insert([
       {
         role_name: roleData.role_name,
-        department: roleData.department,
-        mod_access: roleData.mod_access,
-        rep_access: roleData.rep_access,
-        data_access: roleData.data_access,
-        privileges: roleData.privileges
       },
     ]);
 
