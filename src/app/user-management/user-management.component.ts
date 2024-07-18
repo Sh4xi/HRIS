@@ -170,12 +170,6 @@ export class UserManagementComponent implements OnInit {
   this.originalRoleName = role.role_name; // Store the original name
 }
 
-saveRole(role: any) {
-  // Implement your save logic here, e.g., update the role in your backend
-  this.editingRoleId = null; // Exit edit mode
-  this.originalRoleName = null; // Clear the original name
-}
-
 cancelEdit() {
   if (this.originalRoleName !== null && this.editingRoleId) {
     const roleToEdit = this.searchroletab.find(r => r.role_id === this.editingRoleId);
@@ -431,23 +425,6 @@ cancelEdit() {
     this.showRolePopup = false;
   }
   
-    // Load assigned users for the selected role
-    // async loadAssignedUsers(role: { role_id: number; role_name: string }): Promise<void> {
-    //   this.assignedRole = role;
-    //   console.log('Loading assigned users for role:', this.assignedRole);
-  
-    //   try {
-    //     const users = await this.supabaseService.getUsersAssignedToRole(role.role_id);
-    //     this.assignedUsers = users;
-    //     console.log('Assigned users:', this.assignedUsers);
-    //   } catch (error) {
-    //     if (error instanceof Error) {
-    //       console.error('Error loading assigned users:', error.message);
-    //     } else {
-    //       console.error('An unknown error occurred');
-    //     }
-    //   }
-    // }
     async loadAssignedUsers(role: { role_id: number; role_name: string }): Promise<void> {
       this.assignedRole = role;
       console.log('Loading assigned users for role:', this.assignedRole);
@@ -509,6 +486,17 @@ cancelEdit() {
         } else {
           console.error('An unknown error occurred');
         }
+      }
+    }
+
+    async updateRoleName(role: any) {
+      try {
+        await this.supabaseService.updateRoleName(role.role_id, role.role_name);
+        this.editingRoleId = null; // Exit edit mode
+        this.originalRoleName = null; // Clear the original name
+        this.loadRoles(); // Refresh the roles list
+      } catch (error) {
+        console.error('Error saving role:', error);
       }
     }
   
@@ -789,8 +777,8 @@ deleteUsers() {
   // Update pagination
   this.updatePagination();
 
-  // // Refresh the page
-  // window.location.reload();
+  // Refresh the page
+  window.location.reload();
 }
 
 clearSelections() {
