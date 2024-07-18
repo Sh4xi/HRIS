@@ -231,6 +231,7 @@ export class SupabaseService {
     if (error) {
       throw new Error('Error assigning role to users: ' + error.message);
     }
+    await this.refreshSession();
   }
 
   async unassignUserFromRole(userId: number, roleId: number): Promise<void> {
@@ -243,6 +244,7 @@ export class SupabaseService {
     if (error) {
       throw new Error('Error unassigning user from role: ' + error.message);
     }
+    await this.refreshSession();
   }
 
   async createRole(roleData: any): Promise<PostgrestSingleResponse<any>> {
@@ -276,6 +278,19 @@ export class SupabaseService {
     if (error) {
       console.error('Error deleting role:', error.message);
     }
+    await this.refreshSession();
+  }
+
+  async updateRoleName(role_id: number, role_name: string): Promise<any> {
+    const { data, error } = await this.supabase
+      .from('roles')
+      .update({ role_name })
+      .eq('role_id', role_id);
+  
+    if (error) {
+      throw new Error(error.message);
+    }
+    return data;
   }
 
   //Displays the name assigned to the Role clicked in the first container in "Roles" tab
@@ -292,13 +307,6 @@ export class SupabaseService {
       console.error('Error fetching assigned users:', error.message);
       return [];
     }
-  
-    // return data.map((userRole: any) => ({
-    //   id: userRole.user_id,
-    //   name: `${userRole.profile.first_name} ${userRole.profile.mid_name} ${userRole.profile.surname}`,
-    //   position: userRole.profile.position,
-    // }));
-      // Flatten the data to directly include user information in the returned array
   return data.map(user => ({
     user_id: user.user_id,
     ...user.profile
