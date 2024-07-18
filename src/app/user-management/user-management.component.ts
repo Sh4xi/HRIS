@@ -739,8 +739,8 @@ deleteUsers() {
   // Update pagination
   this.updatePagination();
 
-  // // Refresh the page
-  // window.location.reload();
+  // Refresh the page
+  window.location.reload();
 }
 
 clearSelections() {
