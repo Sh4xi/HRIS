@@ -153,6 +153,9 @@ cancelEdit() {
 
   openRolePopup() {
     this.showRolePopup = true;
+    this.isManageMode = false;
+
+
   }
 
   closeRolePopup() {
@@ -161,6 +164,7 @@ cancelEdit() {
 
   openAssignPopup() {
     this.showAssignPopup = true;
+    this.isManageMode = false;
   }
 
   closeAssignPopup() {

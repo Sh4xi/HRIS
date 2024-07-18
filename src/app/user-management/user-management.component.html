@@ -383,13 +383,7 @@
         <div class="flex justify-between mb-6">
           <input type="text" [(ngModel)]="searchRoleTerm" placeholder="Search Roles..." class="w-half p-2 border rounded-lg">          
           <div class="mr-2">
-            <button 
-              class="px-6 py-2 text-white rounded" 
-              [ngClass]="{'bg-blue-500': !isManageMode, 'bg-red-500': isManageMode}" 
-              (click)="toggleManageMode()"
-            >
-            {{ isManageMode ? 'Stop Managing' : 'Manage Roles' }}
-            </button>
+            <button class=" text-white rounded h-full w-28 whitespace-nowrap text-center" [ngClass]="{'bg-blue-500': !isManageMode, 'bg-red-500': isManageMode}" (click)="toggleManageMode()">{{ isManageMode ? 'Stop Managing' : 'Manage Roles' }}</button>
           </div>      
         </div>
         
@@ -461,14 +455,23 @@
               <div class="overflow-y-auto overflow-x-hidden custom-scrollbar" style="height: calc(450px - 8rem);">
                 <table class="table-auto w-full">
                   <tbody>
-                    <tr class="h-9 text-gray-600 text-sm font-light w-full" *ngFor="let user of assignedUsers">
-                      <td class = "w-full">{{ user.first_name }} {{ user.mid_name }} {{ user.surname }}</td>
-                      <td>
-                        <button class="text-red-500 hover:text-red-700 pr-1" *ngIf="isManageMode" (click)="unassignUser(user.user_id, assignedRole.role_id)"><i class="fa fa-trash" aria-hidden="true"></i></button>
-                      </td>
-                    </tr>
+                    <ng-container *ngIf="assignedUsers.length > 0; else noRoleMatch">
+                      <tr class="h-9 text-gray-600 text-sm font-light w-full" *ngFor="let user of assignedUsers">
+                        <td class="w-full">{{ user.first_name }} {{ user.mid_name }} {{ user.surname }}</td>
+                        <td>
+                          <button class="text-red-500 hover:text-red-700 pr-1" *ngIf="isManageMode" (click)="unassignUser(user.user_id, assignedRole.role_id)">
+                            <i class="fa fa-trash" aria-hidden="true"></i>
+                          </button>
+                        </td>
+                      </tr>
+                    </ng-container>
+                    <ng-template #noRoleMatch>
+                      <tr class="h-9 text-gray-600 text-sm font-light">
+                        <td colspan="3" class="text-center p-4">No assigned employees</td>
+                      </tr>
+                    </ng-template>
                   </tbody>
-                </table>
+                </table>  
               </div>
             </div>
           </div>
@@ -489,63 +492,153 @@
                   <tbody>
                     <tr class="h-9 text-gray-600 text-sm font-light">
                       <td class="font-black w-full">User Management</td>
-                      <td class="whitespace-nowrap text-center px-6">View</td>
-                      <td class="whitespace-nowrap text-center">Edit</td>
+                      <td class="whitespace-nowrap text-center px-3"></td>
+                      <td class="whitespace-nowrap text-center px-3"></td>
+                      <td class="whitespace-nowrap text-center px-3">None</td>
+                      <td class="whitespace-nowrap text-center px-3">View</td>
+                      <td class="whitespace-nowrap text-center px-3">Edit</td>
                     </tr>
                     <tr class="h-7 text-gray-600 text-sm font-light">
                       <td class="w-full">Users</td>
-                      <td class="whitespace-nowrap text-center px-6"><input type="checkbox" [disabled]="!isManageMode"></td>
-                      <td class="whitespace-nowrap text-center"><input type="checkbox" [disabled]="!isManageMode"></td>
+                      <td class="whitespace-nowrap text-center px-3"></td>
+                      <td class="whitespace-nowrap text-center px-3"></td>
+                      <td class="whitespace-nowrap text-center px-3">
+                        <input type="radio" name="users" value="none" [disabled]="!isManageMode">
+                      </td>
+                      <td class="whitespace-nowrap text-center px-3">
+                        <input type="radio" name="users" value="view" [disabled]="!isManageMode">
+                      </td>
+                      <td class="whitespace-nowrap text-center px-3">
+                        <input type="radio" name="users" value="edit" [disabled]="!isManageMode">
+                      </td>
                     </tr>
                     <tr class="h-7 text-gray-600 text-sm font-light">
                       <td class="w-full">Roles</td>
-                      <td class="whitespace-nowrap text-center px-6"><input type="checkbox" [disabled]="!isManageMode"></td>
-                      <td class="whitespace-nowrap text-center"><input type="checkbox" [disabled]="!isManageMode"></td>
+                      <td class="whitespace-nowrap text-center px-3"></td>
+                      <td class="whitespace-nowrap text-center px-3"></td>
+                      <td class="whitespace-nowrap text-center px-3">
+                        <input type="radio" name="roles" value="none" [disabled]="!isManageMode">
+                      </td>
+                      <td class="whitespace-nowrap text-center px-3">
+                        <input type="radio" name="roles" value="view" [disabled]="!isManageMode">
+                      </td>
+                      <td class="whitespace-nowrap text-center px-3">
+                        <input type="radio" name="roles" value="edit" [disabled]="!isManageMode">
+                      </td>
                     </tr>
                     <tr class="h-7 text-gray-600 text-sm font-light">
                       <td class="w-full">Support Tickets</td>
-                      <td class="whitespace-nowrap text-center px-6"><input type="checkbox" [disabled]="!isManageMode"></td>
-                      <td class="whitespace-nowrap text-center"><input type="checkbox" [disabled]="!isManageMode"></td>
+                      <td class="whitespace-nowrap text-center px-3"></td>
+                      <td class="whitespace-nowrap text-center px-3"></td>
+                      <td class="whitespace-nowrap text-center px-3">
+                        <input type="radio" name="supportTickets" value="none" [disabled]="!isManageMode">
+                      </td>
+                      <td class="whitespace-nowrap text-center px-3">
+                        <input type="radio" name="supportTickets" value="view" [disabled]="!isManageMode">
+                      </td>
+                      <td class="whitespace-nowrap text-center px-3">
+                        <input type="radio" name="supportTickets" value="edit" [disabled]="!isManageMode">
+                      </td>
                     </tr>
-
+                
                     <tr class="h-9 text-gray-600 text-sm font-light">
                       <td class="font-black w-full">System Management</td>
+                      <td class="whitespace-nowrap text-center px-3"></td>
+                      <td class="whitespace-nowrap text-center px-3"></td>
+                      <td class="whitespace-nowrap text-center px-3"></td>
+                      <td class="whitespace-nowrap text-center px-3"></td>
+                      <td class="whitespace-nowrap text-center px-3"></td>
                     </tr>
                     <tr class="h-7 text-gray-600 text-sm font-light">
-                      <td class="w-full">Paremeters</td>
-                      <td class="whitespace-nowrap text-center px-6"><input type="checkbox" [disabled]="!isManageMode"></td>
-                      <td class="whitespace-nowrap text-center"><input type="checkbox" [disabled]="!isManageMode"></td>
+                      <td class="w-full">Parameters</td>
+                      <td class="whitespace-nowrap text-center px-3"></td>
+                      <td class="whitespace-nowrap text-center px-3"></td>
+                      <td class="whitespace-nowrap text-center px-3">
+                        <input type="radio" name="parameters" value="none" [disabled]="!isManageMode">
+                      </td>
+                      <td class="whitespace-nowrap text-center px-3">
+                        <input type="radio" name="parameters" value="view" [disabled]="!isManageMode">
+                      </td>
+                      <td class="whitespace-nowrap text-center px-3">
+                        <input type="radio" name="parameters" value="edit" [disabled]="!isManageMode">
+                      </td>
                     </tr>
-
+                
                     <tr class="h-9 text-gray-600 text-sm font-light">
                       <td class="font-black w-full">Daily Time Record</td>
+                      <td class="whitespace-nowrap text-center px-3"></td>
+                      <td class="whitespace-nowrap text-center px-3"></td>
+                      <td class="whitespace-nowrap text-center px-3"></td>
+                      <td class="whitespace-nowrap text-center px-3"></td>
+                      <td class="whitespace-nowrap text-center px-3"></td>
                     </tr>
                     <tr class="h-7 text-gray-600 text-sm font-light">
                       <td class="w-full">Daily</td>
-                      <td class="whitespace-nowrap text-center px-6"><input type="checkbox" [disabled]="!isManageMode"></td>
-                      <td class="whitespace-nowrap text-center"><input type="checkbox" [disabled]="!isManageMode"></td>
+                      <td class="whitespace-nowrap text-center px-3"></td>
+                      <td class="whitespace-nowrap text-center px-3"></td>
+                      <td class="whitespace-nowrap text-center px-3">
+                        <input type="radio" name="dailyTimeRecord" value="none" [disabled]="!isManageMode">
+                      </td>
+                      <td class="whitespace-nowrap text-center px-3">
+                        <input type="radio" name="dailyTimeRecord" value="view" [disabled]="!isManageMode">
+                      </td>
+                      <td class="whitespace-nowrap text-center px-3">
+                        <input type="radio" name="dailyTimeRecord" value="edit" [disabled]="!isManageMode">
+                      </td>
                     </tr>
                     <tr class="h-7 text-gray-600 text-sm font-light">
                       <td class="w-full">Monthly</td>
-                      <td class="whitespace-nowrap text-center px-6"><input type="checkbox" [disabled]="!isManageMode"></td>
-                      <td class="whitespace-nowrap text-center"><input type="checkbox" [disabled]="!isManageMode"></td>
+                      <td class="whitespace-nowrap text-center px-3"></td>
+                      <td class="whitespace-nowrap text-center px-3"></td>
+                      <td class="whitespace-nowrap text-center px-3">
+                        <input type="radio" name="monthlyTimeRecord" value="none" [disabled]="!isManageMode">
+                      </td>
+                      <td class="whitespace-nowrap text-center px-3">
+                        <input type="radio" name="monthlyTimeRecord" value="view" [disabled]="!isManageMode">
+                      </td>
+                      <td class="whitespace-nowrap text-center px-3">
+                        <input type="radio" name="monthlyTimeRecord" value="edit" [disabled]="!isManageMode">
+                      </td>
                     </tr>
                     <tr class="h-7 text-gray-600 text-sm font-light">
                       <td class="w-full">Weekly</td>
-                      <td class="whitespace-nowrap text-center px-6"><input type="checkbox" [disabled]="!isManageMode"></td>
-                      <td class="whitespace-nowrap text-center"><input type="checkbox" [disabled]="!isManageMode"></td>
+                      <td class="whitespace-nowrap text-center px-3"></td>
+                      <td class="whitespace-nowrap text-center px-3"></td>
+                      <td class="whitespace-nowrap text-center px-3">
+                        <input type="radio" name="weeklyTimeRecord" value="none" [disabled]="!isManageMode">
+                      </td>
+                      <td class="whitespace-nowrap text-center px-3">
+                        <input type="radio" name="weeklyTimeRecord" value="view" [disabled]="!isManageMode">
+                      </td>
+                      <td class="whitespace-nowrap text-center px-3">
+                        <input type="radio" name="weeklyTimeRecord" value="edit" [disabled]="!isManageMode">
+                      </td>
                     </tr>
-
+                
                     <tr class="h-9 text-gray-600 text-sm font-light">
                       <td class="font-black w-full">Audit Trail</td>
+                      <td class="whitespace-nowrap text-center px-3"></td>
+                      <td class="whitespace-nowrap text-center px-3"></td>
+                      <td class="whitespace-nowrap text-center px-3"></td>
+                      <td class="whitespace-nowrap text-center px-3"></td>
+                      <td class="whitespace-nowrap text-center px-3"></td>
                     </tr>
                     <tr class="h-7 text-gray-600 text-sm font-light">
                       <td class="w-full">Entries</td>
-                      <td class="whitespace-nowrap text-center px-6"><input type="checkbox" [disabled]="!isManageMode"></td>
-                      <td class="whitespace-nowrap text-center"><input type="checkbox" [disabled]="!isManageMode"></td>
+                      <td class="whitespace-nowrap text-center px-3"></td>
+                      <td class="whitespace-nowrap text-center px-3"></td>
+                      <td class="whitespace-nowrap text-center px-3">
+                        <input type="radio" name="entries" value="none" [disabled]="!isManageMode">
+                      </td>
+                      <td class="whitespace-nowrap text-center px-3">
+                        <input type="radio" name="entries" value="view" [disabled]="!isManageMode">
+                      </td>
+                      <td class="whitespace-nowrap text-center px-3">
+                        <input type="radio" name="entries" value="edit" [disabled]="!isManageMode">
+                      </td>
                     </tr>
                   </tbody>
-                </table>
+                </table>                                                                 
               </div>
             </div>
           </div>
@@ -560,67 +653,157 @@
             
             <!-- Add the table here -->
             <div class="overflow-y-auto overflow-x-hidden custom-scrollbar" style="height: calc(80% - 2rem);">
-            <table class="table-auto w-full mb-4">
-              <tbody>
-                <tr class="h-9 text-gray-600 text-sm font-light">
-                  <td class="font-black w-full">User Management</td>
-                  <td class="whitespace-nowrap text-center px-6">View</td>
-                  <td class="whitespace-nowrap text-center">Edit</td>
-                </tr>
-                <tr class="h-7 text-gray-600 text-sm font-light">
-                  <td class="w-full">Users</td>
-                  <td class="whitespace-nowrap text-center px-6"><input type="checkbox"></td>
-                  <td class="whitespace-nowrap text-center"><input type="checkbox"></td>
-                </tr>
-                <tr class="h-7 text-gray-600 text-sm font-light">
-                  <td class="w-full">Roles</td>
-                  <td class="whitespace-nowrap text-center px-6"><input type="checkbox"></td>
-                  <td class="whitespace-nowrap text-center"><input type="checkbox"></td>
-                </tr>
-                <tr class="h-7 text-gray-600 text-sm font-light">
-                  <td class="w-full">Support Tickets</td>
-                  <td class="whitespace-nowrap text-center px-6"><input type="checkbox"></td>
-                  <td class="whitespace-nowrap text-center"><input type="checkbox"></td>
-                </tr>
-        
-                <tr class="h-9 text-gray-600 text-sm font-light">
-                  <td class="font-black w-full">System Management</td>
-                </tr>
-                <tr class="h-7 text-gray-600 text-sm font-light">
-                  <td class="w-full">Paremeters</td>
-                  <td class="whitespace-nowrap text-center px-6"><input type="checkbox"></td>
-                  <td class="whitespace-nowrap text-center"><input type="checkbox"></td>
-                </tr>
-        
-                <tr class="h-9 text-gray-600 text-sm font-light">
-                  <td class="font-black w-full">Daily Time Record</td>
-                </tr>
-                <tr class="h-7 text-gray-600 text-sm font-light">
-                  <td class="w-full">Daily</td>
-                  <td class="whitespace-nowrap text-center px-6"><input type="checkbox"></td>
-                  <td class="whitespace-nowrap text-center"><input type="checkbox"></td>
-                </tr>
-                <tr class="h-7 text-gray-600 text-sm font-light">
-                  <td class="w-full">Monthly</td>
-                  <td class="whitespace-nowrap text-center px-6"><input type="checkbox"></td>
-                  <td class="whitespace-nowrap text-center"><input type="checkbox"></td>
-                </tr>
-                <tr class="h-7 text-gray-600 text-sm font-light">
-                  <td class="w-full">Weekly</td>
-                  <td class="whitespace-nowrap text-center px-6"><input type="checkbox"></td>
-                  <td class="whitespace-nowrap text-center"><input type="checkbox"></td>
-                </tr>
-        
-                <tr class="h-9 text-gray-600 text-sm font-light">
-                  <td class="font-black w-full">Audit Trail</td>
-                </tr>
-                <tr class="h-7 text-gray-600 text-sm font-light">
-                  <td class="w-full">Entries</td>
-                  <td class="whitespace-nowrap text-center px-6"><input type="checkbox"></td>
-                  <td class="whitespace-nowrap text-center"><input type="checkbox"></td>
-                </tr>
-              </tbody>
-            </table>
+              <table class="table-auto w-full">
+                <tbody>
+                  <tr class="h-9 text-gray-600 text-sm font-light">
+                    <td class="font-black w-full">User Management</td>
+                    <td class="whitespace-nowrap text-center px-3"></td>
+                    <td class="whitespace-nowrap text-center px-3"></td>
+                    <td class="whitespace-nowrap text-center px-3">None</td>
+                    <td class="whitespace-nowrap text-center px-3">View</td>
+                    <td class="whitespace-nowrap text-center px-3">Edit</td>
+                  </tr>
+                  <tr class="h-7 text-gray-600 text-sm font-light">
+                    <td class="w-full">Users</td>
+                    <td class="whitespace-nowrap text-center px-3"></td>
+                    <td class="whitespace-nowrap text-center px-3"></td>
+                    <td class="whitespace-nowrap text-center px-3">
+                      <input type="radio" name="users" value="none">
+                    </td>
+                    <td class="whitespace-nowrap text-center px-3">
+                      <input type="radio" name="users" value="view">
+                    </td>
+                    <td class="whitespace-nowrap text-center px-3">
+                      <input type="radio" name="users" value="edit">
+                    </td>
+                  </tr>
+                  <tr class="h-7 text-gray-600 text-sm font-light">
+                    <td class="w-full">Roles</td>
+                    <td class="whitespace-nowrap text-center px-3"></td>
+                    <td class="whitespace-nowrap text-center px-3"></td>
+                    <td class="whitespace-nowrap text-center px-3">
+                      <input type="radio" name="roles" value="none">
+                    </td>
+                    <td class="whitespace-nowrap text-center px-3">
+                      <input type="radio" name="roles" value="view">
+                    </td>
+                    <td class="whitespace-nowrap text-center px-3">
+                      <input type="radio" name="roles" value="edit">
+                    </td>
+                  </tr>
+                  <tr class="h-7 text-gray-600 text-sm font-light">
+                    <td class="w-full">Support Tickets</td>
+                    <td class="whitespace-nowrap text-center px-3"></td>
+                    <td class="whitespace-nowrap text-center px-3"></td>
+                    <td class="whitespace-nowrap text-center px-3">
+                      <input type="radio" name="supportTickets" value="none">
+                    </td>
+                    <td class="whitespace-nowrap text-center px-3">
+                      <input type="radio" name="supportTickets" value="view">
+                    </td>
+                    <td class="whitespace-nowrap text-center px-3">
+                      <input type="radio" name="supportTickets" value="edit">
+                    </td>
+                  </tr>
+              
+                  <tr class="h-9 text-gray-600 text-sm font-light">
+                    <td class="font-black w-full">System Management</td>
+                    <td class="whitespace-nowrap text-center px-3"></td>
+                    <td class="whitespace-nowrap text-center px-3"></td>
+                    <td class="whitespace-nowrap text-center px-3"></td>
+                    <td class="whitespace-nowrap text-center px-3"></td>
+                    <td class="whitespace-nowrap text-center px-3"></td>
+                  </tr>
+                  <tr class="h-7 text-gray-600 text-sm font-light">
+                    <td class="w-full">Parameters</td>
+                    <td class="whitespace-nowrap text-center px-3"></td>
+                    <td class="whitespace-nowrap text-center px-3"></td>
+                    <td class="whitespace-nowrap text-center px-3">
+                      <input type="radio" name="parameters" value="none">
+                    </td>
+                    <td class="whitespace-nowrap text-center px-3">
+                      <input type="radio" name="parameters" value="view">
+                    </td>
+                    <td class="whitespace-nowrap text-center px-3">
+                      <input type="radio" name="parameters" value="edit">
+                    </td>
+                  </tr>
+              
+                  <tr class="h-9 text-gray-600 text-sm font-light">
+                    <td class="font-black w-full">Daily Time Record</td>
+                    <td class="whitespace-nowrap text-center px-3"></td>
+                    <td class="whitespace-nowrap text-center px-3"></td>
+                    <td class="whitespace-nowrap text-center px-3"></td>
+                    <td class="whitespace-nowrap text-center px-3"></td>
+                    <td class="whitespace-nowrap text-center px-3"></td>
+                  </tr>
+                  <tr class="h-7 text-gray-600 text-sm font-light">
+                    <td class="w-full">Daily</td>
+                    <td class="whitespace-nowrap text-center px-3"></td>
+                    <td class="whitespace-nowrap text-center px-3"></td>
+                    <td class="whitespace-nowrap text-center px-3">
+                      <input type="radio" name="dailyTimeRecord" value="none">
+                    </td>
+                    <td class="whitespace-nowrap text-center px-3">
+                      <input type="radio" name="dailyTimeRecord" value="view">
+                    </td>
+                    <td class="whitespace-nowrap text-center px-3">
+                      <input type="radio" name="dailyTimeRecord" value="edit">
+                    </td>
+                  </tr>
+                  <tr class="h-7 text-gray-600 text-sm font-light">
+                    <td class="w-full">Monthly</td>
+                    <td class="whitespace-nowrap text-center px-3"></td>
+                    <td class="whitespace-nowrap text-center px-3"></td>
+                    <td class="whitespace-nowrap text-center px-3">
+                      <input type="radio" name="monthlyTimeRecord" value="none">
+                    </td>
+                    <td class="whitespace-nowrap text-center px-3">
+                      <input type="radio" name="monthlyTimeRecord" value="view">
+                    </td>
+                    <td class="whitespace-nowrap text-center px-3">
+                      <input type="radio" name="monthlyTimeRecord" value="edit">
+                    </td>
+                  </tr>
+                  <tr class="h-7 text-gray-600 text-sm font-light">
+                    <td class="w-full">Weekly</td>
+                    <td class="whitespace-nowrap text-center px-3"></td>
+                    <td class="whitespace-nowrap text-center px-3"></td>
+                    <td class="whitespace-nowrap text-center px-3">
+                      <input type="radio" name="weeklyTimeRecord" value="none">
+                    </td>
+                    <td class="whitespace-nowrap text-center px-3">
+                      <input type="radio" name="weeklyTimeRecord" value="view">
+                    </td>
+                    <td class="whitespace-nowrap text-center px-3">
+                      <input type="radio" name="weeklyTimeRecord" value="edit">
+                    </td>
+                  </tr>
+              
+                  <tr class="h-9 text-gray-600 text-sm font-light">
+                    <td class="font-black w-full">Audit Trail</td>
+                    <td class="whitespace-nowrap text-center px-3"></td>
+                    <td class="whitespace-nowrap text-center px-3"></td>
+                    <td class="whitespace-nowrap text-center px-3"></td>
+                    <td class="whitespace-nowrap text-center px-3"></td>
+                    <td class="whitespace-nowrap text-center px-3"></td>
+                  </tr>
+                  <tr class="h-7 text-gray-600 text-sm font-light">
+                    <td class="w-full">Entries</td>
+                    <td class="whitespace-nowrap text-center px-3"></td>
+                    <td class="whitespace-nowrap text-center px-3"></td>
+                    <td class="whitespace-nowrap text-center px-3">
+                      <input type="radio" name="entries" value="none" >
+                    </td>
+                    <td class="whitespace-nowrap text-center px-3">
+                      <input type="radio" name="entries" value="view" >
+                    </td>
+                    <td class="whitespace-nowrap text-center px-3">
+                      <input type="radio" name="entries" value="edit" >
+                    </td>
+                  </tr>
+                </tbody>
+              </table>              
           </div>
             
             <div class="flex justify-start">

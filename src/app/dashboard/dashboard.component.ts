@@ -83,14 +83,26 @@ export class DashboardComponent implements OnInit {
     }
   }
 
-  timeIn() {
-    console.log('Time In button clicked');
-    alert ('TIME IN BUTTON CLICKED, NOW RUN FOR YOUR LIFE.');
-    // Add your logic here for Time In
+
+  async timeIn() {
+    try {
+      const status = 'Time In';
+      const name = 'cheska'; // You mentioned this name earlier
+      
+      const result = await this.supabaseService.insertDTRRecord(status, name);
+      console.log('Time In recorded successfully:', result);
+      alert('Time In recorded successfully');
+    } catch (error) {
+      console.error('Error recording Time In:', error);
+      if (error instanceof Error) {
+        alert(`Error recording Time In: ${error.message}`);
+      } else {
+        alert('Error recording Time In. Please try again.');
+      }
+    }
   }
 
-  timeOut() {
-    console.log('Time Out button clicked');
-    // Add your logic here for Time Out
+  async timeOut(){
+
   }
 }
