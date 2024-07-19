@@ -106,13 +106,20 @@ export class DashboardComponent implements OnInit {
 
   async timeIn() {
     try {
-      const status = 'Time In';
-      const name = this.userEmail; // Use the email instead of 'cheska'
-
+      const name = this.userEmail;
+  
       if (!name) {
         throw new Error('User email not available');
       }
-
+  
+      // Check if the user has already timed in today
+      const hasTimedIn = await this.supabaseService.hasTimedInToday(name);
+      if (hasTimedIn) {
+        alert('You have already timed in today. You can only time in once per day.');
+        return;
+      }
+  
+      const status = 'Time In';
       const result = await this.supabaseService.insertDTRRecord(status, name);
       console.log('Time In recorded successfully:', result);
       alert('Time In recorded successfully');
