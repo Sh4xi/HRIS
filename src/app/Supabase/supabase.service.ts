@@ -622,25 +622,81 @@ export class SupabaseService {
       const { data, error } = await this.supabase
         .from('DTR')
         .insert([
-          { status, 
+          { 
+            status, 
             name, 
             clock_in: new Date(),
+            clock_out: null,  // Explicitly set clock_out to null
             schedule_in: '09:00:00',  // 9:00 AM
-            schedule_out: '19:00:00', }
+            schedule_out: '19:00:00' 
+          }
         ]);
-
+  
       if (error) throw error;
-
+  
       return data;
     } catch (error) {
       console.error('Error inserting DTR record:', error);
       throw error;
     }
   }
+  
+  async updateDTRClockOut(name: string) {
+    try {
+      const { data: existingRecords, error: fetchError } = await this.supabase
+        .from('DTR')
+        .select('*')
+        .eq('name', name)
+        .is('clock_out', null);
+  
+      if (fetchError) throw fetchError;
+  
+      if (existingRecords.length === 0) {
+        throw new Error('No matching Time In record found.');
+      }
+  
+      const { data, error } = await this.supabase
+        .from('DTR')
+        .update({ clock_out: new Date() })
+        .eq('name', name)
+        .is('clock_out', null);
+  
+      if (error) throw error;
+  
+      return { data, error: null };
+    } catch (error) {
+      console.error('Error updating DTR record:', error);
+      return { data: null, error };
+    }
+  }
 
   async getUser() {
     return await this.supabase.auth.getUser();
   }
+
+  async checkTimeInRecord(name: string) {
+    try {
+      // Find the most recent clock_in record for the user that does not have a clock_out time
+      const { data, error } = await this.supabase
+        .from('DTR')
+        .select('*')
+        .eq('name', name)
+        .is('clock_out', null)
+        .order('clock_in', { ascending: false })
+        .limit(1);
+  
+      if (error) {
+        console.error('Error fetching existing Time In records:', error);
+        throw error;
+      }
+  
+      return { data, error: null };
+    } catch (error) {
+      console.error('Error checking Time In record:', error);
+      return { data: null, error };
+    }
+  }
+  
 
   async createReply(reply: any) {
     return await this.supabase
