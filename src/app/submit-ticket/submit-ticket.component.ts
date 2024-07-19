@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { TicketService } from './submit-ticket.service';
@@ -18,6 +18,13 @@ export class SubmitTicketComponent {
   };
   ticketSubmitted = false;
   submitError = '';
+
+  @Output() close = new EventEmitter<void>();
+
+  closePopup() {
+    this.close.emit();
+  }
+
 
   constructor(private ticketService: TicketService) {}
 
