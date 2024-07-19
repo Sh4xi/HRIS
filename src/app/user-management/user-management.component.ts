@@ -84,6 +84,15 @@ export class UserManagementComponent implements OnInit {
   weeklyRights: string = 'none';
   entriesRights: string = 'none';
 
+popupUsersRights: string = 'none';
+popupRolesRights: string = 'none';
+popupSupportRights: string = 'none';
+popupParametersRights: string = 'none';
+popupDailyRights: string = 'none';
+popupMonthlyRights: string = 'none'; 
+popupWeeklyRights: string = 'none';
+popupEntriesRights: string = 'none';
+
   newDepartment = '';
   departmentType = 'all';
   selectedDepartments: string[] = [];
@@ -384,14 +393,14 @@ cancelEdit() {
     }
     const roleData = {
       role_name: this.newRole,
-      users_rights: this.usersRights,
-      roles_rights: this.rolesRights,
-      sup_rights: this.supportRights,
-      par_rights: this.parametersRights,
-      daily_rights: this.dailyRights,
-      monthly_rights: this.monthlyRights,
-      weekly_rights: this.weeklyRights,
-      entries: this.entriesRights,
+      users_rights: this.popupUsersRights,
+      roles_rights: this.popupRolesRights,
+      sup_rights: this.popupSupportRights,
+      par_rights: this.popupParametersRights,
+      daily_rights: this.popupDailyRights,
+      monthly_rights: this.popupMonthlyRights,
+      weekly_rights: this.popupWeeklyRights,
+      entries: this.popupEntriesRights,
     };
     this.supabaseService.createRole(roleData)
     .then(response => {
