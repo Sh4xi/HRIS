@@ -74,6 +74,7 @@ export class UserManagementComponent implements OnInit {
   showPasswordGeneratedMessage: boolean = false;
 
   newRole = '';
+  selectedRole: any = {};
   usersRights: string = 'none';
   rolesRights: string = 'none';
   supportRights: string = 'none';
@@ -202,6 +203,11 @@ cancelEdit() {
   cancelRolePopup() {
     this.newManageRole = '';
     this.showRolePopup = false;
+  }
+
+  selectRoleForEditing(role: any) {
+    this.selectedRole = { ...role };
+    this.fetchAccessRights(role.role_id);
   }
 
   // Delete a role
@@ -469,6 +475,38 @@ cancelEdit() {
         this.loadRoles(); // Refresh the roles list
       } catch (error) {
         console.error('Error saving role:', error);
+      }
+    }
+
+    //for updating access rights
+    async fetchAccessRights(roleId: string) {
+      try {
+        const accessRights = await this.supabaseService.fetchRoleAccessRights(roleId);
+        this.selectedRole = { ...this.selectedRole, ...accessRights };
+      } catch (error) {
+        console.error('Error fetching access rights:', error);
+      }
+    }
+    
+    //for access rights update
+    async onAccessRightChange(rightType: string, event: any) {
+      this.selectedRole[rightType] = event.target.value;
+      await this.saveAccessRights(rightType);
+    }
+
+    //for updating access rights
+    async saveAccessRights(changedRight: string) {
+      if (!this.isManageMode) return;
+  
+      try {
+        await this.supabaseService.updateRoleAccessRight(
+          this.selectedRole.role_id,
+          changedRight,
+          this.selectedRole[changedRight]
+        );
+        console.log(`${changedRight} updated successfully`);
+      } catch (error) {
+        console.error(`Error updating ${changedRight}:`, error);
       }
     }
   

@@ -398,8 +398,8 @@
                 <table class="table-auto w-[100%]">
                   <tbody>
                     <ng-container *ngIf="searchroletab.length > 0; else noMatch">
-                      <tr class="h-9 text-gray-600 text-sm font-light border-b" *ngFor="let role of searchroletab" (click)="onRoleClick(role)">
-                        <td class="hover:bg-gray-100 w-full" [ngClass]="{'bg-gray-100': clickedRoleId === role.role_id}">
+                      <tr class="h-9 text-gray-600 text-sm font-light border-b" *ngFor="let role of searchroletab" (click)="onRoleClick(role)" (click)="selectRoleForEditing(role)" [ngClass]="{'bg-gray-100': selectedRole.role_id === role.role_id}">
+                        <td class ="hover:bg-gray-100 w-full" [ngClass]="{'bg-gray-100': clickedRoleId === role.role_id}">
                           <ng-container *ngIf="editingRoleId === role.role_id; else displayRoleName">
                             <input [(ngModel)]="role.role_name" class="border rounded outline-none" />
                           </ng-container>
@@ -503,13 +503,13 @@
                       <td class="whitespace-nowrap text-center px-3"></td>
                       <td class="whitespace-nowrap text-center px-3"></td>
                       <td class="whitespace-nowrap text-center px-3">
-                        <input type="radio" name="users" value="none" [disabled]="!isManageMode" [checked]="usersRights === 'none'">
+                        <input type="radio" name="users" value="none" [disabled]="!isManageMode" [checked]="usersRights === 'none'" [(ngModel)]="selectedRole.users_rights" (change)="onAccessRightChange('users_rights', $event)">
                       </td>
                       <td class="whitespace-nowrap text-center px-3">
-                        <input type="radio" name="users" value="view" [disabled]="!isManageMode" [checked]="usersRights === 'view'">
+                        <input type="radio" name="users" value="view" [disabled]="!isManageMode" [checked]="usersRights === 'view'" [(ngModel)]="selectedRole.users_rights" (change)="onAccessRightChange('users_rights', $event)">
                       </td>
                       <td class="whitespace-nowrap text-center px-3">
-                        <input type="radio" name="users" value="edit" [disabled]="!isManageMode" [checked]="usersRights === 'edit'">
+                        <input type="radio" name="users" value="edit" [disabled]="!isManageMode" [checked]="usersRights === 'edit'" [(ngModel)]="selectedRole.users_rights" (change)="onAccessRightChange('users_rights', $event)">
                       </td>
                     </tr>
                     <tr class="h-7 text-gray-600 text-sm font-light">
@@ -517,13 +517,13 @@
                       <td class="whitespace-nowrap text-center px-3"></td>
                       <td class="whitespace-nowrap text-center px-3"></td>
                       <td class="whitespace-nowrap text-center px-3">
-                        <input type="radio" name="roles" value="none" [disabled]="!isManageMode" [checked]="rolesRights === 'none'">
+                        <input type="radio" name="roles" value="none" [disabled]="!isManageMode" [checked]="rolesRights === 'none'" [(ngModel)]="selectedRole.roles_rights" (change)="onAccessRightChange('roles_rights', $event)">
                       </td>
                       <td class="whitespace-nowrap text-center px-3">
-                        <input type="radio" name="roles" value="view" [disabled]="!isManageMode" [checked]="rolesRights === 'view'">
+                        <input type="radio" name="roles" value="view" [disabled]="!isManageMode" [checked]="rolesRights === 'view'" [(ngModel)]="selectedRole.roles_rights" (change)="onAccessRightChange('roles_rights', $event)">
                       </td>
                       <td class="whitespace-nowrap text-center px-3">
-                        <input type="radio" name="roles" value="edit" [disabled]="!isManageMode" [checked]="rolesRights === 'edit'">
+                        <input type="radio" name="roles" value="edit" [disabled]="!isManageMode" [checked]="rolesRights === 'edit'" [(ngModel)]="selectedRole.roles_rights" (change)="onAccessRightChange('roles_rights', $event)">
                       </td>
                     </tr>
                     <tr class="h-7 text-gray-600 text-sm font-light">
@@ -531,13 +531,13 @@
                       <td class="whitespace-nowrap text-center px-3"></td>
                       <td class="whitespace-nowrap text-center px-3"></td>
                       <td class="whitespace-nowrap text-center px-3">
-                        <input type="radio" name="supportTickets" value="none" [disabled]="!isManageMode" [checked]="supportRights === 'none'">
+                        <input type="radio" name="supportTickets" value="none" [disabled]="!isManageMode" [checked]="supportRights === 'none'" [(ngModel)]="selectedRole.sup_rights" (change)="onAccessRightChange('sup_rights', $event)">
                       </td>
                       <td class="whitespace-nowrap text-center px-3">
-                        <input type="radio" name="supportTickets" value="view" [disabled]="!isManageMode" [checked]="supportRights === 'view'">
+                        <input type="radio" name="supportTickets" value="view" [disabled]="!isManageMode" [checked]="supportRights === 'view'" [(ngModel)]="selectedRole.sup_rights" (change)="onAccessRightChange('sup_rights', $event)">
                       </td>
                       <td class="whitespace-nowrap text-center px-3">
-                        <input type="radio" name="supportTickets" value="edit" [disabled]="!isManageMode" [checked]="supportRights === 'edit'">
+                        <input type="radio" name="supportTickets" value="edit" [disabled]="!isManageMode" [checked]="supportRights === 'edit'" [(ngModel)]="selectedRole.sup_rights" (change)="onAccessRightChange('sup_rights', $event)">
                       </td>
                     </tr>
                 
@@ -554,13 +554,13 @@
                       <td class="whitespace-nowrap text-center px-3"></td>
                       <td class="whitespace-nowrap text-center px-3"></td>
                       <td class="whitespace-nowrap text-center px-3">
-                        <input type="radio" name="parameters" value="none" [disabled]="!isManageMode" [checked]="parametersRights === 'none'">
+                        <input type="radio" name="parameters" value="none" [disabled]="!isManageMode" [checked]="parametersRights === 'none'" [(ngModel)]="selectedRole.par_rights" (change)="onAccessRightChange('par_rights', $event)">
                       </td>
                       <td class="whitespace-nowrap text-center px-3">
-                        <input type="radio" name="parameters" value="view" [disabled]="!isManageMode" [checked]="parametersRights === 'view'">
+                        <input type="radio" name="parameters" value="view" [disabled]="!isManageMode" [checked]="parametersRights === 'view'" [(ngModel)]="selectedRole.par_rights" (change)="onAccessRightChange('par_rights', $event)">
                       </td>
                       <td class="whitespace-nowrap text-center px-3">
-                        <input type="radio" name="parameters" value="edit" [disabled]="!isManageMode" [checked]="parametersRights === 'edit'">
+                        <input type="radio" name="parameters" value="edit" [disabled]="!isManageMode" [checked]="parametersRights === 'edit'" [(ngModel)]="selectedRole.par_rights" (change)="onAccessRightChange('par_rights', $event)">
                       </td>
                     </tr>
                 
@@ -577,13 +577,13 @@
                       <td class="whitespace-nowrap text-center px-3"></td>
                       <td class="whitespace-nowrap text-center px-3"></td>
                       <td class="whitespace-nowrap text-center px-3">
-                        <input type="radio" name="dailyTimeRecord" value="none" [disabled]="!isManageMode" [checked]="dailyRights === 'none'">
+                        <input type="radio" name="dailyTimeRecord" value="none" [disabled]="!isManageMode" [checked]="dailyRights === 'none'" [(ngModel)]="selectedRole.daily_rights" (change)="onAccessRightChange('daily_rights', $event)">
                       </td>
                       <td class="whitespace-nowrap text-center px-3">
-                        <input type="radio" name="dailyTimeRecord" value="view" [disabled]="!isManageMode" [checked]="dailyRights === 'view'">
+                        <input type="radio" name="dailyTimeRecord" value="view" [disabled]="!isManageMode" [checked]="dailyRights === 'view'" [(ngModel)]="selectedRole.daily_rights" (change)="onAccessRightChange('daily_rights', $event)">
                       </td>
                       <td class="whitespace-nowrap text-center px-3">
-                        <input type="radio" name="dailyTimeRecord" value="edit" [disabled]="!isManageMode" [checked]="dailyRights === 'edit'">
+                        <input type="radio" name="dailyTimeRecord" value="edit" [disabled]="!isManageMode" [checked]="dailyRights === 'edit'" [(ngModel)]="selectedRole.daily_rights" (change)="onAccessRightChange('daily_rights', $event)">
                       </td>
                     </tr>
                     <tr class="h-7 text-gray-600 text-sm font-light">
@@ -591,13 +591,13 @@
                       <td class="whitespace-nowrap text-center px-3"></td>
                       <td class="whitespace-nowrap text-center px-3"></td>
                       <td class="whitespace-nowrap text-center px-3">
-                        <input type="radio" name="monthlyTimeRecord" value="none" [disabled]="!isManageMode" [checked]="monthlyRights === 'none'">
+                        <input type="radio" name="monthlyTimeRecord" value="none" [disabled]="!isManageMode" [checked]="monthlyRights === 'none'" [(ngModel)]="selectedRole.monthly_rights" (change)="onAccessRightChange('monthly_rights', $event)">
                       </td>
                       <td class="whitespace-nowrap text-center px-3">
-                        <input type="radio" name="monthlyTimeRecord" value="view" [disabled]="!isManageMode" [checked]="monthlyRights === 'view'">
+                        <input type="radio" name="monthlyTimeRecord" value="view" [disabled]="!isManageMode" [checked]="monthlyRights === 'view'" [(ngModel)]="selectedRole.monthly_rights" (change)="onAccessRightChange('monthly_rights', $event)">
                       </td>
                       <td class="whitespace-nowrap text-center px-3">
-                        <input type="radio" name="monthlyTimeRecord" value="edit" [disabled]="!isManageMode" [checked]="monthlyRights === 'edit'">
+                        <input type="radio" name="monthlyTimeRecord" value="edit" [disabled]="!isManageMode" [checked]="monthlyRights === 'edit'" [(ngModel)]="selectedRole.monthly_rights" (change)="onAccessRightChange('monthly_rights', $event)">
                       </td>
                     </tr>
                     <tr class="h-7 text-gray-600 text-sm font-light">
@@ -605,13 +605,13 @@
                       <td class="whitespace-nowrap text-center px-3"></td>
                       <td class="whitespace-nowrap text-center px-3"></td>
                       <td class="whitespace-nowrap text-center px-3">
-                        <input type="radio" name="weeklyTimeRecord" value="none" [disabled]="!isManageMode" [checked]="weeklyRights === 'none'">
+                        <input type="radio" name="weeklyTimeRecord" value="none" [disabled]="!isManageMode" [checked]="weeklyRights === 'none'" [(ngModel)]="selectedRole.weekly_rights" (change)="onAccessRightChange('weekly_rights', $event)">
                       </td>
                       <td class="whitespace-nowrap text-center px-3">
-                        <input type="radio" name="weeklyTimeRecord" value="view" [disabled]="!isManageMode" [checked]="weeklyRights === 'view'">
+                        <input type="radio" name="weeklyTimeRecord" value="view" [disabled]="!isManageMode" [checked]="weeklyRights === 'view'" [(ngModel)]="selectedRole.weekly_rights" (change)="onAccessRightChange('weekly_rights', $event)">
                       </td>
                       <td class="whitespace-nowrap text-center px-3">
-                        <input type="radio" name="weeklyTimeRecord" value="edit" [disabled]="!isManageMode" [checked]="weeklyRights === 'edit'">
+                        <input type="radio" name="weeklyTimeRecord" value="edit" [disabled]="!isManageMode" [checked]="weeklyRights === 'edit'" [(ngModel)]="selectedRole.weekly_rights" (change)="onAccessRightChange('weekly_rights', $event)">
                       </td>
                     </tr>
                 
@@ -628,13 +628,13 @@
                       <td class="whitespace-nowrap text-center px-3"></td>
                       <td class="whitespace-nowrap text-center px-3"></td>
                       <td class="whitespace-nowrap text-center px-3">
-                        <input type="radio" name="entries" value="none" [disabled]="!isManageMode" [checked]="entriesRights === 'none'">
+                        <input type="radio" name="entries" value="none" [disabled]="!isManageMode" [checked]="entriesRights === 'none'" [(ngModel)]="selectedRole.entries" (change)="onAccessRightChange('entries', $event)">
                       </td>
                       <td class="whitespace-nowrap text-center px-3">
-                        <input type="radio" name="entries" value="view" [disabled]="!isManageMode" [checked]="entriesRights === 'view'">
+                        <input type="radio" name="entries" value="view" [disabled]="!isManageMode" [checked]="entriesRights === 'view'" [(ngModel)]="selectedRole.entries" (change)="onAccessRightChange('entries', $event)">
                       </td>
                       <td class="whitespace-nowrap text-center px-3">
-                        <input type="radio" name="entries" value="edit" [disabled]="!isManageMode" [checked]="entriesRights === 'edit'">
+                        <input type="radio" name="entries" value="edit" [disabled]="!isManageMode" [checked]="entriesRights === 'edit'" [(ngModel)]="selectedRole.entries" (change)="onAccessRightChange('entries', $event)">
                       </td>
                     </tr>
                   </tbody>

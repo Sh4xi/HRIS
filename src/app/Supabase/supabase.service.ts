@@ -325,6 +325,29 @@ export class SupabaseService {
     return response;
   }
 
+  //for updating access rights
+  async fetchRoleAccessRights(roleId: string) {
+    const { data, error } = await this.supabase
+      .from('roles')
+      .select('users_rights, roles_rights, sup_rights, par_rights, daily_rights, weekly_rights, monthly_rights, entries')
+      .eq('role_id', roleId)
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
+  //for updating access rights
+  async updateRoleAccessRight(roleId: string, rightType: string, value: string) {
+    const { data, error } = await this.supabase
+      .from('roles')
+      .update({ [rightType]: value })
+      .eq('role_id', roleId);
+
+    if (error) throw error;
+    return data;
+  }
+
   async getEmployees(): Promise<PostgrestResponse<any>> {
     const response = await this.supabase.from('profile').select('');
     if (response.error) {
