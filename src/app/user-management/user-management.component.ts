@@ -97,16 +97,16 @@ export class UserManagementComponent implements OnInit {
   searchTicketTerm: string = '';
   ticket_currentPage: number = 1;
   ticket_itemsPerPage: number = 10;
-  ticket_totalPages: number = 1;
-  
+  ticket_totalPages: number = 1;  
 
   filteredTickets: Ticket[] = []; // Array to hold the tickets after applying any filters
   selectedTickets: boolean[] = []; // Array to keep track of selected state for each ticket (true if selected, false otherwise)  
   filterOption: string = 'all'; // Default filter option
 
-  selectedTicket: any = null;
+  selectedTicket: any;
   isModalVisible = false;
   replyText: string = ''; // Text for the reply
+  currentUser: any; // Make sure this is set with the logged-in user's information
 
   employee = {
     email: '',
@@ -1024,18 +1024,29 @@ closeModal() {
   this.isModalVisible = false;
 }
 
-replyTicket(): void {
+async replyTicket(): Promise<void> {
   if (this.selectedTicket) {
-    // Logic for replying to a ticket
-    this.selectedTicket.reply = this.replyText;
-    this.updateTicket(this.selectedTicket);
-    this.closeModal();
-    this.replyText = ''; // Reset reply text after sending
+    try {
+      // Update the ticket with the new reply
+      this.selectedTicket.reply = this.replyText;
+      this.selectedTicket.status = 'Replied'; // Or any other appropriate status
+      this.selectedTicket.logres = new Date().toISOString(); // Update last response time
+
+      // Update the ticket in the database
+      const { data, error } = await this.supabaseService.updateTicket(this.selectedTicket);
+
+      if (error) throw error;
+
+      this.closeModal();
+      this.replyText = ''; // Reset reply text after sending
+    } catch (error) {
+      console.error('Error replying to ticket:', error);
+      // Handle error (e.g., show an error message to the user)
+    }
   } else {
     console.log('No ticket selected to reply.');
   }
 }
-
 
 
 //DO NOT DELETE: These codes below might be useful in the future

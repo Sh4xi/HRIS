@@ -628,5 +628,22 @@ export class SupabaseService {
     return await this.supabase.auth.getUser();
   }
 
-  
+  async createReply(reply: any) {
+    return await this.supabase
+      .from('replies')
+      .insert(reply)
+      .select();
+  }
+
+  async updateTicket(ticket: any) {
+    return await this.supabase
+      .from('ticket')
+      .update({
+        reply: ticket.reply,
+        status: ticket.status,
+        logres: ticket.logres
+      })
+      .eq('id', ticket.id)
+      .select();
+  }
 }
