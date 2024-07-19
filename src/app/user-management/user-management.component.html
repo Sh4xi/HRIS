@@ -151,7 +151,7 @@
 
 
 <!-- Users active tab -->
-<div *ngIf="activeTab === 'users'" class="flex flex-col h-screen">
+<div *ngIf="activeTab === 'users'" class="flex flex-col">
   <section id="user-list" class="flex flex-col h-full">
     <div class="mb-4 flex flex-col md:flex-row md:justify-between md:items-center">
       <input type="text" [(ngModel)]="searchTerm" (input)="searchTable()" placeholder="Search Employees..." class="w-full md:w-1/2 p-2 border rounded-lg mb-2 md:mb-0">
