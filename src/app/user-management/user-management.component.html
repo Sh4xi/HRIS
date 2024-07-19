@@ -392,7 +392,7 @@
             <div class="m-10">
               <div class="flex justify-between items-center">
                 <p class="text-2xl font-black">Roles</p>
-                <button class="bg-blue-500 text-white px-4 py-2 rounded" (click)="openRolePopup()">Add Role</button>
+                <button class="bg-blue-500 text-white px-4 py-2 rounded" (click)="openRolePopup()" *ngIf="!isManageMode">Add Role</button>
               </div>
               <div class="custom-scrollbar overflow-y-auto overflow-x-hidden" style="height: calc(450px - 8rem);">
                 <table class="table-auto w-[100%]">
@@ -450,13 +450,13 @@
             <div class="m-10" *ngIf="assignedRole">
               <div class="flex justify-between items-center">
                 <p class=" text-2xl font-black">{{ assignedRole.role_name }}</p>
-                <button class="bg-blue-500 text-white px-4 py-2 rounded" (click)="openAssignPopup()">Assign</button>
+                <button class="bg-blue-500 text-white px-4 py-2 rounded" (click)="openAssignPopup()" *ngIf="!isManageMode">Assign</button>
               </div>
               <div class="overflow-y-auto overflow-x-hidden custom-scrollbar" style="height: calc(450px - 8rem);">
                 <table class="table-auto w-full">
                   <tbody>
                     <ng-container *ngIf="assignedUsers.length > 0; else noRoleMatch">
-                      <tr class="h-9 text-gray-600 text-sm font-light w-full" *ngFor="let user of assignedUsers">
+                      <tr class="h-9 text-gray-600 text-sm font-light w-full border-b" *ngFor="let user of assignedUsers">
                         <td class="w-full">{{ user.first_name }} {{ user.mid_name }} {{ user.surname }}</td>
                         <td>
                           <button class="text-red-500 hover:text-red-700 pr-1" *ngIf="isManageMode" (click)="unassignUser(user.user_id, assignedRole.role_id)">
@@ -829,7 +829,7 @@
                 <table class="table-auto w-full">
                   <tbody>
                     <ng-container *ngIf="searchEmpRole.length > 0; else noMatch">
-                      <tr class="h-7 text-gray-600 text-sm font-light" *ngFor="let emp of searchEmpRole">
+                      <tr class="h-7 text-gray-600 text-sm font-light border-b" *ngFor="let emp of searchEmpRole">
                         <td>
                           <input type="checkbox" (change)="onCheckboxChange(emp.user_id, $event)">
                         </td>
@@ -844,7 +844,7 @@
                   </tbody>
                 </table>
               </div>
-              <div class="flex gap-2 justify-start">
+              <div class="flex gap-2 justify-start m-3">
                 <button class="bg-green-500 text-white px-4 py-2 rounded" (click)="assignRole()">Assign</button>
                 <button class="bg-gray-500 text-white px-4 py-2 rounded" (click)="closeAssignPopup()">Cancel</button>
               </div>
