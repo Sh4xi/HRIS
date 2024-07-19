@@ -9,11 +9,13 @@ import { SystemManagementComponent } from './system-management/system-management
 import { DtrComponent } from './dtr/dtr.component';
 import { WorkflowComponent } from './workflow-approval/workflow-approval.component';
 import { WorkflowApprovalUserComponent } from './workflow-approval-user/workflow-approval-user.component';
+import { SubmitTicketComponent } from './submit-ticket/submit-ticket.component';
 import { authGuard } from './auth/auth.guard'; // Adjust the path if necessary
 
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
+  { path: 'submit-ticket', component: SubmitTicketComponent },
   { path: 'dashboard', component: DashboardComponent, canActivate: [authGuard] },
   { path: 'user-management', component: UserManagementComponent, canActivate: [authGuard] },
   { path: 'login-failed', component: LoginFailedComponent },
