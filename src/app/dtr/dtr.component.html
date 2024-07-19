@@ -49,10 +49,10 @@
                         <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">{{ attendance.name || 'N/A' }}</td>
                         <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-500">{{ attendance.status || 'N/A' }}</td>
                         <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-500">{{ formatSchedule(attendance.schedule_in, attendance.schedule_out) || 'N/A' }}</td>
-                        <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-500">{{ attendance.clock_in || 'N/A' }}</td>
-                        <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-500">{{ attendance.clock_out || 'N/A' }}</td>
-                        <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-500">{{ attendance.OT_IN || 'N/A' }}</td>
-                        <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-500">{{ attendance.OT_OUT || 'N/A' }}</td>
+                        <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-500">{{ formatTime(attendance.clock_in) || 'N/A' }}</td>
+<td class="px-3 py-4 whitespace-nowrap text-sm text-gray-500">{{ formatTime(attendance.clock_out) || 'N/A' }}</td>
+<td class="px-3 py-4 whitespace-nowrap text-sm text-gray-500">{{ formatTime(attendance.OT_IN) || 'N/A' }}</td>
+<td class="px-3 py-4 whitespace-nowrap text-sm text-gray-500">{{ formatTime(attendance.OT_OUT) || 'N/A' }}</td>
                         <td *ngIf="isManageMode" class="px-3 py-4 whitespace-nowrap text-sm font-medium">
                             <button (click)="editAttendance(attendance)" class="text-blue-600 hover:text-blue-800">
                                 <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">

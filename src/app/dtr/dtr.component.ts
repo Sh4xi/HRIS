@@ -173,4 +173,23 @@ export class DtrComponent implements OnInit {
   async deleteSelectedAttendances() {
     // Implementation for deleting selected attendances
   }
+
+  formatTime(time: string | null): string {
+    if (!time) return 'N/A';
+    
+    const date = new Date(time);
+    
+    // Convert to UTC+8
+    const options: Intl.DateTimeFormatOptions = {
+      timeZone: 'Asia/Manila',
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric',
+      hour12: true
+    };
+  
+    return date.toLocaleString('en-US', options);
+  }
 }
