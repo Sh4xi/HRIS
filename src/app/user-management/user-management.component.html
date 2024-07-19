@@ -503,13 +503,13 @@
                       <td class="whitespace-nowrap text-center px-3"></td>
                       <td class="whitespace-nowrap text-center px-3"></td>
                       <td class="whitespace-nowrap text-center px-3">
-                        <input type="radio" name="users" value="none" [disabled]="!isManageMode">
+                        <input type="radio" name="users" value="none" [disabled]="!isManageMode" [checked]="usersRights === 'none'">
                       </td>
                       <td class="whitespace-nowrap text-center px-3">
-                        <input type="radio" name="users" value="view" [disabled]="!isManageMode">
+                        <input type="radio" name="users" value="view" [disabled]="!isManageMode" [checked]="usersRights === 'view'">
                       </td>
                       <td class="whitespace-nowrap text-center px-3">
-                        <input type="radio" name="users" value="edit" [disabled]="!isManageMode">
+                        <input type="radio" name="users" value="edit" [disabled]="!isManageMode" [checked]="usersRights === 'edit'">
                       </td>
                     </tr>
                     <tr class="h-7 text-gray-600 text-sm font-light">
@@ -517,13 +517,13 @@
                       <td class="whitespace-nowrap text-center px-3"></td>
                       <td class="whitespace-nowrap text-center px-3"></td>
                       <td class="whitespace-nowrap text-center px-3">
-                        <input type="radio" name="roles" value="none" [disabled]="!isManageMode">
+                        <input type="radio" name="roles" value="none" [disabled]="!isManageMode" [checked]="rolesRights === 'none'">
                       </td>
                       <td class="whitespace-nowrap text-center px-3">
-                        <input type="radio" name="roles" value="view" [disabled]="!isManageMode">
+                        <input type="radio" name="roles" value="view" [disabled]="!isManageMode" [checked]="rolesRights === 'view'">
                       </td>
                       <td class="whitespace-nowrap text-center px-3">
-                        <input type="radio" name="roles" value="edit" [disabled]="!isManageMode">
+                        <input type="radio" name="roles" value="edit" [disabled]="!isManageMode" [checked]="rolesRights === 'edit'">
                       </td>
                     </tr>
                     <tr class="h-7 text-gray-600 text-sm font-light">
@@ -531,13 +531,13 @@
                       <td class="whitespace-nowrap text-center px-3"></td>
                       <td class="whitespace-nowrap text-center px-3"></td>
                       <td class="whitespace-nowrap text-center px-3">
-                        <input type="radio" name="supportTickets" value="none" [disabled]="!isManageMode">
+                        <input type="radio" name="supportTickets" value="none" [disabled]="!isManageMode" [checked]="supportRights === 'none'">
                       </td>
                       <td class="whitespace-nowrap text-center px-3">
-                        <input type="radio" name="supportTickets" value="view" [disabled]="!isManageMode">
+                        <input type="radio" name="supportTickets" value="view" [disabled]="!isManageMode" [checked]="supportRights === 'view'">
                       </td>
                       <td class="whitespace-nowrap text-center px-3">
-                        <input type="radio" name="supportTickets" value="edit" [disabled]="!isManageMode">
+                        <input type="radio" name="supportTickets" value="edit" [disabled]="!isManageMode" [checked]="supportRights === 'edit'">
                       </td>
                     </tr>
                 
@@ -554,13 +554,13 @@
                       <td class="whitespace-nowrap text-center px-3"></td>
                       <td class="whitespace-nowrap text-center px-3"></td>
                       <td class="whitespace-nowrap text-center px-3">
-                        <input type="radio" name="parameters" value="none" [disabled]="!isManageMode">
+                        <input type="radio" name="parameters" value="none" [disabled]="!isManageMode" [checked]="parametersRights === 'none'">
                       </td>
                       <td class="whitespace-nowrap text-center px-3">
-                        <input type="radio" name="parameters" value="view" [disabled]="!isManageMode">
+                        <input type="radio" name="parameters" value="view" [disabled]="!isManageMode" [checked]="parametersRights === 'view'">
                       </td>
                       <td class="whitespace-nowrap text-center px-3">
-                        <input type="radio" name="parameters" value="edit" [disabled]="!isManageMode">
+                        <input type="radio" name="parameters" value="edit" [disabled]="!isManageMode" [checked]="parametersRights === 'edit'">
                       </td>
                     </tr>
                 
@@ -577,13 +577,13 @@
                       <td class="whitespace-nowrap text-center px-3"></td>
                       <td class="whitespace-nowrap text-center px-3"></td>
                       <td class="whitespace-nowrap text-center px-3">
-                        <input type="radio" name="dailyTimeRecord" value="none" [disabled]="!isManageMode">
+                        <input type="radio" name="dailyTimeRecord" value="none" [disabled]="!isManageMode" [checked]="dailyRights === 'none'">
                       </td>
                       <td class="whitespace-nowrap text-center px-3">
-                        <input type="radio" name="dailyTimeRecord" value="view" [disabled]="!isManageMode">
+                        <input type="radio" name="dailyTimeRecord" value="view" [disabled]="!isManageMode" [checked]="dailyRights === 'view'">
                       </td>
                       <td class="whitespace-nowrap text-center px-3">
-                        <input type="radio" name="dailyTimeRecord" value="edit" [disabled]="!isManageMode">
+                        <input type="radio" name="dailyTimeRecord" value="edit" [disabled]="!isManageMode" [checked]="dailyRights === 'edit'">
                       </td>
                     </tr>
                     <tr class="h-7 text-gray-600 text-sm font-light">
@@ -591,13 +591,13 @@
                       <td class="whitespace-nowrap text-center px-3"></td>
                       <td class="whitespace-nowrap text-center px-3"></td>
                       <td class="whitespace-nowrap text-center px-3">
-                        <input type="radio" name="monthlyTimeRecord" value="none" [disabled]="!isManageMode">
+                        <input type="radio" name="monthlyTimeRecord" value="none" [disabled]="!isManageMode" [checked]="monthlyRights === 'none'">
                       </td>
                       <td class="whitespace-nowrap text-center px-3">
-                        <input type="radio" name="monthlyTimeRecord" value="view" [disabled]="!isManageMode">
+                        <input type="radio" name="monthlyTimeRecord" value="view" [disabled]="!isManageMode" [checked]="monthlyRights === 'view'">
                       </td>
                       <td class="whitespace-nowrap text-center px-3">
-                        <input type="radio" name="monthlyTimeRecord" value="edit" [disabled]="!isManageMode">
+                        <input type="radio" name="monthlyTimeRecord" value="edit" [disabled]="!isManageMode" [checked]="monthlyRights === 'edit'">
                       </td>
                     </tr>
                     <tr class="h-7 text-gray-600 text-sm font-light">
@@ -605,13 +605,13 @@
                       <td class="whitespace-nowrap text-center px-3"></td>
                       <td class="whitespace-nowrap text-center px-3"></td>
                       <td class="whitespace-nowrap text-center px-3">
-                        <input type="radio" name="weeklyTimeRecord" value="none" [disabled]="!isManageMode">
+                        <input type="radio" name="weeklyTimeRecord" value="none" [disabled]="!isManageMode" [checked]="weeklyRights === 'none'">
                       </td>
                       <td class="whitespace-nowrap text-center px-3">
-                        <input type="radio" name="weeklyTimeRecord" value="view" [disabled]="!isManageMode">
+                        <input type="radio" name="weeklyTimeRecord" value="view" [disabled]="!isManageMode" [checked]="weeklyRights === 'view'">
                       </td>
                       <td class="whitespace-nowrap text-center px-3">
-                        <input type="radio" name="weeklyTimeRecord" value="edit" [disabled]="!isManageMode">
+                        <input type="radio" name="weeklyTimeRecord" value="edit" [disabled]="!isManageMode" [checked]="weeklyRights === 'edit'">
                       </td>
                     </tr>
                 
@@ -628,13 +628,13 @@
                       <td class="whitespace-nowrap text-center px-3"></td>
                       <td class="whitespace-nowrap text-center px-3"></td>
                       <td class="whitespace-nowrap text-center px-3">
-                        <input type="radio" name="entries" value="none" [disabled]="!isManageMode">
+                        <input type="radio" name="entries" value="none" [disabled]="!isManageMode" [checked]="entriesRights === 'none'">
                       </td>
                       <td class="whitespace-nowrap text-center px-3">
-                        <input type="radio" name="entries" value="view" [disabled]="!isManageMode">
+                        <input type="radio" name="entries" value="view" [disabled]="!isManageMode" [checked]="entriesRights === 'view'">
                       </td>
                       <td class="whitespace-nowrap text-center px-3">
-                        <input type="radio" name="entries" value="edit" [disabled]="!isManageMode">
+                        <input type="radio" name="entries" value="edit" [disabled]="!isManageMode" [checked]="entriesRights === 'edit'">
                       </td>
                     </tr>
                   </tbody>

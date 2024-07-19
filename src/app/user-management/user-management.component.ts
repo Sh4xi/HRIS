@@ -226,6 +226,21 @@ cancelEdit() {
     console.log('Role clicked:', role);
     this.assignedRole = role;
     this.clickedRoleId = this.clickedRoleId === role.role_id ? null : role.role_id; // Toggle clicked state
+    if (this.clickedRoleId) {
+      const { data, error } = await this.supabaseService.getRoleById(role.role_id);
+      if (error) {
+        console.error('Error fetching role:', error.message);
+      } else if (data) {
+        this.usersRights = data.users_rights;
+        this.rolesRights = data.roles_rights;
+        this.supportRights = data.sup_rights;
+        this.parametersRights = data.par_rights;
+        this.dailyRights = data.daily_rights;
+        this.monthlyRights = data.monthly_rights;
+        this.weeklyRights = data.weekly_rights;
+        this.entriesRights = data.entries;
+      }
+    }
     await this.loadAssignedUsers(role);
     console.log('Assigned Role:', this.assignedRole);
   }
