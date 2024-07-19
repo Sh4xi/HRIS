@@ -622,7 +622,11 @@ export class SupabaseService {
       const { data, error } = await this.supabase
         .from('DTR')
         .insert([
-          { status, name, clock_in: new Date() }
+          { status, 
+            name, 
+            clock_in: new Date(),
+            schedule_in: '09:00:00',  // 9:00 AM
+            schedule_out: '19:00:00', }
         ]);
 
       if (error) throw error;
