@@ -717,8 +717,30 @@ export class SupabaseService {
       throw error;
     }
   }
+  async getTodayAttendances(): Promise<any[]> {
+    try {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
   
-
+      const { data, error } = await this.supabase
+        .from('DTR')
+        .select('*')
+        .gte('clock_in', today.toISOString())
+        .order('clock_in', { ascending: false });
+  
+      if (error) {
+        throw error;
+      }
+  
+      console.log('Fetched today\'s data from Supabase:', data);
+      return data;
+    } catch (error) {
+      console.error('Error fetching today\'s attendances from Supabase:', error);
+      throw error;
+    }
+  }
+  
+  //reply
   async createReply(reply: any) {
     return await this.supabase
       .from('replies')

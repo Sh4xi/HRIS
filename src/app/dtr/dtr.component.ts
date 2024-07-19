@@ -4,6 +4,7 @@ import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { SidebarNavigationModule } from './../sidebar-navigation/sidebar-navigation.module';
 import { SupabaseService } from '../Supabase/supabase.service';
+import { DatePipe } from '@angular/common';
 
 interface Attendance {
   id: number;
@@ -26,6 +27,7 @@ interface Attendance {
   styleUrls: ['./dtr.component.css']
 })
 export class DtrComponent implements OnInit {
+  today: Date = new Date();
   showPopup = false;
   showTable = true;
   isEdit = false;
@@ -48,11 +50,11 @@ export class DtrComponent implements OnInit {
 
   async loadAttendances() {
     try {
-      this.attendances = await this.supabaseService.getAttendances();
-      this.filteredAttendances = this.attendances; // Initialize filteredAttendances
-      this.updatePagination(); // Update pagination after data load
+      this.attendances = await this.supabaseService.getTodayAttendances();
+      this.filteredAttendances = this.attendances;
+      this.updatePagination();
     } catch (error) {
-      console.error('Error loading attendances:', error);
+      console.error('Error loading today\'s attendances:', error);
     }
   }
 
