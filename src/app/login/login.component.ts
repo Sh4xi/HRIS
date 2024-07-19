@@ -84,4 +84,10 @@ export class LoginComponent {
   handleLoginFailure(message: string): void {
     this.errorMessage = message;
   }
+
+  submitTicket() {
+    // Implement the logic to navigate to the ticket submission page
+    // For example, you could use Angular's Router to navigate to a specific route
+    this.router.navigate(['/submit-ticket']);
+  }
 }
