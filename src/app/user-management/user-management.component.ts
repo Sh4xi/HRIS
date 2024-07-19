@@ -368,6 +368,9 @@ cancelEdit() {
     }
   }
 
+  showSuccessMessage: boolean = false;
+
+
   addRole() {
     if (!this.newRole) {
       alert('Please enter a role name');
@@ -391,15 +394,20 @@ cancelEdit() {
       } else {
         if (response.data) {
           console.log('Role created successfully:', response.data);
+          this.showSuccessMessage = true;
+          setTimeout(() => {
+            this.showSuccessMessage = false;
+          }, 3000); // Hide the message after 3 seconds
         } else {
           console.log('Role created successfully, but no data returned.');
+          this.showSuccessMessage = true;
         }
         this.closeAddPopup();
       }
     });
     this.showRolePopup = false;
     this.loadRoles();
-  }
+  }  
   
     async loadAssignedUsers(role: { role_id: number; role_name: string }): Promise<void> {
       this.assignedRole = role;
