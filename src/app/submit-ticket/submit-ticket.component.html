@@ -1,1 +1,31 @@
-<p>submit ticket works</p>
+
+<div class="submit-ticket-container">
+    <h2>{{ ticket.title }}</h2>
+  
+    <form (ngSubmit)="onSubmit()" #ticketForm="ngForm">
+      <div class="form-group">
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" [(ngModel)]="ticket.email" required>
+      </div>
+  
+      <div class="form-group">
+        <label for="title">Title:</label>
+        <input type="text" id="title" name="title" [(ngModel)]="ticket.title" required>
+      </div>
+  
+      <div class="form-group">
+        <label for="description">Description:</label>
+        <textarea id="description" name="description" [(ngModel)]="ticket.description" required rows="4"></textarea>
+      </div>
+  
+      <button type="submit" [disabled]="!ticketForm.form.valid">Submit Ticket</button>
+    </form>
+  
+    <div *ngIf="ticketSubmitted" class="success-message">
+      Ticket submitted successfully!
+    </div>
+  
+    <div *ngIf="submitError" class="error-message">
+      {{ submitError }}
+    </div>
+  </div>

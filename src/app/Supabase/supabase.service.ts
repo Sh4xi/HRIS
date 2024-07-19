@@ -719,8 +719,51 @@ export class SupabaseService {
       return { data: null, error };
     }
   }
-  
 
+  async hasTimedInToday(name: string): Promise<boolean> {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+  
+    try {
+      const { data, error } = await this.supabase
+        .from('DTR')
+        .select('*')
+        .eq('name', name)
+        .gte('clock_in', today.toISOString())
+        .limit(1);
+  
+      if (error) throw error;
+  
+      return data && data.length > 0;
+    } catch (error) {
+      console.error('Error checking if user has timed in today:', error);
+      throw error;
+    }
+  }
+  async getTodayAttendances(): Promise<any[]> {
+    try {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+  
+      const { data, error } = await this.supabase
+        .from('DTR')
+        .select('*')
+        .gte('clock_in', today.toISOString())
+        .order('clock_in', { ascending: false });
+  
+      if (error) {
+        throw error;
+      }
+  
+      console.log('Fetched today\'s data from Supabase:', data);
+      return data;
+    } catch (error) {
+      console.error('Error fetching today\'s attendances from Supabase:', error);
+      throw error;
+    }
+  }
+  
+  //reply
   async createReply(reply: any) {
     return await this.supabase
       .from('replies')
