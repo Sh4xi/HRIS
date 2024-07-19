@@ -23,6 +23,7 @@ interface DashboardCard {
 })
 export class DashboardComponent implements OnInit {
   isExpanded = false;
+  userEmail: string = ''; // Add this line to declare userEmail
   
   dashboardCards: DashboardCard[] = [
     { title: 'Total Employees', value: 0 },
@@ -32,7 +33,8 @@ export class DashboardComponent implements OnInit {
 
   constructor(private router: Router, private supabaseService: SupabaseService) {}
 
-  ngOnInit() {
+  async ngOnInit() {
+    await this.fetchUserEmail();
     this.fetchDashboardData();
   }
 
@@ -83,12 +85,34 @@ export class DashboardComponent implements OnInit {
     }
   }
 
+  async fetchUserEmail() {
+    try {
+      const { data: { user }, error: userError } = await this.supabaseService.getUser();
+      if (userError) {
+        console.error('User authentication error:', userError.message);
+        throw userError;
+      }
+      if (!user || !user.email) {
+        throw new Error('No authenticated user found or email is missing');
+      }
+  
+      console.log('Fetched user email:', user.email);
+      this.userEmail = user.email!; // Use non-null assertion operator
+    } catch (error) {
+      console.error('Error fetching user email:', error);
+      this.userEmail = ''; // Set to empty string if there's an error
+    }
+  }
 
   async timeIn() {
     try {
       const status = 'Time In';
-      const name = 'cheska'; // You mentioned this name earlier
+      const name = this.userEmail; // Use the email instead of 'cheska'
       
+      if (!name) {
+        throw new Error('User email not available');
+      }
+
       const result = await this.supabaseService.insertDTRRecord(status, name);
       console.log('Time In recorded successfully:', result);
       alert('Time In recorded successfully');
@@ -102,7 +126,7 @@ export class DashboardComponent implements OnInit {
     }
   }
 
-  async timeOut(){
-
+  async timeOut() {
+    // Implement time out logic here
   }
 }
