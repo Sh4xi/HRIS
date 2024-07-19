@@ -1,10 +1,14 @@
 import { Component } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 import { TicketService } from './submit-ticket.service';
 
 @Component({
   selector: 'app-submit-ticket',
   templateUrl: './submit-ticket.component.html',
-  styleUrls: ['./submit-ticket.component.css']
+  styleUrls: ['./submit-ticket.component.css'],
+  standalone: true,
+  imports: [FormsModule, CommonModule]
 })
 export class SubmitTicketComponent {
   ticket = {

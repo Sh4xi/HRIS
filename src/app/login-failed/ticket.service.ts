@@ -1,3 +1,4 @@
+
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -22,6 +23,20 @@ export class TicketService {
     return this.http.post(
       `${this.supabaseUrl}/ticket`,
       ticket,
+      { headers: headers }
+    );
+  }
+
+  submitTicketWithImages(formData: FormData): Observable<any> {
+    const headers = new HttpHeaders({
+      'apikey': this.supabaseKey,
+      'Authorization': `Bearer ${this.supabaseKey}`,
+      'Prefer': 'return=minimal'
+    });
+
+    return this.http.post(
+      `${this.supabaseUrl}/ticket`,
+      formData,
       { headers: headers }
     );
   }
