@@ -21,6 +21,7 @@ interface AuditLogEntry {
   new_value: string;
   ip_address: string;
   date?: string;
+  email?: string;
 }
 
 @Injectable({
@@ -143,163 +144,112 @@ export class SupabaseService {
     return data.length > 0;
   }
 
-  async createEmployee(employeeData: any): Promise<{ data: any; error: any }> {
-    console.log('SupabaseService received employee data:', employeeData);
   
+  
+  async createRole(roleData: any): Promise<{ data: any; error: any }> {
     try {
-      // Log the exact data being inserted
-      console.log('Data to insert:', employeeData);
-  
       const { data, error } = await this.supabase
-        .from('profile')
-        .insert([employeeData])
+        .from('roles')
+        .insert([roleData])
         .select();
   
       if (error) {
-        console.error('Supabase insert error:', error);
+        console.error('Error creating role:', error.message);
         return { data: null, error };
       }
   
-      if (!data || data.length === 0) {
-        console.error('No data returned from Supabase insert');
-        return { data: null, error: new Error('No data returned from insert') };
-      }
-  
-      console.log('Supabase insert successful:', data);
+      console.log('Role created successfully:', data);
       return { data: data[0], error: null };
     } catch (error) {
-      console.error('Error in createEmployee:', error);
+      console.error('Unexpected error creating role:', error);
       return { data: null, error };
     }
   }
-
-  async createRole(roleData: any): Promise<PostgrestSingleResponse<any>> {
-    const response = await this.supabase.from('roles').insert([
-      {
-        role_name: roleData.role_name,
-        department: roleData.department,
-        mod_access: roleData.mod_access,
-        rep_access: roleData.rep_access,
-        data_access: roleData.data_access,
-        privileges: roleData.privileges
-      },
-    ]);
-
-    if (response.error) {
-      console.error('Error creating role:', response.error.message);
-    } else {
-      console.log('Role created successfully:', response.data);
+  
+  async createDepartment(departmentData: any): Promise<{ data: any; error: any }> {
+    try {
+      const { data, error } = await this.supabase
+        .from('department')
+        .insert([departmentData])
+        .select();
+  
+      if (error) {
+        console.error('Error creating department:', error.message);
+        return { data: null, error };
+      }
+  
+      console.log('Department created successfully:', data);
+      return { data: data[0], error: null };
+    } catch (error) {
+      console.error('Unexpected error creating department:', error);
+      return { data: null, error };
     }
-
-    return response;
   }
-
-  async createDepartment(departmentData: any): Promise<PostgrestSingleResponse<any>> {
-    const response = await this.supabase.from('department').insert([
-      {
-        department_name: departmentData.department_name,
-        mod_access: departmentData.mod_access,
-        rep_access: departmentData.rep_access,
-        data_access: departmentData.data_access,
-        privileges: departmentData.privileges
-      },
-    ]);
-
-    if (response.error) {
-      console.error('Error creating department:', response.error.message);
-    } else {
-      console.log('Department created successfully:', response.data);
+  
+  async getEmployees(): Promise<{ data: any[]; error: any }> {
+    try {
+      const { data, error } = await this.supabase
+        .from('profile')
+        .select('*');
+  
+      if (error) {
+        console.error('Error fetching employees:', error.message);
+        return { data: [], error };
+      }
+  
+      return { data, error: null };
+    } catch (error) {
+      console.error('Unexpected error fetching employees:', error);
+      return { data: [], error };
     }
-
-    return response;
   }
-
-  async getEmployees(): Promise<PostgrestResponse<any>> {
-    const response = await this.supabase.from('profile').select('');
-    if (response.error) {
-      console.error('Error fetching employees:', response.error.message);
-    }
-    return response;
-  }
-
-  async deleteUser(email: string): Promise<PostgrestSingleResponse<any>> {
+  
+  async deleteUser(email: string): Promise<{ success: boolean; error: any }> {
     try {
       // Retrieve the user's profile to get the image path
-      const { data: userProfile, error: userProfileError } = await this.supabase
-        .from('profile')
-        .select('photo_url') // Adjust this to match your actual image path column
-        .eq('email', email)
-        .single();
-  
-      if (userProfileError) {
-        console.error('Error retrieving user profile:', userProfileError.message);
-        return {
-          data: null,
-          error: userProfileError,
-          count: null,
-          status: 500,
-          statusText: 'Error retrieving user profile'
-        };
-      }
-  // Delete the photo from storage if it exists
-  if (userProfile && userProfile.photo_url) {
-    const fileName = userProfile.photo_url.split('/').pop();
-    if (fileName) {
-      const { error: storageError } = await this.supabase
-        .storage
-        .from('photos')
-        .remove([fileName]);
+      // Get the old user data before deletion
+    const { data: oldUserData, error: oldDataError } = await this.supabase
+    .from('profile')
+    .select('*')
+    .eq('email', email)
+    .single();
 
-      if (storageError) {
-        console.error('Error deleting image from storage:', storageError.message);
-      } else {
-        console.log('Image deleted successfully from storage');
-      }
-    }
+  if (oldDataError) {
+    console.error('Error retrieving old user data:', oldDataError.message);
+    return { success: false, error: oldDataError };
   }
-      // Delete the user profile
-      const response = await this.supabase
-        .from('profile')
-        .delete()
-        .eq('email', email);
-  
-      if (response.error) {
-        console.error('Error deleting user:', response.error.message);
-        return response;
-      }
-  
-      console.log('User deleted successfully:', response.data);
-      
-      // Refresh the session after the delete operation
-      await this.refreshSession();
-  
-      // Check if the user profile exists and has an image path
-      if (userProfile && userProfile.photo_url) {
-        const { error: storageError } = await this.supabase
-          .storage
-          .from('photos') // Replace with your actual bucket name
-          .remove([userProfile.photo_url]);
-  
-        if (storageError) {
-          console.error('Error deleting image from storage:', storageError.message);
-        } else {
-          console.log('Image deleted successfully from storage');
-        }
-      }
-  
-      return response;
-    } catch (error) {
-      console.error('Unexpected error deleting user:', error);
-      // Create a PostgrestSingleResponse-like object for unexpected errors
-      return {
-        data: null,
-        error: error as any,
-        count: null,
-        status: 500,
-        statusText: 'Internal Server Error'
-      };
-    }
+
+  // Delete the user profile
+  const { error: deleteError } = await this.supabase
+    .from('profile')
+    .delete()
+    .eq('email', email);
+
+  if (deleteError) {
+    console.error('Error deleting user:', deleteError.message);
+    return { success: false, error: deleteError };
   }
+
+  // Create audit log
+  await this.createAuditLog({
+    user_id: await this.getCurrentUserId(),
+    affected_page: 'User Management',
+    action: 'Delete',
+    old_parameter: JSON.stringify(oldUserData),
+    new_parameter: null
+  });
+
+  console.log('User deleted successfully');
+
+  // Refresh the session after the delete operation
+  await this.refreshSession();
+
+  return { success: true, error: null };
+} catch (error) {
+  console.error('Unexpected error deleting user:', error);
+  return { success: false, error };
+}
+}
   
   
   
@@ -342,43 +292,238 @@ export class SupabaseService {
     return { data, error };
   }
 
-  async updateEmployee(employee: any): Promise<PostgrestSingleResponse<any>> {
-    const response = await this.supabase
-      .from('profile')
-      .update({
-        first_name: employee.first_name,
-        mid_name: employee.mid_name,
-        surname: employee.surname,
-        password: employee.password,
-        department: employee.department,
-        position: employee.position,
-        types: employee.types,
-        photo_url: employee.photo_url // Ensure this field is also updated if needed
-      })
-      .eq('email', employee.email);
-  
-    if (response.error) {
-      console.error('Error updating employee:', response.error.message);
-    } else {
-      console.log('Employee updated successfully:', response.data);
-      await this.refreshSession();
+//new code for audit
+async createAuditLog(logData: any) {
+  console.log('Attempting to create audit log:', logData);
+
+  // Check for required fields
+  const requiredFields = ['email', 'affected_page', 'action'];
+  for (const field of requiredFields) {
+    if (!logData[field]) {
+      const error = `Missing required field for audit log: ${field}`;
+      console.error(error);
+      return { success: false, error };
     }
+  }
+
+  try {
+    const currentDate = new Date();
+    const auditLogEntry = {
+      date: currentDate,
+      time: currentDate.toTimeString().split(' ')[0],
+      email: logData.email,
+      ip_address: await this.getUserIpAddress(),
+      affected_page: logData.affected_page,
+      action: logData.action,
+      parameter: logData.parameter || null,
+      old_parameter: logData.old_parameter || null,
+      new_parameter: logData.new_parameter || null
+    };
+
+    console.log('Prepared audit log entry:', auditLogEntry);
+
+    const { data, error } = await this.supabase
+      .from('audit_trail')
+      .insert(auditLogEntry)
+      .select();
+
+    if (error) {
+      console.error('Supabase error creating audit log:', error);
+      return { success: false, error: error.message };
+    }
+
+    if (!data || data.length === 0) {
+      console.error('No data returned from Supabase after inserting audit log');
+      return { success: false, error: 'No data returned from insert operation' };
+    }
+
+    console.log('Audit log created successfully:', data[0]);
+    return { success: true, data: data[0] };
+  } catch (error) {
+    console.error('Unexpected error in createAuditLog:', error);
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+  }
+}
+
+subscribeToAuditLogs(callback: (payload: any) => void) {
+  return this.supabase
+    .channel('audit_trail_changes')
+    .on(
+      'postgres_changes',
+      { event: 'INSERT', schema: 'public', table: 'audit_trail' },
+      (payload) => {
+        console.log('New audit log:', payload.new);
+        callback(payload.new);
+      }
+    ) 
+    .subscribe((status) => {
+      console.log('Subscription status:', status);
+    });
+}
+async isAuditTrailEmpty(): Promise<boolean> {
+  const { count, error } = await this.supabase
+    .from('audit_trail')
+    .select('*', { count: 'exact', head: true });
+
+  if (error) {
+    console.error('Error checking if audit_trail is empty:', error);
+    return true;
+  }
+
+  return count === 0;
+}
+  async updateEmployee(employee: any): Promise<{ data: any; error: any }> {
+    try {
+      // Get the old employee data before update
+      const { data: oldEmployeeData, error: oldDataError } = await this.supabase
+        .from('profile')
+        .select('*')
+        .eq('email', employee.email)
+        .single();
   
-    return response;
+      if (oldDataError) {
+        console.error('Error retrieving old employee data:', oldDataError.message);
+        return { data: null, error: oldDataError };
+      }
+  
+      const { data, error } = await this.supabase
+        .from('profile')
+        .update({
+          first_name: employee.first_name,
+          mid_name: employee.mid_name,
+          surname: employee.surname,
+          password: employee.password,
+          department: employee.department,
+          position: employee.position,
+          types: employee.types,
+          photo_url: employee.photo_url
+        })
+        .eq('email', employee.email)
+        .select();
+  
+      if (error) {
+        console.error('Error updating employee:', error.message);
+        return { data: null, error };
+      }
+  
+      // Create audit log
+      await this.createAuditLog({
+        user_id: await this.getCurrentUserId(),
+        affected_page: 'Employee Management',
+        action: 'Update',
+        old_parameter: JSON.stringify(oldEmployeeData),
+        new_parameter: JSON.stringify(data[0])
+      });
+  
+      console.log('Employee updated successfully:', data);
+      await this.refreshSession();
+  
+      return { data: data[0], error: null };
+    } catch (error) {
+      console.error('Unexpected error updating employee:', error);
+      return { data: null, error };
+    }
+  }
+  async createEmployee(employeeData: any): Promise<{ data: any; error: any }> {
+    console.log('Creating employee:', JSON.stringify(employeeData, null, 2));
+    try {
+      const { data, error } = await this.supabase
+        .from('profile')
+        .insert([employeeData])
+        .select();
+  
+      if (error) {
+        console.error('Error creating employee:', error);
+        return { data: null, error };
+      }
+  
+      console.log('Employee created successfully:', JSON.stringify(data, null, 2));
+  
+      // Create audit log
+      const auditLogData: AuditLogEntry = {
+        user_id: await this.getCurrentUserId(),
+        action: 'Create',
+        affected_page: 'Employee Management',
+        parameter: 'New employee created',
+        old_value: '',  // No old value for a new employee
+        new_value: JSON.stringify(data[0]),
+        ip_address: await this.getUserIpAddress(),
+        date: new Date().toISOString(),
+        email: await this.getCurrentUserEmail()
+      };
+  
+      console.log('Audit log data being sent:', JSON.stringify(auditLogData, null, 2));
+  
+      const auditLogResult = await this.createAuditLog(auditLogData);
+      if (!auditLogResult.success) {
+        console.error('Failed to create audit log:', auditLogResult.error);
+      } else {
+        console.log('Audit log created successfully:', JSON.stringify(auditLogResult.data, null, 2));
+      }
+  
+      return { data: data[0], error: null };
+    } catch (error) {
+      console.error('Unexpected error in createEmployee:', error);
+      return { data: null, error: error instanceof Error ? error.message : 'Unknown error' };
+    }
+  }
+  
+  // Method to get the current user's email
+  async getCurrentUserEmail(): Promise<string> {
+    const { data, error } = await this.supabase.auth.getSession();
+    if (error) {
+      throw new Error('Error getting session: ' + error.message);
+    }
+    if (data.session && data.session.user) {
+        return data.session.user.id;
+      } else {
+        throw new Error('No user is currently logged in.');
+      }
   }
   
 
-  async getWorkflows() {
-    const { data, error } = await this.supabase
-      .from('workflow')
-      .select('*');
-
+  // Example implementation of getCurrentUserId
+  async getCurrentUserId(): Promise<string> {
+    const { data, error } = await this.supabase.auth.getSession();
     if (error) {
-      console.error('Error fetching workflows:', error);
-      return [];
+      throw new Error('Error getting session: ' + error.message);
     }
+    if (data.session) {
+      return data.session.user.id;
+    } else {
+      throw new Error('No user is currently logged in.');
+    }
+  }
 
-    return data;
+  // Example implementation of getUserIpAddress (needs to be defined)
+  async getUserIpAddress(): Promise<string> {
+    // This method should be implemented to return the user's IP address
+    return '127.0.0.1';
+  }
+  
+  // // Helper method to get current user ID
+  // async getCurrentUserId(): Promise<string> {
+  //   const { data: { user } } = await this.supabase.auth.getUser();
+  //   return user?.id || 'Unknown';
+  // }
+
+  
+  async getWorkflows(): Promise<{ data: any[]; error: any }> {
+    try {
+      const { data, error } = await this.supabase
+        .from('workflow')
+        .select('*');
+  
+      if (error) {
+        console.error('Error fetching workflows:', error.message);
+        return { data: [], error };
+      }
+  
+      return { data, error: null };
+    } catch (error) {
+      console.error('Unexpected error fetching workflows:', error);
+      return { data: [], error };
+    }
   }
 
   // Fetch tickets from the database
@@ -501,30 +646,42 @@ export class SupabaseService {
     }
 }
 
-async logAction(logEntry: AuditLogEntry) {
-  const { error } = await this.supabase
+async logAction(logEntry: AuditLogEntry): Promise<void> {
+  const { data, error } = await this.supabase
     .from('audit_trail')
     .insert([logEntry]);
-
+  
   if (error) {
     console.error('Error logging action:', error.message);
     throw error;
   }
+
+  console.log('Action logged successfully:', data);
 }
 
+
+
 // Your existing fetchAuditLogs method
-async fetchAuditLogs() {
-  const { data, error } = await this.supabase
-    .from('audit_trail')
-    .select('*')
-    .order('date', { ascending: false });
+async fetchAuditLogs(): Promise<{ data: any[]; error: any }> {
+  console.log('Fetching audit logs from Supabase...');
+  try {
+    const { data, error } = await this.supabase
+      .from('audit_trail')
+      .select('*')
+      .order('date', { ascending: false })
+      .order('time', { ascending: false });
 
-  if (error) {
-    console.error('Error fetching audit logs:', error);
-    return [];
+    if (error) {
+      console.error('Supabase error fetching audit logs:', error);
+      return { data: [], error };
+    }
+
+    console.log('Raw audit logs data from Supabase:', JSON.stringify(data, null, 2));
+    return { data: data || [], error: null };
+  } catch (error) {
+    console.error('Unexpected error in fetchAuditLogs:', error);
+    return { data: [], error };
   }
-
-  return data;
 }
 
 

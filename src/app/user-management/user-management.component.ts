@@ -43,6 +43,16 @@ interface Ticket {
   status: string;
   dateTime: Date;
 }
+interface AuditLogEntry {
+  user_id: string;
+  action: string;
+  affected_page: string;
+  parameter: string;
+  old_value: string;
+  new_value: string;
+  ip_address: string;
+  date: string;
+}
 
 @Component({
   selector: 'app-user-management',
@@ -440,6 +450,12 @@ export class UserManagementComponent implements OnInit {
     try {
       console.log('Updating employee:', employee);
   
+      // Get the original employee data for audit logging
+      const originalEmployee = this.users.find(user => user.email === employee.email);
+      if (!originalEmployee) {
+        throw new Error('Employee not found for update');
+      }
+  
       // Upload the photo and get the URL
       let photoUrl = null;
       if (this.photoFile) {
@@ -467,17 +483,6 @@ export class UserManagementComponent implements OnInit {
   
       console.log('Updated user object:', updatedUser);
   
-      // Update user locally
-      const index = this.users.findIndex(user => user.email === employee.email);
-      if (index !== -1) {
-        this.users[index] = updatedUser as User;
-        console.log('Local user array updated');
-      } else {
-        console.warn('User not found in local array for update');
-      }
-      this.filteredUsers = this.users;
-      this.updatePagination();
-  
       // Update user in the database
       const { data, error } = await this.supabaseService.updateEmployee({
         ...employee,
@@ -491,6 +496,31 @@ export class UserManagementComponent implements OnInit {
   
       console.log('Employee updated successfully in Supabase:', data);
   
+      // Update user locally
+      const index = this.users.findIndex(user => user.email === employee.email);
+      if (index !== -1) {
+        this.users[index] = updatedUser as User;
+        console.log('Local user array updated');
+      } else {
+        console.warn('User not found in local array for update');
+      }
+      this.filteredUsers = this.users;
+      this.updatePagination();
+  
+      // Log the action
+      const auditLogEntry: AuditLogEntry = {
+        user_id: 'id', // or the ID of the user performing the action
+        action: 'UPDATE_EMPLOYEE',
+        affected_page: 'User Management',
+        parameter: 'Employee Update',
+        old_value: JSON.stringify(originalEmployee),
+        new_value: JSON.stringify(updatedUser),
+        ip_address: await this.getClientIpAddress(), // Implement this method to get the client's IP
+        date: new Date().toISOString()
+      };
+  
+      await this.supabaseService.logAction(auditLogEntry);
+  
       // Close modal and reset form
       this.toggleModal();
       this.resetForm();
@@ -501,9 +531,24 @@ export class UserManagementComponent implements OnInit {
       return updatedUser;
     } catch (error) {
       console.error('Error in updateEmployee:', error);
-      // You might want to show an error message to the user here
+      // Show an error message to the user
+      this.showErrorMessage('Failed to update employee. Please try again.');
       throw error; // Re-throw the error so it can be handled by the caller if needed
     }
+  }
+  
+  // Implement these methods:
+  
+  private async getClientIpAddress(): Promise<string> {
+    // Implement a method to get the client's IP address
+    // You might need to use a third-party service or ask your backend to provide this information
+    return 'client_ip';
+  }
+  
+  private showErrorMessage(message: string): void {
+    // Implement a method to show error messages to the user
+    // This could be a modal, toast notification, or alert
+    alert(message);
   }
   
   
@@ -580,6 +625,15 @@ export class UserManagementComponent implements OnInit {
   
       console.log('Employee created successfully:', data);
   
+      // Create audit log
+      try {
+        const userId = await this.supabaseService.getCurrentUserId();
+        await this.createAuditLogWithRetry(userId, data);
+      } catch (auditLogError) {
+        console.error('Error creating audit log:', auditLogError);
+        // Log the error but continue with the process
+      }
+  
       const newUser: User = {
         profile: newEmployee.profile,
         name: `${newEmployee.first_name} ${newEmployee.mid_name ? newEmployee.mid_name + ' ' : ''}${newEmployee.surname}`,
@@ -602,6 +656,28 @@ export class UserManagementComponent implements OnInit {
     } catch (error) {
       console.error('Unexpected error creating employee:', error);
       alert('An unexpected error occurred. Please try again.');
+    }
+  }
+  
+  private async createAuditLogWithRetry(userId: string, data: any, retries = 3): Promise<void> {
+    for (let i = 0; i < retries; i++) {
+      try {
+        await this.supabaseService.createAuditLog({
+          user_id: userId,
+          affected_page: 'User Management',
+          action: 'Create Employee',
+          old_parameter: null,
+          new_parameter: JSON.stringify(data)
+        });
+        console.log('Audit log created successfully');
+        return;
+      } catch (error) {
+        console.error(`Attempt ${i + 1} failed to create audit log:`, error);
+        if (i === retries - 1) {
+          throw error; // Throw the error after all retries have failed
+        }
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for 1 second before retrying
+      }
     }
   }
   ngOnInit() {
