@@ -315,6 +315,16 @@ export class SupabaseService {
   }));
   }
 
+  async getRoleById(roleId: number): Promise<PostgrestSingleResponse<any>> {
+    const response = await this.supabase.from('roles').select('*').eq('role_id', roleId).single();
+    if (response.error) {
+      console.error('Error fetching role by ID:', response.error.message);
+    } else {
+      console.log('Role fetched successfully:', response.data);
+    }
+    return response;
+  }
+
   async getEmployees(): Promise<PostgrestResponse<any>> {
     const response = await this.supabase.from('profile').select('');
     if (response.error) {
@@ -612,7 +622,11 @@ export class SupabaseService {
       const { data, error } = await this.supabase
         .from('DTR')
         .insert([
-          { status, name, clock_in: new Date() }
+          { status, 
+            name, 
+            clock_in: new Date(),
+            schedule_in: '09:00:00',  // 9:00 AM
+            schedule_out: '19:00:00', }
         ]);
 
       if (error) throw error;
