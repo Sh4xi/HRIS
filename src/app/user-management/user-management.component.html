@@ -398,7 +398,7 @@
                 <table class="table-auto w-[100%]">
                   <tbody>
                     <ng-container *ngIf="searchroletab.length > 0; else noMatch">
-                      <tr class="h-9 text-gray-600 text-sm font-light" *ngFor="let role of searchroletab" (click)="onRoleClick(role)">
+                      <tr class="h-9 text-gray-600 text-sm font-light border-b" *ngFor="let role of searchroletab" (click)="onRoleClick(role)">
                         <td class="hover:bg-gray-100 w-full" [ngClass]="{'bg-gray-100': clickedRoleId === role.role_id}">
                           <ng-container *ngIf="editingRoleId === role.role_id; else displayRoleName">
                             <input [(ngModel)]="role.role_name" class="border rounded outline-none" />
