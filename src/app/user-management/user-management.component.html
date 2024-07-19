@@ -380,11 +380,12 @@
 <!-- Roles Active tab -->
     <div *ngIf="activeTab === 'roles'">
       <section id="user-list">
-        <div class="flex justify-between mb-6">
-          <input type="text" [(ngModel)]="searchRoleTerm" placeholder="Search Roles..." class="w-half p-2 border rounded-lg">          
-          <div class="mr-2">
-            <button class=" text-white rounded h-full w-28 whitespace-nowrap text-center" [ngClass]="{'bg-blue-500': !isManageMode, 'bg-red-500': isManageMode}" (click)="toggleManageMode()">{{ isManageMode ? 'Stop Managing' : 'Manage Roles' }}</button>
-          </div>      
+        <div class="flex justify-between items-stretch mb-6 h-9 space-x-4 mr-2">
+          <input type="text" [(ngModel)]="searchRoleTerm" placeholder="Search Roles..." class="w-[10%] h-full p-2 border rounded-lg">
+          <p *ngIf="showSuccessMessage" class="border w-[20%] h-full flex items-center justify-center whitespace-nowrap px-2 rounded-lg bg-green-50 border-green-500 text-green-700">Role Created Successfully</p>            
+          <button class="text-white rounded h-full w-[10%] whitespace-nowrap text-center" [ngClass]="{'bg-blue-500': !isManageMode, 'bg-red-500': isManageMode}" (click)="toggleManageMode()">
+            {{ isManageMode ? 'Stop Managing' : 'Manage Roles' }}
+          </button>
         </div>
         
         <div class="flex justify-between">
@@ -398,7 +399,7 @@
                 <table class="table-auto w-[100%]">
                   <tbody>
                     <ng-container *ngIf="searchroletab.length > 0; else noMatch">
-                      <tr class="h-9 text-gray-600 text-sm font-light border-b" *ngFor="let role of searchroletab" (click)="onRoleClick(role)">
+                      <tr class="h-9 text-gray-600 text-sm font-light" *ngFor="let role of searchroletab" (click)="onRoleClick(role)">
                         <td class="hover:bg-gray-100 w-full" [ngClass]="{'bg-gray-100': clickedRoleId === role.role_id}">
                           <ng-container *ngIf="editingRoleId === role.role_id; else displayRoleName">
                             <input [(ngModel)]="role.role_name" class="border rounded outline-none" />
@@ -456,7 +457,7 @@
                 <table class="table-auto w-full">
                   <tbody>
                     <ng-container *ngIf="assignedUsers.length > 0; else noRoleMatch">
-                      <tr class="h-9 text-gray-600 text-sm font-light w-full border-b" *ngFor="let user of assignedUsers">
+                      <tr class="h-9 text-gray-600 text-sm font-light w-full" *ngFor="let user of assignedUsers">
                         <td class="w-full">{{ user.first_name }} {{ user.mid_name }} {{ user.surname }}</td>
                         <td>
                           <button class="text-red-500 hover:text-red-700 pr-1" *ngIf="isManageMode" (click)="unassignUser(user.user_id, assignedRole.role_id)">
@@ -829,7 +830,7 @@
                 <table class="table-auto w-full">
                   <tbody>
                     <ng-container *ngIf="searchEmpRole.length > 0; else noMatch">
-                      <tr class="h-7 text-gray-600 text-sm font-light border-b" *ngFor="let emp of searchEmpRole">
+                      <tr class="h-7 text-gray-600 text-sm font-light" *ngFor="let emp of searchEmpRole">
                         <td>
                           <input type="checkbox" (change)="onCheckboxChange(emp.user_id, $event)">
                         </td>

@@ -24,7 +24,7 @@ interface DashboardCard {
 export class DashboardComponent implements OnInit {
   isExpanded = false;
   userEmail: string = ''; // Add this line to declare userEmail
-  
+
   dashboardCards: DashboardCard[] = [
     { title: 'Total Employees', value: 0 },
     { title: 'DTR', value: 5 },
@@ -95,7 +95,7 @@ export class DashboardComponent implements OnInit {
       if (!user || !user.email) {
         throw new Error('No authenticated user found or email is missing');
       }
-  
+
       console.log('Fetched user email:', user.email);
       this.userEmail = user.email!; // Use non-null assertion operator
     } catch (error) {
@@ -106,13 +106,20 @@ export class DashboardComponent implements OnInit {
 
   async timeIn() {
     try {
-      const status = 'Time In';
-      const name = this.userEmail; // Use the email instead of 'cheska'
-      
+      const name = this.userEmail;
+  
       if (!name) {
         throw new Error('User email not available');
       }
-
+  
+      // Check if the user has already timed in today
+      const hasTimedIn = await this.supabaseService.hasTimedInToday(name);
+      if (hasTimedIn) {
+        alert('You have already timed in today. You can only time in once per day.');
+        return;
+      }
+  
+      const status = 'Time In';
       const result = await this.supabaseService.insertDTRRecord(status, name);
       console.log('Time In recorded successfully:', result);
       alert('Time In recorded successfully');
@@ -127,6 +134,26 @@ export class DashboardComponent implements OnInit {
   }
 
   async timeOut() {
-    // Implement time out logic here
+    try {
+      const name = this.userEmail;
+
+      if (!name) {
+        throw new Error('User email not available');
+      }
+
+      const result = await this.supabaseService.updateDTRClockOut(name);
+      if (result.error) {
+        throw result.error;
+      }
+      console.log('Time Out recorded successfully:', result.data);
+      alert('Time Out recorded successfully');
+    } catch (error) {
+      console.error('Error recording Time Out:', error);
+      if (error instanceof Error) {
+        alert(`Error recording Time Out: ${error.message}`);
+      } else {
+        alert('Error recording Time Out. Please try again.');
+      }
+    }
   }
 }
