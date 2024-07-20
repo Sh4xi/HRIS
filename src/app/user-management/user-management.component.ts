@@ -140,6 +140,7 @@ popupEntriesRights: string = 'none';
   showRolePopup: boolean = false;
   newManageRole: string = '';
   showAssignPopup: boolean = false;
+  showDeleteAssigneePopup = false
   searchRoleTerm: string = '';
   assignedUsers: any[] = [];
   assignedRole: { role_id: number; role_name: string } = { role_id: 0, role_name: '' };  // Default value
@@ -180,10 +181,17 @@ cancelEdit() {
     this.isManageMode = !this.isManageMode;
   }
 
+    openDeleteAssigneePopup(){
+      this.showDeleteAssigneePopup = true;
+    }
+
+    closeDeleteAssigneePopup(){
+      this.showDeleteAssigneePopup = false;
+    }
+
   openRolePopup() {
     this.showRolePopup = true;
     this.isManageMode = false;
-
 
   }
 
@@ -384,6 +392,7 @@ cancelEdit() {
   }
 
   showSuccessMessage: boolean = false;
+  showErrorMessage: boolean = false;
 
 
   addRole() {
@@ -406,6 +415,7 @@ cancelEdit() {
     .then(response => {
       if (response.error) {
         console.error('Error creating role:', response.error.message);
+        this.showErrorMessage = true;
       } else {
         if (response.data) {
           console.log('Role created successfully:', response.data);

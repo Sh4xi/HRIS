@@ -382,8 +382,9 @@
       <section id="user-list">
         <div class="flex justify-between items-stretch mb-6 h-9 space-x-4 mr-2">
           <input type="text" [(ngModel)]="searchRoleTerm" placeholder="Search Roles..." class="w-[10%] h-full p-2 border rounded-lg">
-          <p *ngIf="showSuccessMessage" class="border w-[20%] h-full flex items-center justify-center whitespace-nowrap px-2 rounded-lg bg-green-50 border-green-500 text-green-700">Role Created Successfully</p>            
-          <button class="text-white rounded h-full w-[10%] whitespace-nowrap text-center" [ngClass]="{'bg-blue-500': !isManageMode, 'bg-red-500': isManageMode}" (click)="toggleManageMode()">
+          <p *ngIf="showSuccessMessage" class="border w-[20%] h-full flex items-center justify-center whitespace-nowrap px-2 rounded-lg bg-green-50 border-green-500 text-green-700">Role Created Successfully</p>  
+          <p *ngIf="showErrorMessage" class="border w-[20%] h-full flex items-center justify-center whitespace-nowrap px-2 rounded-lg bg-red-50 border-red-500 text-red-700">Error Creating Role</p>           
+          <button class="text-white rounded h-full w-[10%] whitespace-nowrap text-center" [ngClass]="{'bg-blue-500 hover:bg-blue-600': !isManageMode, 'bg-red-500 hover:bg-red-600': isManageMode}" (click)="toggleManageMode()">
             {{ isManageMode ? 'Stop Managing' : 'Manage Roles' }}
           </button>
         </div>
@@ -393,14 +394,14 @@
             <div class="m-10">
               <div class="flex justify-between items-center">
                 <p class="text-2xl font-black">Roles</p>
-                <button class="bg-blue-500 text-white px-4 py-2 rounded" (click)="openRolePopup()" *ngIf="!isManageMode">Add Role</button>
+                <button class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" (click)="openRolePopup()" *ngIf="!isManageMode">Add Role</button>
               </div>
               <div class="custom-scrollbar overflow-y-auto overflow-x-hidden" style="height: calc(450px - 8rem);">
                 <table class="table-auto w-[100%]">
                   <tbody>
                     <ng-container *ngIf="searchroletab.length > 0; else noMatch">
-                      <tr class="h-9 text-gray-600 text-sm font-light border-b" *ngFor="let role of searchroletab" (click)="onRoleClick(role)" (click)="selectRoleForEditing(role)" [ngClass]="{'bg-gray-100': selectedRole.role_id === role.role_id}">
-                        <td class ="hover:bg-gray-100 w-full" [ngClass]="{'bg-gray-100': clickedRoleId === role.role_id}">
+                      <tr class="hover:bg-gray-100 h-9 text-gray-600 text-sm font-light border-b" *ngFor="let role of searchroletab" [ngClass]="{'bg-gray-100': selectedRole.role_id === role.role_id}">
+                        <td class =" w-full" [ngClass]="{'bg-gray-100': clickedRoleId === role.role_id}" (click)="onRoleClick(role)" (click)="selectRoleForEditing(role)">
                           <ng-container *ngIf="editingRoleId === role.role_id; else displayRoleName">
                             <input [(ngModel)]="role.role_name" class="border rounded outline-none" />
                           </ng-container>
@@ -451,7 +452,7 @@
             <div class="m-10" *ngIf="assignedRole">
               <div class="flex justify-between items-center">
                 <p class=" text-2xl font-black">{{ assignedRole.role_name }}</p>
-                <button class="bg-blue-500 text-white px-4 py-2 rounded" (click)="openAssignPopup()" *ngIf="!isManageMode">Assign</button>
+                <button class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" (click)="openAssignPopup()" *ngIf="!isManageMode">Assign</button>
               </div>
               <div class="overflow-y-auto overflow-x-hidden custom-scrollbar" style="height: calc(450px - 8rem);">
                 <table class="table-auto w-full">
@@ -819,18 +820,20 @@
           <div class="w-[25%] h-[70%] shadow-xl rounded-lg bg-white flex flex-col">
             <div class="flex flex-col h-full p-6">
               <div class="flex justify-start flex-col mb-3">
-                <p class="text-2xl font-black">Assign for <span class="text-blue-600">{{ assignedRole.role_name }}</span></p>
+                <p class="text-2xl font-black">
+                  Assign for <span class="text-blue-600">{{ assignedRole.role_name }}</span>
+                </p>
                 <input type="text" [(ngModel)]="searchTerm" placeholder="Search Employees..." class="w-full p-2 border rounded-lg">
               </div>
               <p *ngIf="selectedUserIds.size > 0" class="text-gray-400 text-sm">
-                <button type="button" class="focus:outline-none text-red-700" (click)="deselectAllCheckboxes()">Deselect All</button> 
+                <button type="button" class="focus:outline-none text-red-700" (click)="deselectAllCheckboxes()">Deselect All</button>
                 {{selectedUserIds.size}} assigned
               </p>
-              <div class="overflow-y-auto overflow-x-hidden custom-scrollbar">
+              <div class="flex-grow overflow-y-auto overflow-x-hidden custom-scrollbar min-h-[150px]">
                 <table class="table-auto w-full">
                   <tbody>
                     <ng-container *ngIf="searchEmpRole.length > 0; else noMatch">
-                      <tr class="h-7 text-gray-600 text-sm font-light" *ngFor="let emp of searchEmpRole">
+                      <tr class="h-9 text-gray-600 text-sm font-light" *ngFor="let emp of searchEmpRole">
                         <td>
                           <input type="checkbox" (change)="onCheckboxChange(emp.user_id, $event)">
                         </td>
@@ -845,13 +848,32 @@
                   </tbody>
                 </table>
               </div>
-              <div class="flex gap-2 justify-start m-3">
-                <button class="bg-green-500 text-white px-4 py-2 rounded" (click)="assignRole()">Assign</button>
-                <button class="bg-gray-500 text-white px-4 py-2 rounded" (click)="closeAssignPopup()">Cancel</button>
+              <div class="flex gap-2 justify-start mt-3">
+                <button class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600" (click)="assignRole()">Assign</button>
+                <button class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600" (click)="closeAssignPopup()">Cancel</button>
               </div>
-            </div>            
-          </div>                   
+            </div>
+          </div>                        
         </div>
+
+        <div *ngIf="showDeleteAssigneePopup" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
+          <div class="w-[20%] shadow-xl rounded-lg bg-white flex flex-col">
+            <div class="flex flex-col h-full p-4 md:p-6 justify-between">
+              <div class="flex flex-col justify-center items-center mb-2">
+                <p class="text-xl md:text-2xl font-black text-center">Delete Assignee</p>
+                <p class="text-gray-600 text-center">This action cannot be undone. By deleting the assignee, all associated information will be permanently lost.</p>
+              </div>
+              <div class="flex gap-2 justify-center w-full">
+                <button class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 flex-grow" >Delete</button>
+                <button class="border border-gray-500 text-gray-500 px-4 py-2 rounded hover:bg-gray-100 flex-grow">Cancel</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        
+
+
       </section>
 
 <!-- Popup Overlay -->
