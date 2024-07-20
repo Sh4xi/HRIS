@@ -404,8 +404,11 @@ cancelEdit() {
     }
   }
 
-  showSuccessMessage: boolean = false;
-  showErrorMessage: boolean = false;
+  showRoleSuccessMessage: boolean = false;
+  showRoleErrorMessage: boolean = false;
+  showEmpSuccessMessage: boolean = false;
+  showEmpErrorMessage: boolean = false;
+
 
 
   addRole() {
@@ -428,17 +431,23 @@ cancelEdit() {
     .then(response => {
       if (response.error) {
         console.error('Error creating role:', response.error.message);
-        this.showErrorMessage = true;
+        this.showRoleErrorMessage = true;
+        setTimeout(() => {
+          this.showRoleErrorMessage = false;
+        }, 5000); // Hide the message after 3 seconds
       } else {
         if (response.data) {
           console.log('Role created successfully:', response.data);
-          this.showSuccessMessage = true;
+          this.showRoleSuccessMessage = true;
           setTimeout(() => {
-            this.showSuccessMessage = false;
-          }, 3000); // Hide the message after 3 seconds
+            this.showRoleSuccessMessage = false;
+          }, 5000); // Hide the message after 3 seconds
         } else {
           console.log('Role created successfully, but no data returned.');
-          this.showSuccessMessage = true;
+          this.showRoleSuccessMessage = true;
+          setTimeout(() => {
+            this.showRoleSuccessMessage = false;
+          }, 5000);
         }
         this.closeAddPopup();
       }
@@ -501,9 +510,17 @@ cancelEdit() {
       await this.supabaseService.unassignUserFromRole(userId, roleId);
       console.log('User unassigned successfully.');
       this.loadAssignedUsers(this.assignedRole);
+      this.showEmpSuccessMessage = true;
+      setTimeout(() => {
+        this.showEmpSuccessMessage = false;
+      }, 5000);
     } catch (error) {
       if (error instanceof Error) {
         console.error('Error unassigning user:', error.message);
+        this.showEmpErrorMessage = true;
+        setTimeout(() => {
+          this.showEmpErrorMessage = false;
+        }, 5000);
       } else {
         console.error('An unknown error occurred');
       }
