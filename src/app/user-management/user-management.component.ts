@@ -181,13 +181,26 @@ cancelEdit() {
     this.isManageMode = !this.isManageMode;
   }
 
-    openDeleteAssigneePopup(){
-      this.showDeleteAssigneePopup = true;
-    }
+  openDeleteAssigneePopup(userId: number, roleId: number): void {
+    this.currentUserId = userId;
+    this.currentRoleId = roleId;
+    this.showDeleteAssigneePopup = true;
+  }
 
-    closeDeleteAssigneePopup(){
+  async confirmDeleteAssignee(): Promise<void> {
+    if (this.currentUserId !== null && this.currentRoleId !== null) {
+      await this.unassignUser(this.currentUserId, this.currentRoleId);
       this.showDeleteAssigneePopup = false;
+      this.currentUserId = null;
+      this.currentRoleId = null;
     }
+  }
+
+  closeDeleteAssigneePopup(): void {
+    this.showDeleteAssigneePopup = false;
+    this.currentUserId = null;
+    this.currentRoleId = null;
+  }
 
   openRolePopup() {
     this.showRolePopup = true;
@@ -480,19 +493,22 @@ cancelEdit() {
       }
     }
 
-    async unassignUser(userId: number, roleId: number): Promise<void> {
-      try {
-        await this.supabaseService.unassignUserFromRole(userId, roleId);
-        console.log('User unassigned successfully.');
-        this.loadAssignedUsers(this.assignedRole);
-      } catch (error) {
-        if (error instanceof Error) {
-          console.error('Error unassigning user:', error.message);
-        } else {
-          console.error('An unknown error occurred');
-        }
+  currentUserId: number | null = null;
+  currentRoleId: number | null = null;
+
+  async unassignUser(userId: number, roleId: number): Promise<void> {
+    try {
+      await this.supabaseService.unassignUserFromRole(userId, roleId);
+      console.log('User unassigned successfully.');
+      this.loadAssignedUsers(this.assignedRole);
+    } catch (error) {
+      if (error instanceof Error) {
+        console.error('Error unassigning user:', error.message);
+      } else {
+        console.error('An unknown error occurred');
       }
     }
+  }
 
     async updateRoleName(role: any) {
       try {

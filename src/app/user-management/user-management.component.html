@@ -461,11 +461,11 @@
                       <tr class="h-9 text-gray-600 text-sm font-light w-full" *ngFor="let user of assignedUsers">
                         <td class="w-full">{{ user.first_name }} {{ user.mid_name }} {{ user.surname }}</td>
                         <td>
-                          <button class="text-red-500 hover:text-red-700 pr-1" *ngIf="isManageMode" (click)="unassignUser(user.user_id, assignedRole.role_id)">
+                          <button class="text-red-500 hover:text-red-700 pr-1" *ngIf="isManageMode" (click)="openDeleteAssigneePopup(user.user_id, assignedRole.role_id)">
                             <i class="fa fa-trash" aria-hidden="true"></i>
                           </button>
                         </td>
-                      </tr>
+                      </tr>                      
                     </ng-container>
                     <ng-template #noRoleMatch>
                       <tr class="h-9 text-gray-600 text-sm font-light">
@@ -864,12 +864,12 @@
                 <p class="text-gray-600 text-center">This action cannot be undone. By deleting the assignee, all associated information will be permanently lost.</p>
               </div>
               <div class="flex gap-2 justify-center w-full">
-                <button class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 flex-grow" >Delete</button>
-                <button class="border border-gray-500 text-gray-500 px-4 py-2 rounded hover:bg-gray-100 flex-grow">Cancel</button>
+                <button class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 flex-grow" (click)="confirmDeleteAssignee()">Delete</button>
+                <button class="border border-gray-500 text-gray-500 px-4 py-2 rounded hover:bg-gray-100 flex-grow" (click)="closeDeleteAssigneePopup()">Cancel</button>
               </div>
             </div>
           </div>
-        </div>
+        </div>        
         
         
 
