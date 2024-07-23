@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { UserManagementComponent } from './user-management/user-management.component';
 import { LoginFailedComponent } from '../app/login-failed/login-failed.component';
+import { SidebarNavigationComponent } from './sidebar-navigation/sidebar-navigation.component';
 import { AuditTrailComponent } from './audit-trail/audit-trail.component';
 
 @NgModule({
@@ -15,7 +16,8 @@ import { AuditTrailComponent } from './audit-trail/audit-trail.component';
     DashboardComponent,
     UserManagementComponent,
     LoginFailedComponent,
-    AuditTrailComponent
+    AuditTrailComponent,
+    SidebarNavigationComponent
   ],
 })
 export class AppModule { }

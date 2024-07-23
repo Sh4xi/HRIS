@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterModule, Router } from '@angular/router';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { environment } from '../environments/environment';
 
@@ -18,63 +19,56 @@ interface Workflow {
 @Component({
   selector: 'app-workflow',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './workflow-approval.component.html',
-  styleUrls: ['./workflow-approval.component.css']
+  styleUrls: ['./workflow-approval.component.css'],
 })
 export class WorkflowComponent implements OnInit {
   private supabase: SupabaseClient;
   workflows: Workflow[] = [];
   filteredWorkflows: Workflow[] = [];
+  paginatedWorkflows: Workflow[] = [];
   selectedStatus: string = '';
   searchTerm: string = '';
   currentPage: number = 1;
   totalPages: number = 1;
   itemsPerPage: number = 10;
-  supabaseService: any;
 
-  constructor() {
+  constructor(private router: Router) {
     this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey);
   }
 
   async ngOnInit() {
-      this.fetchWorkflows();
+    await this.fetchWorkflows();
   }
 
   async fetchWorkflows() {
     const { data, error } = await this.supabase
-      .from('workflow')  // Replace with your actual table name
+      .from('workflow')
       .select('*')
-      .range((this.currentPage - 1) * this.itemsPerPage, this.currentPage * this.itemsPerPage - 1);
+      
   
     if (error) {
       console.error('Error fetching workflows:', error);
     } else {
-       
-        this.workflows = data?.map(item => ({
-          id: item.id,
-          status: item.status_column, // Map 'status_column' to 'status' if needed
-          submitted_for: item.submitted_for,
-          submitted_for_role: item.submitted_for_role,
-          reviewer: item.reviewer,
-          request: item.request,
-          requested_by: item.requested_by,
-          requested_by_role: item.requested_by_role
-        })) || [];
-        this.filterWorkflows();
-      
+      this.workflows = data?.map(item => ({
+        id: item.id,
+        status: item.status,
+        submitted_for: item.submitted_for,
+        submitted_for_role: item.submitted_for_role,
+        reviewer: item.reviewer,
+        request: item.request,
+        requested_by: item.requested_by,
+        requested_by_role: item.requested_by_role
+      })) || [];
+      this.filterWorkflows();
     }
   
-    const { count } = await this.supabase
-      .from('workflow')  // Replace with your actual table name
-      .select('*', { count: 'exact', head: true });
   
-    this.totalPages = Math.ceil((count || 0) / this.itemsPerPage);
-    console.log('Total pages:', this.totalPages);  // Add this line
   }
 
+  // pagination control
   filterWorkflows() {
-    console.log('Filtering workflows. Before:', this.workflows.length);  // Add this line
     this.filteredWorkflows = this.workflows.filter(workflow => {
       const matchesStatus = !this.selectedStatus || workflow.status === this.selectedStatus;
       const matchesSearch = !this.searchTerm || 
@@ -83,22 +77,61 @@ export class WorkflowComponent implements OnInit {
         );
       return matchesStatus && matchesSearch;
     });
-    console.log('After filtering:', this.filteredWorkflows.length);  // Add this line
+    this.totalPages = Math.ceil(this.filteredWorkflows.length / this.itemsPerPage);
+    this.currentPage = 1;
+    this.updatePaginatedWorkflows();
   }
 
+  updatePaginatedWorkflows() {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    this.paginatedWorkflows = this.filteredWorkflows.slice(startIndex, endIndex);
+    this.totalPages = Math.ceil(this.filteredWorkflows.length / this.itemsPerPage);
+  }
+
+// functionality for the previous button
   async previousPage() {
     if (this.currentPage > 1) {
       this.currentPage--;
-      await this.fetchWorkflows();
+      this.updatePaginatedWorkflows();
     }
   }
 
+  // funtionality for the next page button
   async nextPage() {
     if (this.currentPage < this.totalPages) {
       this.currentPage++;
-      await this.fetchWorkflows();
+      this.updatePaginatedWorkflows();  
     }
   }
 
-}
+  // navigation functions
+  goHome() {
+    this.router.navigate(['/system-management']);
+  }
 
+  onStatusChange() { // Reset to first page when filter changes
+    this.fetchWorkflows();
+  }
+
+  onSearchChange() { // Reset to first page when search changes
+    this.fetchWorkflows();
+  }
+
+  // The View function
+  viewWorkflowDetails(workflowId: number) {
+    console.log('View details for workflow:', workflowId);
+    // Implement navigation to workflow details page if needed
+  }
+// the approve function
+  approveWorkflow(workflowId: number) {
+    console.log('Approve workflow:', workflowId);
+    // Implement approval logic
+  }
+
+  // The reject function
+  rejectWorkflow(workflowId: number) {
+    console.log('Reject workflow:', workflowId);
+    // Implement rejection logic
+  }
+}

@@ -4,6 +4,9 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class AuthService {
+  getUser() {
+    throw new Error('Method not implemented.');
+  }
   login(username: string, password: string): boolean {
     // Implement your authentication logic here
     if (username === 'admin' && password === 'password') {

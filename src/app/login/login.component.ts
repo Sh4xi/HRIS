@@ -1,9 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, ComponentRef, ViewChild, ViewContainerRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { SupabaseService } from '../Supabase/supabase.service';
 import { LoginAttemptService } from '../services/login-attempt.service';
+import { SubmitTicketComponent } from '../submit-ticket/submit-ticket.component';
 
 @Component({
   selector: 'app-login',
@@ -17,6 +18,19 @@ export class LoginComponent {
   password: string = '';
   errorMessage: string = '';
   isLoading: boolean = false;
+
+  @ViewChild('popupHostContainer', { read: ViewContainerRef }) popupHostContainerRef!: ViewContainerRef;
+  popupComponentInstance!: ComponentRef<SubmitTicketComponent>;
+
+  displayCustomPopup() {
+    this.popupHostContainerRef.clear();
+    this.popupComponentInstance = this.popupHostContainerRef.createComponent(SubmitTicketComponent);
+    this.popupComponentInstance.instance.close.subscribe(() => this.removeCustomPopup());
+  }
+
+  removeCustomPopup() {
+    this.popupComponentInstance.destroy();
+  }
 
   constructor(
     private supabaseService: SupabaseService,
@@ -83,5 +97,11 @@ export class LoginComponent {
 
   handleLoginFailure(message: string): void {
     this.errorMessage = message;
+  }
+
+  submitTicket() {
+    // Implement the logic to navigate to the ticket submission page
+    // For example, you could use Angular's Router to navigate to a specific route
+    this.displayCustomPopup();
   }
 }

@@ -12,11 +12,12 @@
 }
 
 body {
-    background-color: blue; /* Light gray background color */
-    background-image: url("https://i.imgur.com/MQj1oy4.jpg");/*background-image: url("background.png");/* Path to your background image */
+    background-color: white; /* Light gray background color */
     background-size: cover;
     background-position: center;
     margin: 0;
     padding: 0;
     font-family: 'SF Pro Display', sans-serif;
   }
+
+  

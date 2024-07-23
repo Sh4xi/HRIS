@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { SupabaseService } from '../Supabase/supabase.service';
+import { SidebarNavigationModule } from '../sidebar-navigation/sidebar-navigation.module';
 
 interface SidebarItem {
   name: string;
@@ -16,32 +17,24 @@ interface DashboardCard {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, SidebarNavigationModule],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent implements OnInit {
   isExpanded = false;
-
-  sidebarItems: SidebarItem[] = [
-    { name: 'Overview', route: '/overview' },
-    { name: 'Employee Management', route: '/user-management' },
-    { name: 'System Management', route: '/system-management' },
-    { name: 'Payroll', route: '/payroll' },
-    { name: 'Performance', route: '/performance' },
-    { name: 'Recruitment', route: '/recruitment' },
-    { name: 'Reports', route: '/reports' }
-  ];
+  userEmail: string = ''; // Add this line to declare userEmail
 
   dashboardCards: DashboardCard[] = [
     { title: 'Total Employees', value: 0 },
-    { title: 'Leaves Pending', value: 5 },
+    { title: 'DTR', value: 5 },
     { title: 'New Applications', value: 8 }
   ];
 
   constructor(private router: Router, private supabaseService: SupabaseService) {}
 
-  ngOnInit() {
+  async ngOnInit() {
+    await this.fetchUserEmail();
     this.fetchDashboardData();
   }
 
@@ -52,7 +45,7 @@ export class DashboardComponent implements OnInit {
         const totalEmployees = response.data.length;
         this.dashboardCards = [
           { title: 'Total Employees', value: totalEmployees },
-          { title: 'Leaves Pending', value: 7 },
+          { title: 'DTR', value: 7 },
           { title: 'New Applications', value: 10 }
         ];
       } else {
@@ -81,7 +74,7 @@ export class DashboardComponent implements OnInit {
 
   getIconForRoute(route: string): string {
     switch (route) {
-      case '/overview': return 'dashboard';
+      case '/dashboard': return 'dashboard';
       case '/user-management': return 'group';
       case '/system-management': return 'settings';
       case '/payroll': return 'attach_money';
@@ -92,12 +85,75 @@ export class DashboardComponent implements OnInit {
     }
   }
 
-  async signOut() {
+  async fetchUserEmail() {
     try {
-      await this.supabaseService.signOut();
-      this.router.navigate(['/login']);
+      const { data: { user }, error: userError } = await this.supabaseService.getUser();
+      if (userError) {
+        console.error('User authentication error:', userError.message);
+        throw userError;
+      }
+      if (!user || !user.email) {
+        throw new Error('No authenticated user found or email is missing');
+      }
+
+      console.log('Fetched user email:', user.email);
+      this.userEmail = user.email!; // Use non-null assertion operator
     } catch (error) {
-      console.error('Error signing out:', error);
+      console.error('Error fetching user email:', error);
+      this.userEmail = ''; // Set to empty string if there's an error
+    }
+  }
+
+  async timeIn() {
+    try {
+      const name = this.userEmail;
+  
+      if (!name) {
+        throw new Error('User email not available');
+      }
+  
+      // Check if the user has already timed in today
+      const hasTimedIn = await this.supabaseService.hasTimedInToday(name);
+      if (hasTimedIn) {
+        alert('You have already timed in today. You can only time in once per day.');
+        return;
+      }
+  
+      const status = 'Time In';
+      const result = await this.supabaseService.insertDTRRecord(status, name);
+      console.log('Time In recorded successfully:', result);
+      alert('Time In recorded successfully');
+    } catch (error) {
+      console.error('Error recording Time In:', error);
+      if (error instanceof Error) {
+        alert(`Error recording Time In: ${error.message}`);
+      } else {
+        alert('Error recording Time In. Please try again.');
+      }
+    }
+  }
+
+  async timeOut() {
+    try {
+      const name = this.userEmail;
+
+      if (!name) {
+        throw new Error('User email not available');
+      }
+
+      const result = await this.supabaseService.updateDTRClockOut(name);
+      if (result.error) {
+        throw result.error;
+      }
+      console.log('Time Out recorded successfully:', result.data);
+      alert('Time Out recorded successfully');
+    } catch (error) {
+      console.error('Error recording Time Out:', error);
+      if (error instanceof Error) {
+        alert(`Error recording Time Out: ${error.message}`);
+      } else {
+        alert('Error recording Time Out. Please try again.');
+      }
     }
   }
 }
