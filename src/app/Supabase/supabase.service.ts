@@ -624,58 +624,110 @@ async isAuditTrailEmpty(): Promise<boolean> {
 
   return count === 0;
 }
-  async updateEmployee(employee: any): Promise<{ data: any; error: any }> {
-    try {
-      // Get the old employee data before update
-      const { data: oldEmployeeData, error: oldDataError } = await this.supabase
-        .from('profile')
-        .select('*')
-        .eq('email', employee.email)
-        .single();
-  
-      if (oldDataError) {
-        console.error('Error retrieving old employee data:', oldDataError.message);
-        return { data: null, error: oldDataError };
-      }
-  
-      const { data, error } = await this.supabase
-        .from('profile')
-        .update({
-          first_name: employee.first_name,
-          mid_name: employee.mid_name,
-          surname: employee.surname,
-          password: employee.password,
-          department: employee.department,
-          position: employee.position,
-          types: employee.types,
-          photo_url: employee.photo_url
-        })
-        .eq('email', employee.email)
-        .select();
-  
-      if (error) {
-        console.error('Error updating employee:', error.message);
-        return { data: null, error };
-      }
-  
-      // Create audit log
-      await this.createAuditLog({
-        user_id: await this.getCurrentUserId(),
-        affected_page: 'Employee Management',
-        action: 'Update',
-        old_parameter: JSON.stringify(oldEmployeeData),
-        new_parameter: JSON.stringify(data[0])
-      });
-  
-      console.log('Employee updated successfully:', data);
-      await this.refreshSession();
-  
-      return { data: data[0], error: null };
-    } catch (error) {
-      console.error('Unexpected error updating employee:', error);
-      return { data: null, error };
+isValidEmail(email: string): boolean {
+  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return regex.test(email);
+}
+async updateEmployee(employee: any): Promise<{ data: any; error: any }> {
+  // ... (previous code remains the same)
+
+  try {
+    // Step 1: Get the old employee data before update
+    const { data: oldEmployeeData, error: oldDataError } = await this.supabase
+      .from('profile')
+      .select('*')
+      .eq('email', employee.email)
+      .single();
+
+    if (oldDataError) {
+      console.error('Error retrieving old employee data:', oldDataError.message);
+      return { data: null, error: oldDataError };
     }
+
+    // Step 2: Update the employee data in the 'profile' table
+    const { data: updatedData, error: updateError } = await this.supabase
+      .from('profile')
+      .update({
+        first_name: employee.first_name.trim(),
+        mid_name: employee.mid_name ? employee.mid_name.trim() : null,
+        surname: employee.surname.trim(),
+        password: employee.password,
+        department: employee.department.trim(),
+        position: employee.position.trim(),
+        types: employee.types.trim(),
+        photo_url: employee.photo_url,
+      })
+      .eq('email', employee.email)
+      .select();
+
+    if (updateError) {
+      console.error('Error updating employee:', updateError.message);
+      return { data: null, error: updateError };
+    }
+
+    if (!updatedData || updatedData.length === 0) {
+      console.error('No data returned from update operation');
+      return { data: null, error: { message: 'No data returned from update operation' } };
+    }
+
+    // Step 3: Update the user's role if the position has changed
+    // ... (role update code remains the same)
+
+    // Step 4: Create an audit log entry with old and new parameters
+    const oldParameterValue = JSON.stringify({
+      first_name: oldEmployeeData.first_name,
+      mid_name: oldEmployeeData.mid_name,
+      surname: oldEmployeeData.surname,
+      email: oldEmployeeData.email,
+      department: oldEmployeeData.department,
+      position: oldEmployeeData.position,
+      types: oldEmployeeData.types,
+      photo_url: oldEmployeeData.photo_url,
+    });
+
+    const newParameterValue = JSON.stringify({
+      first_name: updatedData[0].first_name,
+      mid_name: updatedData[0].mid_name,
+      surname: updatedData[0].surname,
+      email: updatedData[0].email,
+      department: updatedData[0].department,
+      position: updatedData[0].position,
+      types: updatedData[0].types,
+      photo_url: updatedData[0].photo_url,
+    });
+
+    const auditLogData: AuditLogEntry = {
+      user_id: await this.getCurrentUserId(),
+      action: 'Update',
+      affected_page: 'Employee Management',
+      parameter: 'Employee updated',
+      old_value: oldParameterValue,
+      new_value: newParameterValue,
+      ip_address: await this.getUserIpAddress(),
+      date: new Date().toISOString(),
+      email: await this.getCurrentUserEmail()
+    };
+
+    console.log('Audit log data being sent:', JSON.stringify(auditLogData, null, 2));
+
+    const auditLogResult = await this.createAuditLog(auditLogData);
+    if (!auditLogResult.success) {
+      console.error('Failed to create audit log:', auditLogResult.error);
+    } else {
+      console.log('Audit log created successfully:', JSON.stringify(auditLogResult.data, null, 2));
+    }
+
+    // Step 5: Refresh the session
+    await this.refreshSession();
+
+    console.log('Employee updated successfully:', JSON.stringify(updatedData[0], null, 2));
+    return { data: updatedData[0], error: null };
+  } catch (error) {
+    console.error('Unexpected error updating employee:', error);
+    return { data: null, error: { message: 'An unexpected error occurred' } };
   }
+}
+  
 
   
   // Method to get the current user's email

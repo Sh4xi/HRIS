@@ -692,7 +692,7 @@ cancelEdit() {
         password: employee.password,
         department: employee.department.trim(),
         position: employee.position.trim(),
-        type: employee.type.trim(),
+        type: employee.types.trim(),
         status: 'Active',
         access: true
       };
