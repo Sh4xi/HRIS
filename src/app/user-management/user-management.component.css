@@ -60,7 +60,24 @@
     white-space: nowrap; /* Ensure text stays in one line */
   }
   
-  
   .on { left: 60%; }
   .off { left: 40%; }
   
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 5px;
+    height: 10px;
+  }
+  
+  .custom-scrollbar {
+    -ms-overflow-style: none;  /* Internet Explorer 10+ */
+    scrollbar-width: 5x;  /* Firefox */
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgb(183, 183, 183);
+    border-radius: 50px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }

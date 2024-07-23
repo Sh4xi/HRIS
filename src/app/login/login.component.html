@@ -53,6 +53,12 @@
             <span *ngIf="isLoading">Logging in...</span>
           </button>
         </div>
+        <div class="mt-4">
+          <button type="button" class="border-none rounded-md underline text-blue-700" (click)="submitTicket()">
+           Submit a Ticket
+          </button>
+          <ng-container #popupHostContainer></ng-container>
+        </div>
       </form>
     </div>
   </div>

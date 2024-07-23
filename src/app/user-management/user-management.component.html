@@ -6,31 +6,34 @@
 
     <!-- Main componenet -->
 <div class="bg-white min-h-screen">
-  <header class="bg-white text-center py-4 px-4 sm:px-6">
-    <h1 class="text-m sm:text-2xl">User Management System</h1>
-  </header>
-
   <main class="p-6">
 
-    <div class="flex mb-6">
-      <button (click)="setActiveTab('users')" [ngClass]="activeTab === 'users' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-500'" class="mr-4">Users</button>
-      <button (click)="setActiveTab('roles')" [ngClass]="activeTab === 'roles' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-500'" class="mr-4">Roles</button>
-      <button (click)="setActiveTab('support tickets')" [ngClass]="activeTab === 'support tickets' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-500'">Support Tickets</button>
+    <div class="mb-6">
+      <p class="mb-2 text-3xl font-bold text-neutral-900">User Management<br></p>
+      <p class="mb-2 pb-5 text-slate-500 text-sm">Configure employee details and access rights</p>
+      <div class="flex">
+        <button (click)="setActiveTab('users')" [ngClass]="activeTab === 'users' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-500'" class="mr-4">Users</button>
+        <button (click)="setActiveTab('roles')" [ngClass]="activeTab === 'roles' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-500'" class="mr-4">Roles</button>
+        <button (click)="setActiveTab('support tickets')" [ngClass]="activeTab === 'support tickets' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-500'">Support Tickets</button>
+      </div>
     </div>
+    
 
-    <!-- Support tickets -->
-  <div *ngIf="activeTab === 'support tickets'">
-  <section id="ticket-list" class="bg-white rounded-lg shadow-lg p-6">
+<!-- Support tickets -->
+<div *ngIf="activeTab === 'support tickets'">
+  <section id="ticket-list" class="flex flex-col h-full">
     <div class="mb-4 flex flex-col md:flex-row justify-between items-center">
       <div class="w-full md:w-1/2 mb-4 md:mb-0">
-        <input type="text" [(ngModel)]="searchTicketTerm" (input)="searchTicketTable()" placeholder="Search..." class="w-full p-2 border rounded-lg">
+        <input type="text" [(ngModel)]="searchTicketTerm" (input)="searchTicketTable()" placeholder="Search Tickets..." class="w-full p-2 border rounded-lg">
       </div>
       <div class="flex items-center">
         <div class="relative ml-4">
           <select class="bg-blue-500 hover:bg-blue-600 text-white py-2 pl-3 pr-10 rounded-lg appearance-none" [(ngModel)]="filterOption" (change)="filterTickets()">
             <option value="all">All</option>
-            <option value="read">Read</option>
-            <option value="unread">Unread</option>
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+            <option value="urgent">Urgent</option>
           </select>
           <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-white">
             <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
@@ -39,6 +42,7 @@
           </div>
         </div>
         <button class="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg ml-4" (click)="deleteSelectedTickets()">Delete</button>
+        <button class="bg-green-600 hover:bg-green-600 text-white py-2 px-4 rounded-lg ml-4" (click)="deleteSelectedTickets()">Refresh</button>
       </div>
     </div>
       
@@ -53,30 +57,41 @@
         <th scope="col" class="px-6 py-3">Email</th>
         <th scope="col" class="px-6 py-3">Description</th>
         <th scope="col" class="px-6 py-3">Status</th>
-        <th scope="col" class="px-6 py-3">Date</th>
-        <th scope="col" class="px-6 py-3">Actions</th>
+        <th scope="col" class="px-6 py-3">Date Created</th>
+        <th scope="col" class="px-6 py-3">Priority</th>
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let ticket of filteredTickets; let i = index" class="border-b border-gray-200 hover:bg-gray-100" (click)="openTicketDetails(ticket)">
+      <tr *ngFor="let ticket of ticketPaginate(); let i = index" class="border-b border-gray-200 hover:bg-gray-100" (click)="openTicketDetails(ticket)">
         <td class="p-4">
           <input type="checkbox" [(ngModel)]="selectedTickets[i]" (click)="$event.stopPropagation()">
         </td>
         <td class="px-6 py-3">{{ ticket.id }}</td>
-        <td class="px-6 py-3">{{ ticket.title }}</td>
-        <td class="px-6 py-3">{{ ticket.email }}</td>
+        <td class="px-6 py-3 font-semibold">{{ ticket.title }}</td>
+        <td class="px-6 py-3 flex justify-start">{{ ticket.email }}</td>
         <td class="px-6 py-3 overflow-hidden max-w-xs whitespace-nowrap overflow-ellipsis">{{ ticket.description }}</td>
         <td class="px-6 py-3">
-          <span [ngClass]="{
-            'text-green-700 bg-green-300 py-1 px-3 rounded-full text-xs': ticket.status === 'Open',
-            'text-blue-700 bg-blue-300 py-1 px-3 rounded-full text-xs': ticket.status === 'In Progress',
-            'text-red-700 bg-red-300 py-1 px-3 rounded-full text-xs': ticket.status === 'Closed'}">{{ ticket.status }}
+          <span class="bg-green-200 py-1 px-3 rounded-full text-xs">
+            <span [ngClass]="{
+              'text-green-700': ticket.status === 'Open',
+              'text-blue-700': ticket.status === 'In Progress',
+              'text-red-700': ticket.status === 'Closed'
+            }">{{ ticket.status }}</span>
           </span>
-        </td>
-        <td class="px-6 py-3">{{ ticket.dateTime | date:'MMMM d, yyyy' }}</td>        
-          <td class="px-6 py-3">
-          <button class="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded-lg" (click)="deleteTicket(ticket.id); $event.stopPropagation()">Delete</button>
-        </td>
+        </td>        
+        <td class="px-6 py-3 text-sm">{{ ticket.dateTime | date:'hh:mm a' }}<br>{{ ticket.dateTime | date:'MMMM d, yyyy' }}</td>
+        <td class="px-6 py-3">
+          <div (click)="$event.stopPropagation()">
+            <select class="py-2 pl-3 pr-10 rounded-lg font-bold shadow-md"
+                    [(ngModel)]="ticket.priority" 
+                    (change)="updateTicketPriority(ticket, $event)">
+              <option value="Low" [selected]="ticket.priority === 'Low'" style="font-weight: 600; color: green;">Low</option>
+              <option value="Medium" [selected]="ticket.priority === 'Medium'" style="font-weight: 600; color: yellow;">Medium</option>
+              <option value="High" [selected]="ticket.priority === 'High'" style="font-weight: 600; color: orange;">High</option>
+              <option value="Urgent" [selected]="ticket.priority === 'Urgent'" style="font-weight: 600; color: red;">Urgent</option>
+            </select>
+          </div>               
+        </td>          
       </tr>
     </tbody>
   </table>
@@ -84,13 +99,13 @@
 
 </section>
 
-<!-- Paginations for users tab -->
+<!-- Paginations for tickets -->
     <div class="flex justify-between items-center mt-4">
-        <button class="bg-gray-500 text-white px-4 py-2 rounded" (click)="prevPage()" [disabled]="currentPage === 1">Previous</button>
-        <span class="text-gray-600">Page {{ currentPage }} of {{ totalPages }}</span>
-        <button class="bg-gray-500 text-white px-4 py-2 rounded" (click)="nextPage()" [disabled]="currentPage === totalPages">Next</button>
+        <button class="bg-gray-500 text-white px-4 py-2 rounded" (click)="ticketPrevPage()" [disabled]="ticket_currentPage === 1">Previous</button>
+        <span class="text-gray-600">Page {{ ticket_currentPage }} of {{ ticket_totalPages }}</span>
+        <button class="bg-gray-500 text-white px-4 py-2 rounded" (click)="ticketNextPage()" [disabled]="ticket_currentPage === totalPages">Next</button>
       </div>
-    </div>
+   </div>
     
 <!-- Ticket Details Modal -->
 <div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50" *ngIf="isModalVisible">
@@ -102,25 +117,36 @@
     <div class="mt-4">
       <p><strong>Title:</strong> {{ selectedTicket?.title }}</p>
       <p><strong>Email:</strong> {{ selectedTicket?.email }}</p>
-      <p><strong>Status: </strong><span [ngClass]="{
-        'text-green-600': selectedTicket?.status === 'Open',
-        'text-blue-600': selectedTicket?.status === 'In Progress',
-        'text-red-600': selectedTicket?.status === 'Closed'}">{{ selectedTicket?.status }}</span></p>
-      <div class="max-h-40 overflow-y-auto">
-        <p><strong>Description:</strong> {{ selectedTicket?.description }}</p>
+      <p><strong>Status:</strong>
+        <span [ngClass]="{
+          'text-green-700': selectedTicket?.status === 'Open',
+          'text-blue-700': selectedTicket?.status === 'In Progress',
+          'text-red-700': selectedTicket?.status === 'Closed'
+        }">{{ selectedTicket?.status }}</span>
+      </p>
+      <div class="mt-2">
+        <p><strong>Description:</strong></p>
+        <div class="max-h-40 overflow-y-auto border border-gray-200 rounded p-2">
+          {{ selectedTicket?.description }}
+        </div>
+      </div>
+      <div class="mt-4">
+        <p><strong>Admin Reply:</strong></p>
+        <textarea [(ngModel)]="replyText" class="w-full p-2 border rounded-lg" placeholder="Type your reply here..."></textarea>
       </div>
     </div>
     <div class="mt-4 flex justify-end">
-      <button class="bg-blue-500 text-white px-4 py-2 rounded" (click)="editTicket()">Edit</button>
+      <button class="bg-blue-500 text-white px-4 py-2 rounded mr-2" (click)="replyTicket()">Reply</button>
     </div>
   </div>
 </div>
 
+
 <!-- Users active tab -->
-<div *ngIf="activeTab === 'users'" class="flex flex-col h-screen">
+<div *ngIf="activeTab === 'users'" class="flex flex-col">
   <section id="user-list" class="flex flex-col h-full">
     <div class="mb-4 flex flex-col md:flex-row md:justify-between md:items-center">
-      <input type="text" [(ngModel)]="searchTerm" (input)="searchTable()" placeholder="Search..." class="w-full md:w-1/2 p-2 border rounded-lg mb-2 md:mb-0">
+      <input type="text" [(ngModel)]="searchTerm" (input)="searchTable()" placeholder="Search Employees..." class="w-full md:w-1/2 p-2 border rounded-lg mb-2 md:mb-0">
       <div class="flex space-x-4">
         <!-- Delete button only displayed when in editing mode -->
         <button *ngIf="isEditing" class="bg-red-500 text-white px-4 py-2 rounded-lg" (click)="deleteUsers()">
@@ -219,10 +245,7 @@
                           <label for="position" class="block mb-1 text-sm font-medium text-gray-900 dark:text-white">Position*</label>
                           <select id="position" [(ngModel)]="employee.position" name="position" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required>
                             <option value="" disabled selected>Select a position</option>
-                            <option value="Manager">Manager</option>
-                            <option value="Developer">Developer</option>
-                            <option value="Designer">Designer</option>
-                            <option value="Analyst">Analyst</option>
+                            <option *ngFor="let role of roles" [value]="role.role_name">{{ role.role_name }}</option>
                           </select>
                         </div>
                         <div>
@@ -264,20 +287,20 @@
       </div>
 
 <!-- Users active tab -->
-      <div *ngIf="filteredUsers.length > 0" class="p-4 rounded-lg shadow-lg bg-white">
-        <table class="w-full md:min-w-full border-collapse">
+      <div *ngIf="filteredUsers.length > 0" class="rounded-lg shadow-lg bg-transparent">
+        <table class="w-full md:min-w-full border-collapse rounded-lg overflow-hidden">
           <thead>
-            <tr class="bg-gray-300 text-gray-700 uppercase text-sm leading-normal">
-              <th *ngIf="isEditing" class="py-3 px-6 text-center">Select</th>
-              <th class="py-3 px-6 text-left">Profile</th>
-              <th class="py-3 px-6 text-left">Name</th>
-              <th class="py-3 px-6 text-left">Email</th> 
-              <th class="py-3 px-6 text-left">Password</th>
-              <th class="py-3 px-6 text-left">Department</th>
-              <th class="py-3 px-6 text-left">Role</th>
-              <th class="py-3 px-6 text-left">Status</th>
-              <th class="py-3 px-6 text-center">Access</th>
-              <th *ngIf="isEditing" class="py-3 px-6 text-center">Edit</th>
+            <tr class="bg-[#E9ECF1] text-gray-700 leading-normal">
+              <th *ngIf="isEditing" class="font-thin py-3 px-6 text-center">Select</th>
+              <th class="py-3 px-6 text-left font-thin text-lg">Profile</th>
+              <th class="py-3 px-6 text-left font-thin text-lg">Name</th>
+              <th class="py-3 px-6 text-left font-thin text-lg">Email</th> 
+              <th class="py-3 px-6 text-left font-thin text-lg">Password</th>
+              <th class="py-3 px-6 text-left font-thin text-lg">Department</th>
+              <th class="py-3 px-6 text-left font-thin text-lg">Role</th>
+              <th class="py-3 px-6 text-left font-thin text-lg">Status</th>
+              <th class="py-3 px-6 text-center font-thin text-lg">Access</th>
+              <th *ngIf="isEditing" class="py-3 px-6 text-center text-lg">Edit</th>
             </tr>
           </thead>
           <tbody class="text-gray-600 text-sm font-light">
@@ -302,8 +325,8 @@
               <td class="py-3 px-6 text-left">{{ user.position }}<br>{{ getContractType(user.position) }}</td>
               <td class="py-3 px-6 text-left">
                 <span [ngClass]="{
-                  'bg-green-200 text-green-600': user.status === 'Active',
-                  'bg-red-200 text-red-600': user.status === 'Inactive'}" class="py-1 px-3 rounded-full text-xs">{{ user.status }}
+                  'bg-green-200 text-green-700': user.status === 'Active',
+                  'bg-red-200 text-red-700': user.status === 'Inactive'}" class="py-1 px-3 rounded-full text-xs">{{ user.status }}
                 </span>
               </td>
               <td class="py-3 px-6 text-center">
@@ -350,116 +373,502 @@
 <!-- Roles Active tab -->
     <div *ngIf="activeTab === 'roles'">
       <section id="user-list">
-        <div class="flex justify-between mb-6">
-          <input type="text" placeholder="Search..." class="w-half p-2 border rounded-lg">
-          <div>
-            <button class="px-4 py-2 bg-blue-500 text-white rounded mr-2">Edit</button>
-            <button (click)="toggleManagePopup()" class="px-4 py-2 bg-black text-white rounded">Manage</button>
-          </div>      
+        <div class="flex justify-between items-stretch mb-6 h-9 space-x-4 mr-2">
+          <input type="text" [(ngModel)]="searchRoleTerm" placeholder="Search Roles..." class="w-[10%] h-full p-2 border rounded-lg">
+          <p *ngIf="showRoleSuccessMessage" class="border w-[20%] h-full flex items-center justify-center whitespace-nowrap px-2 rounded-lg bg-green-50 border-green-500 text-green-700">Role has been created successfully.</p> 
+          <p *ngIf="showRoleErrorMessage" class="border w-[25%] h-full flex items-center justify-center whitespace-nowrap px-2 rounded-lg bg-red-50 border-red-500 text-red-700">There was an error creating the role.</p>        
+          <p *ngIf="showEmpSuccessMessage" class="border w-[25%] h-full flex items-center justify-center whitespace-nowrap px-2 rounded-lg bg-green-50 border-green-500 text-green-700">Employee has been unassigned successfully.</p>   
+          <p *ngIf="showEmpErrorMessage" class="border w-[20%] h-full flex items-center justify-center whitespace-nowrap px-2 rounded-lg bg-red-50 border-red-500 text-red-700">There was an error unassigning the employee.</p>    
+          <button class="text-white rounded h-full w-[10%] whitespace-nowrap text-center" [ngClass]="{'bg-blue-500 hover:bg-blue-600': !isManageMode, 'bg-red-500 hover:bg-red-600': isManageMode}" (click)="toggleManageMode()">
+            {{ isManageMode ? 'Stop Managing' : 'Manage Roles' }}
+          </button>
         </div>
         
-        <div class="flex gap-10 justify-center">
-  <div class="w-[400px] h-[740px] shadow-xl rounded-xl">
-    <div class="flex justify-between items-center">
-      <p class="pl-10 pt-10 text-2xl font-black">Manage Roles</p>
-      <button class="bg-blue-500 text-white px-4 py-2 rounded mt-10 mr-10" (click)="openRolePopup()">Add Role</button>
-    </div>
-    <table class="table-auto ml-10"> 
-      <tbody>
-        <tr class="h-9 hover:bg-gray-200" *ngFor="let role of roles" (click)="onRoleClick(role)">
-          <td>{{ role }}</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-  
-  <div class="flex flex-col gap-10">
-    <div class="w-[400px] h-[350px] shadow-xl rounded-xl">
-      <p class="pl-10 pt-10 text-2xl pb-3 font-black">Assigned for {{ assignedRole }}</p>
-      <table class="table-auto ml-10"> 
-        <tbody>
-          <tr class="h-9" *ngFor="let employee of assignedEmployees">
-            <td>{{ employee }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="w-[400px] h-[350px] shadow-xl rounded-xl">
-    </div>
-  </div>
-  
-  <div class="w-[400px] h-[740px] shadow-xl rounded-xl">
-    <div class="flex justify-between items-center">
-      <p class="pl-10 pt-10 text-2xl font-black">All Employees</p>
-      <button class="bg-blue-500 text-white px-4 py-2 rounded mt-10 mr-10" (click)="addNewRole()">Assign</button>
-    </div>
-    <table class="table-auto ml-10"> 
-      <tbody>
-        <tr class="h-9" *ngFor="let emp of employees">
-          <td *ngIf="showCheckboxes">
-            <input type="checkbox">
-          </td>
-          <td>{{ emp.firstname }} {{ emp.midname }} {{ emp.surname }}</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-</div>
+        <div class="flex justify-between">
+          <div class="flex-1 h-[450px] shadow-xl rounded-xl border border-gray-300">
+            <div class="m-10">
+              <div class="flex justify-between items-center">
+                <p class="text-2xl font-black">Roles</p>
+                <button class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" (click)="openRolePopup()" *ngIf="!isManageMode">Add Role</button>
+              </div>
+              <div class="custom-scrollbar overflow-y-auto overflow-x-hidden" style="height: calc(450px - 8rem);">
+                <table class="table-auto w-[100%]">
+                  <tbody>
+                    <ng-container *ngIf="searchroletab.length > 0; else noMatch">
+                      <tr class="hover:bg-gray-100 h-9 text-gray-600 text-sm font-light border-b" *ngFor="let role of searchroletab" [ngClass]="{'bg-gray-100': selectedRole.role_id === role.role_id}">
+                        <td class =" w-full" [ngClass]="{'bg-gray-100': clickedRoleId === role.role_id}" (click)="onRoleClick(role)" (click)="selectRoleForEditing(role)">
+                          <ng-container *ngIf="editingRoleId === role.role_id; else displayRoleName">
+                            <input [(ngModel)]="role.role_name" class="border rounded outline-none" />
+                          </ng-container>
+                          <ng-template #displayRoleName>
+                            {{ role.role_name }}
+                          </ng-template>
+                        </td>
+                        <td *ngIf="isManageMode" class="text-center" style="min-width: 35px;">
+                          <ng-container *ngIf="editingRoleId === role.role_id; else editIcon">
+                            <button (click)="updateRoleName(role)" class="text-green-500 hover:text-green-700" style="padding: 0;">
+                              <i class="fa fa-check" aria-hidden="true"></i>
+                            </button>
+                          </ng-container>
+                          <ng-template #editIcon>
+                            <button (click)="startEdit(role)" class="text-blue-500 hover:text-blue-700" style="padding: 0;">
+                              <i class="fa fa-pencil" aria-hidden="true"></i>
+                            </button>
+                          </ng-template>
+                        </td>
+                        <td *ngIf="isManageMode" class="text-center" style="min-width: 35px;">
+                          <ng-container *ngIf="editingRoleId === role.role_id; else deleteIcon">
+                            <button (click)="cancelEdit()" class="text-gray-500 hover:text-gray-700" style="padding: 0;">
+                              <i class="fa fa-ban" aria-hidden="true"></i>
+                            </button>
+                          </ng-container>
+                          <ng-template #deleteIcon>
+                            <button (click)="deleteRole(role)" class="text-red-500 hover:text-red-700 pr-1" style="padding: 0;">
+                              <i class="fa fa-trash" aria-hidden="true"></i>
+                            </button>
+                          </ng-template>
+                        </td>
+                      </tr>
+                      
+                                                                   
+                    </ng-container>
+                    <ng-template #noMatch>
+                      <tr class="h-9 text-gray-600 text-sm font-light">
+                        <td colspan="3" class="text-center p-4">No matching roles found</td>
+                      </tr>
+                    </ng-template>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          
+          <div class="flex-1 h-[450px] shadow-xl rounded-xl mx-2 border border-gray-300">
+            <div class="m-10" *ngIf="assignedRole">
+              <div class="flex justify-between items-center">
+                <p class=" text-2xl font-black">{{ assignedRole.role_name }}</p>
+                <button class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" (click)="openAssignPopup()" *ngIf="!isManageMode">Assign</button>
+              </div>
+              <div class="overflow-y-auto overflow-x-hidden custom-scrollbar" style="height: calc(450px - 8rem);">
+                <table class="table-auto w-full">
+                  <tbody>
+                    <ng-container *ngIf="assignedUsers.length > 0; else noRoleMatch">
+                      <tr class="h-9 text-gray-600 text-sm font-light w-full" *ngFor="let user of assignedUsers">
+                        <td class="w-full">{{ user.first_name }} {{ user.mid_name }} {{ user.surname }}</td>
+                        <td>
+                          <button class="text-red-500 hover:text-red-700 pr-1" *ngIf="isManageMode" (click)="openDeleteAssigneePopup(user.user_id, assignedRole.role_id)">
+                            <i class="fa fa-trash" aria-hidden="true"></i>
+                          </button>
+                        </td>
+                      </tr>                      
+                    </ng-container>
+                    <ng-template #noRoleMatch>
+                      <tr class="h-9 text-gray-600 text-sm font-light">
+                        <td colspan="3" class="text-center p-4">No assigned employees</td>
+                      </tr>
+                    </ng-template>
+                  </tbody>
+                </table>  
+              </div>
+            </div>
+          </div>
+          
+          <div class="flex-1 h-[450px] shadow-xl rounded-xl mx-2 border border-gray-300">
+            <div class="m-10">
+              <div class="flex justify-between items-center">
+                <p class="text-2xl font-black">
+                  Access Rights &nbsp;
+                  <span class="text-lg text-blue-600" style="width: 24px; display: inline-block;" *ngIf="isManageMode">
+                    <i class="fa fa-pencil" aria-hidden="true"></i>
+                  </span>
+                  <span class="text-lg text-blue-600" style="width: 24px; display: inline-block;" *ngIf="!isManageMode">&nbsp;</span>
+                </p>
+              </div>
+              <div class="overflow-y-auto overflow-x-hidden custom-scrollbar" style="height: calc(450px - 8rem);">
+                <table class="table-auto w-full">
+                  <tbody>
+                    <tr class="h-9 text-gray-600 text-sm font-light">
+                      <td class="font-black w-full">User Management</td>
+                      <td class="whitespace-nowrap text-center px-3"></td>
+                      <td class="whitespace-nowrap text-center px-3"></td>
+                      <td class="whitespace-nowrap text-center px-3">None</td>
+                      <td class="whitespace-nowrap text-center px-3">View</td>
+                      <td class="whitespace-nowrap text-center px-3">Edit</td>
+                    </tr>
+                    <tr class="h-7 text-gray-600 text-sm font-light">
+                      <td class="w-full">Users</td>
+                      <td class="whitespace-nowrap text-center px-3"></td>
+                      <td class="whitespace-nowrap text-center px-3"></td>
+                      <td class="whitespace-nowrap text-center px-3">
+                        <input type="radio" name="users" value="none" [disabled]="!isManageMode" [checked]="usersRights === 'none'" [(ngModel)]="selectedRole.users_rights" (change)="onAccessRightChange('users_rights', $event)">
+                      </td>
+                      <td class="whitespace-nowrap text-center px-3">
+                        <input type="radio" name="users" value="view" [disabled]="!isManageMode" [checked]="usersRights === 'view'" [(ngModel)]="selectedRole.users_rights" (change)="onAccessRightChange('users_rights', $event)">
+                      </td>
+                      <td class="whitespace-nowrap text-center px-3">
+                        <input type="radio" name="users" value="edit" [disabled]="!isManageMode" [checked]="usersRights === 'edit'" [(ngModel)]="selectedRole.users_rights" (change)="onAccessRightChange('users_rights', $event)">
+                      </td>
+                    </tr>
+                    <tr class="h-7 text-gray-600 text-sm font-light">
+                      <td class="w-full">Roles</td>
+                      <td class="whitespace-nowrap text-center px-3"></td>
+                      <td class="whitespace-nowrap text-center px-3"></td>
+                      <td class="whitespace-nowrap text-center px-3">
+                        <input type="radio" name="roles" value="none" [disabled]="!isManageMode" [checked]="rolesRights === 'none'" [(ngModel)]="selectedRole.roles_rights" (change)="onAccessRightChange('roles_rights', $event)">
+                      </td>
+                      <td class="whitespace-nowrap text-center px-3">
+                        <input type="radio" name="roles" value="view" [disabled]="!isManageMode" [checked]="rolesRights === 'view'" [(ngModel)]="selectedRole.roles_rights" (change)="onAccessRightChange('roles_rights', $event)">
+                      </td>
+                      <td class="whitespace-nowrap text-center px-3">
+                        <input type="radio" name="roles" value="edit" [disabled]="!isManageMode" [checked]="rolesRights === 'edit'" [(ngModel)]="selectedRole.roles_rights" (change)="onAccessRightChange('roles_rights', $event)">
+                      </td>
+                    </tr>
+                    <tr class="h-7 text-gray-600 text-sm font-light">
+                      <td class="w-full">Support Tickets</td>
+                      <td class="whitespace-nowrap text-center px-3"></td>
+                      <td class="whitespace-nowrap text-center px-3"></td>
+                      <td class="whitespace-nowrap text-center px-3">
+                        <input type="radio" name="supportTickets" value="none" [disabled]="!isManageMode" [checked]="supportRights === 'none'" [(ngModel)]="selectedRole.sup_rights" (change)="onAccessRightChange('sup_rights', $event)">
+                      </td>
+                      <td class="whitespace-nowrap text-center px-3">
+                        <input type="radio" name="supportTickets" value="view" [disabled]="!isManageMode" [checked]="supportRights === 'view'" [(ngModel)]="selectedRole.sup_rights" (change)="onAccessRightChange('sup_rights', $event)">
+                      </td>
+                      <td class="whitespace-nowrap text-center px-3">
+                        <input type="radio" name="supportTickets" value="edit" [disabled]="!isManageMode" [checked]="supportRights === 'edit'" [(ngModel)]="selectedRole.sup_rights" (change)="onAccessRightChange('sup_rights', $event)">
+                      </td>
+                    </tr>
+                
+                    <tr class="h-9 text-gray-600 text-sm font-light">
+                      <td class="font-black w-full">System Management</td>
+                      <td class="whitespace-nowrap text-center px-3"></td>
+                      <td class="whitespace-nowrap text-center px-3"></td>
+                      <td class="whitespace-nowrap text-center px-3"></td>
+                      <td class="whitespace-nowrap text-center px-3"></td>
+                      <td class="whitespace-nowrap text-center px-3"></td>
+                    </tr>
+                    <tr class="h-7 text-gray-600 text-sm font-light">
+                      <td class="w-full">Parameters</td>
+                      <td class="whitespace-nowrap text-center px-3"></td>
+                      <td class="whitespace-nowrap text-center px-3"></td>
+                      <td class="whitespace-nowrap text-center px-3">
+                        <input type="radio" name="parameters" value="none" [disabled]="!isManageMode" [checked]="parametersRights === 'none'" [(ngModel)]="selectedRole.par_rights" (change)="onAccessRightChange('par_rights', $event)">
+                      </td>
+                      <td class="whitespace-nowrap text-center px-3">
+                        <input type="radio" name="parameters" value="view" [disabled]="!isManageMode" [checked]="parametersRights === 'view'" [(ngModel)]="selectedRole.par_rights" (change)="onAccessRightChange('par_rights', $event)">
+                      </td>
+                      <td class="whitespace-nowrap text-center px-3">
+                        <input type="radio" name="parameters" value="edit" [disabled]="!isManageMode" [checked]="parametersRights === 'edit'" [(ngModel)]="selectedRole.par_rights" (change)="onAccessRightChange('par_rights', $event)">
+                      </td>
+                    </tr>
+                
+                    <tr class="h-9 text-gray-600 text-sm font-light">
+                      <td class="font-black w-full">Daily Time Record</td>
+                      <td class="whitespace-nowrap text-center px-3"></td>
+                      <td class="whitespace-nowrap text-center px-3"></td>
+                      <td class="whitespace-nowrap text-center px-3"></td>
+                      <td class="whitespace-nowrap text-center px-3"></td>
+                      <td class="whitespace-nowrap text-center px-3"></td>
+                    </tr>
+                    <tr class="h-7 text-gray-600 text-sm font-light">
+                      <td class="w-full">Daily</td>
+                      <td class="whitespace-nowrap text-center px-3"></td>
+                      <td class="whitespace-nowrap text-center px-3"></td>
+                      <td class="whitespace-nowrap text-center px-3">
+                        <input type="radio" name="dailyTimeRecord" value="none" [disabled]="!isManageMode" [checked]="dailyRights === 'none'" [(ngModel)]="selectedRole.daily_rights" (change)="onAccessRightChange('daily_rights', $event)">
+                      </td>
+                      <td class="whitespace-nowrap text-center px-3">
+                        <input type="radio" name="dailyTimeRecord" value="view" [disabled]="!isManageMode" [checked]="dailyRights === 'view'" [(ngModel)]="selectedRole.daily_rights" (change)="onAccessRightChange('daily_rights', $event)">
+                      </td>
+                      <td class="whitespace-nowrap text-center px-3">
+                        <input type="radio" name="dailyTimeRecord" value="edit" [disabled]="!isManageMode" [checked]="dailyRights === 'edit'" [(ngModel)]="selectedRole.daily_rights" (change)="onAccessRightChange('daily_rights', $event)">
+                      </td>
+                    </tr>
+                    <tr class="h-7 text-gray-600 text-sm font-light">
+                      <td class="w-full">Monthly</td>
+                      <td class="whitespace-nowrap text-center px-3"></td>
+                      <td class="whitespace-nowrap text-center px-3"></td>
+                      <td class="whitespace-nowrap text-center px-3">
+                        <input type="radio" name="monthlyTimeRecord" value="none" [disabled]="!isManageMode" [checked]="monthlyRights === 'none'" [(ngModel)]="selectedRole.monthly_rights" (change)="onAccessRightChange('monthly_rights', $event)">
+                      </td>
+                      <td class="whitespace-nowrap text-center px-3">
+                        <input type="radio" name="monthlyTimeRecord" value="view" [disabled]="!isManageMode" [checked]="monthlyRights === 'view'" [(ngModel)]="selectedRole.monthly_rights" (change)="onAccessRightChange('monthly_rights', $event)">
+                      </td>
+                      <td class="whitespace-nowrap text-center px-3">
+                        <input type="radio" name="monthlyTimeRecord" value="edit" [disabled]="!isManageMode" [checked]="monthlyRights === 'edit'" [(ngModel)]="selectedRole.monthly_rights" (change)="onAccessRightChange('monthly_rights', $event)">
+                      </td>
+                    </tr>
+                    <tr class="h-7 text-gray-600 text-sm font-light">
+                      <td class="w-full">Weekly</td>
+                      <td class="whitespace-nowrap text-center px-3"></td>
+                      <td class="whitespace-nowrap text-center px-3"></td>
+                      <td class="whitespace-nowrap text-center px-3">
+                        <input type="radio" name="weeklyTimeRecord" value="none" [disabled]="!isManageMode" [checked]="weeklyRights === 'none'" [(ngModel)]="selectedRole.weekly_rights" (change)="onAccessRightChange('weekly_rights', $event)">
+                      </td>
+                      <td class="whitespace-nowrap text-center px-3">
+                        <input type="radio" name="weeklyTimeRecord" value="view" [disabled]="!isManageMode" [checked]="weeklyRights === 'view'" [(ngModel)]="selectedRole.weekly_rights" (change)="onAccessRightChange('weekly_rights', $event)">
+                      </td>
+                      <td class="whitespace-nowrap text-center px-3">
+                        <input type="radio" name="weeklyTimeRecord" value="edit" [disabled]="!isManageMode" [checked]="weeklyRights === 'edit'" [(ngModel)]="selectedRole.weekly_rights" (change)="onAccessRightChange('weekly_rights', $event)">
+                      </td>
+                    </tr>
+                
+                    <tr class="h-9 text-gray-600 text-sm font-light">
+                      <td class="font-black w-full">Audit Trail</td>
+                      <td class="whitespace-nowrap text-center px-3"></td>
+                      <td class="whitespace-nowrap text-center px-3"></td>
+                      <td class="whitespace-nowrap text-center px-3"></td>
+                      <td class="whitespace-nowrap text-center px-3"></td>
+                      <td class="whitespace-nowrap text-center px-3"></td>
+                    </tr>
+                    <tr class="h-7 text-gray-600 text-sm font-light">
+                      <td class="w-full">Entries</td>
+                      <td class="whitespace-nowrap text-center px-3"></td>
+                      <td class="whitespace-nowrap text-center px-3"></td>
+                      <td class="whitespace-nowrap text-center px-3">
+                        <input type="radio" name="entries" value="none" [disabled]="!isManageMode" [checked]="entriesRights === 'none'" [(ngModel)]="selectedRole.entries" (change)="onAccessRightChange('entries', $event)">
+                      </td>
+                      <td class="whitespace-nowrap text-center px-3">
+                        <input type="radio" name="entries" value="view" [disabled]="!isManageMode" [checked]="entriesRights === 'view'" [(ngModel)]="selectedRole.entries" (change)="onAccessRightChange('entries', $event)">
+                      </td>
+                      <td class="whitespace-nowrap text-center px-3">
+                        <input type="radio" name="entries" value="edit" [disabled]="!isManageMode" [checked]="entriesRights === 'edit'" [(ngModel)]="selectedRole.entries" (change)="onAccessRightChange('entries', $event)">
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>                                                                 
+              </div>
+            </div>
+          </div>
+        </div>
+        
 
         <!-- Popup Modal -->
-<div *ngIf="showRolePopup" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
-  <div class="bg-white p-6 rounded-lg shadow-lg">
-    <h2 class="text-xl font-bold mb-4">Add Role</h2>
-    <input [(ngModel)]="newManageRole" type="text" placeholder="Enter role" class="border p-2 mb-4 w-full"/>
-    <div class="flex justify-end">
-      <button (click)="confirmRolePopup()" class="bg-blue-500 text-white px-4 py-2 rounded mr-2">Confirm</button>
-      <button (click)="cancelRolePopup()" class="bg-gray-500 text-white px-4 py-2 rounded">Cancel</button>
-    </div>
-  </div>
-</div>
+        <div *ngIf="showRolePopup" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
+          <div class="bg-white p-6 rounded-lg shadow-lg w-[30%] h-[80%]">
+            <p class="text-2xl font-black mb-4">Add Role</p>
+            <input type="text" id="role" [(ngModel)]="newRole" placeholder="Enter role name" class="border p-2 mb-4 w-full"/>
+            
+            <!-- Add the table here -->
+            <div class="overflow-y-auto overflow-x-hidden custom-scrollbar" style="height: calc(80% - 2rem);">
+              <table class="table-auto w-full">
+                <tbody>
+                  <tr class="h-9 text-gray-600 text-sm font-light">
+                    <td class="font-black w-full">User Management</td>
+                    <td class="whitespace-nowrap text-center px-3"></td>
+                    <td class="whitespace-nowrap text-center px-3"></td>
+                    <td class="whitespace-nowrap text-center px-3">None</td>
+                    <td class="whitespace-nowrap text-center px-3">View</td>
+                    <td class="whitespace-nowrap text-center px-3">Edit</td>
+                  </tr>
+                  <tr class="h-7 text-gray-600 text-sm font-light">
+                    <td class="w-full">Users</td>
+                    <td class="whitespace-nowrap text-center px-3"></td>
+                    <td class="whitespace-nowrap text-center px-3"></td>
+                    <td class="whitespace-nowrap text-center px-3">
+                      <input type="radio" name="popupUsers"  [(ngModel)]="popupUsersRights" value="none">
+                    </td>
+                    <td class="whitespace-nowrap text-center px-3">
+                      <input type="radio" name="popupUsers"  [(ngModel)]="popupUsersRights" value="view">
+                    </td>
+                    <td class="whitespace-nowrap text-center px-3">
+                      <input type="radio" name="popupUsers"  [(ngModel)]="popupUsersRights" value="edit">
+                    </td>
+                  </tr>
+                  <tr class="h-7 text-gray-600 text-sm font-light">
+                    <td class="w-full">Roles</td>
+                    <td class="whitespace-nowrap text-center px-3"></td>
+                    <td class="whitespace-nowrap text-center px-3"></td>
+                    <td class="whitespace-nowrap text-center px-3">
+                      <input type="radio" name="popRoles" [(ngModel)]="popupRolesRights" value="none">
+                    </td>
+                    <td class="whitespace-nowrap text-center px-3">
+                      <input type="radio" name="popRoles" [(ngModel)]="popupRolesRights" value="view">
+                    </td>
+                    <td class="whitespace-nowrap text-center px-3">
+                      <input type="radio" name="popRoles" [(ngModel)]="popupRolesRights" value="edit">
+                    </td>
+                  </tr>
+                  <tr class="h-7 text-gray-600 text-sm font-light">
+                    <td class="w-full">Support Tickets</td>
+                    <td class="whitespace-nowrap text-center px-3"></td>
+                    <td class="whitespace-nowrap text-center px-3"></td>
+                    <td class="whitespace-nowrap text-center px-3">
+                      <input type="radio" name="popupSupportTickets" [(ngModel)]="popupSupportRights" value="none">
+                    </td>
+                    <td class="whitespace-nowrap text-center px-3">
+                      <input type="radio" name="popupSupportTickets" [(ngModel)]="popupSupportRights" value="view">
+                    </td>
+                    <td class="whitespace-nowrap text-center px-3">
+                      <input type="radio" name="popupSupportTickets" [(ngModel)]="popupSupportRights" value="edit">
+                    </td>
+                  </tr>
+              
+                  <tr class="h-9 text-gray-600 text-sm font-light">
+                    <td class="font-black w-full">System Management</td>
+                    <td class="whitespace-nowrap text-center px-3"></td>
+                    <td class="whitespace-nowrap text-center px-3"></td>
+                    <td class="whitespace-nowrap text-center px-3"></td>
+                    <td class="whitespace-nowrap text-center px-3"></td>
+                    <td class="whitespace-nowrap text-center px-3"></td>
+                  </tr>
+                  <tr class="h-7 text-gray-600 text-sm font-light">
+                    <td class="w-full">Parameters</td>
+                    <td class="whitespace-nowrap text-center px-3"></td>
+                    <td class="whitespace-nowrap text-center px-3"></td>
+                    <td class="whitespace-nowrap text-center px-3">
+                      <input type="radio" name="popupParameters" [(ngModel)]="popupParametersRights" value="none">
+                    </td>
+                    <td class="whitespace-nowrap text-center px-3">
+                      <input type="radio" name="popupParameters" [(ngModel)]="popupParametersRights" value="view">
+                    </td>
+                    <td class="whitespace-nowrap text-center px-3">
+                      <input type="radio" name="popupParameters" [(ngModel)]="popupParametersRights" value="edit">
+                    </td>
+                  </tr>
+              
+                  <tr class="h-9 text-gray-600 text-sm font-light">
+                    <td class="font-black w-full">Daily Time Record</td>
+                    <td class="whitespace-nowrap text-center px-3"></td>
+                    <td class="whitespace-nowrap text-center px-3"></td>
+                    <td class="whitespace-nowrap text-center px-3"></td>
+                    <td class="whitespace-nowrap text-center px-3"></td>
+                    <td class="whitespace-nowrap text-center px-3"></td>
+                  </tr>
+                  <tr class="h-7 text-gray-600 text-sm font-light">
+                    <td class="w-full">Daily</td>
+                    <td class="whitespace-nowrap text-center px-3"></td>
+                    <td class="whitespace-nowrap text-center px-3"></td>
+                    <td class="whitespace-nowrap text-center px-3">
+                      <input type="radio" name="popupDaily" [(ngModel)]="popupDailyRights" value="none">
+                    </td>
+                    <td class="whitespace-nowrap text-center px-3">
+                      <input type="radio" name="popupDaily" [(ngModel)]="popupDailyRights" value="view">
+                    </td>
+                    <td class="whitespace-nowrap text-center px-3">
+                      <input type="radio" name="popupDaily" [(ngModel)]="popupDailyRights" value="edit">
+                    </td>
+                  </tr>
+                  <tr class="h-7 text-gray-600 text-sm font-light">
+                    <td class="w-full">Monthly</td>
+                    <td class="whitespace-nowrap text-center px-3"></td>
+                    <td class="whitespace-nowrap text-center px-3"></td>
+                    <td class="whitespace-nowrap text-center px-3">
+                      <input type="radio" name="popupMonthly" [(ngModel)]="popupMonthlyRights" value="none">
+                    </td>
+                    <td class="whitespace-nowrap text-center px-3">
+                      <input type="radio" name="popupMonthly" [(ngModel)]="popupMonthlyRights" value="view">
+                    </td>
+                    <td class="whitespace-nowrap text-center px-3">
+                      <input type="radio" name="popupMonthly" [(ngModel)]="popupMonthlyRights" value="edit">
+                    </td>
+                  </tr>
+                  <tr class="h-7 text-gray-600 text-sm font-light">
+                    <td class="w-full">Weekly</td>
+                    <td class="whitespace-nowrap text-center px-3"></td>
+                    <td class="whitespace-nowrap text-center px-3"></td>
+                    <td class="whitespace-nowrap text-center px-3">
+                      <input type="radio" name="popupWeekly" [(ngModel)]="popupWeeklyRights" value="none">
+                    </td>
+                    <td class="whitespace-nowrap text-center px-3">
+                      <input type="radio" name="popupWeekly" [(ngModel)]="popupWeeklyRights" value="view">
+                    </td>
+                    <td class="whitespace-nowrap text-center px-3">
+                      <input type="radio" name="popupWeekly" [(ngModel)]="popupWeeklyRights" value="edit">
+                    </td>
+                  </tr>
+              
+                  <tr class="h-9 text-gray-600 text-sm font-light">
+                    <td class="font-black w-full">Audit Trail</td>
+                    <td class="whitespace-nowrap text-center px-3"></td>
+                    <td class="whitespace-nowrap text-center px-3"></td>
+                    <td class="whitespace-nowrap text-center px-3"></td>
+                    <td class="whitespace-nowrap text-center px-3"></td>
+                    <td class="whitespace-nowrap text-center px-3"></td>
+                  </tr>
+                  <tr class="h-7 text-gray-600 text-sm font-light">
+                    <td class="w-full">Entries</td>
+                    <td class="whitespace-nowrap text-center px-3"></td>
+                    <td class="whitespace-nowrap text-center px-3"></td>
+                    <td class="whitespace-nowrap text-center px-3">
+                      <input type="radio" name="popupEntries" [(ngModel)]="popupEntriesRights" value="none" >
+                    </td>
+                    <td class="whitespace-nowrap text-center px-3">
+                      <input type="radio" name="popupEntries" [(ngModel)]="popupEntriesRights" value="view" >
+                    </td>
+                    <td class="whitespace-nowrap text-center px-3">
+                      <input type="radio" name="popupEntries" [(ngModel)]="popupEntriesRights" value="edit" >
+                    </td>
+                  </tr>
+                </tbody>
+              </table>              
+          </div>
+            
+            <div class="flex justify-start">
+              <button (click)="addRole()" class="bg-green-500 text-white px-4 py-2 rounded mr-2">Add</button>
+              <button (click)="cancelRolePopup()" class="bg-gray-500 text-white px-4 py-2 rounded">Cancel</button>
+            </div>
+          </div>
+        </div>
         
-        <!-- <div class="flex grid-cols-1 md:grid-cols-2 gap-8 justify-center items-center">
-          <div class="bg-white shadow-lg rounded-lg p-4 w-1/2 max-w-2xl">
-            <table class=" w-full">
-              <thead>
-                <tr>
-                  <th class="text-left py-2">Name</th>
-                  <th class="text-left py-2">Designation</th> 
-                </tr>
-              </thead>
-              <tbody>
-                <tr class="border-t">
-                  <td class="py-4 flex items-center">
-                    <img src="" alt="Cheska Trinidad" class="w-10 h-10 rounded-full mr-4">
-                    <div>
-                      <p>Cheska Trinidad</p>
-                      <p class="text-sm text-gray-500">cheskatrinidad</p>
-                    </div>
-                  </td>
-                  <td class="py-4">
-                    <p>I.T Department</p>
-                    <p class="text-sm text-gray-500">Graphic Designer</p>
-                    <a href="#" class="text-blue-500 text-sm">Edit</a>
-                  </td>
-                </tr>
-                <tr class="border-t">
-                  <td class="py-4 flex items-center">
-                    <img src="" alt="Juan Dela Cruz" class="w-10 h-10 rounded-full mr-4">
-                    <div>
-                      <p>Juan Dela Cruz</p>
-                      <p class="text-sm text-gray-500">juandelacruzgmail.com</p>
-                    </div>
-                  </td>
-                  <td class="py-4">
-                    <p>Software Department</p>
-                    <p class="text-sm text-gray-500">Data Analyst</p>
-                    <a href="#" class="text-blue-500 text-sm">Edit</a>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>       
-        </div> -->
+
+        <div *ngIf="showAssignPopup" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
+          <div class="w-[25%] h-[70%] shadow-xl rounded-lg bg-white flex flex-col">
+            <div class="flex flex-col h-full p-6">
+              <div class="flex justify-start flex-col mb-3">
+                <p class="text-2xl font-black">
+                  Assign for <span class="text-blue-600">{{ assignedRole.role_name }}</span>
+                </p>
+                <input type="text" [(ngModel)]="searchTerm" placeholder="Search Employees..." class="w-full p-2 border rounded-lg">
+              </div>
+              <p *ngIf="selectedUserIds.size > 0" class="text-gray-400 text-sm">
+                <button type="button" class="focus:outline-none text-red-700" (click)="deselectAllCheckboxes()">Deselect All</button>
+                {{selectedUserIds.size}} assigned
+              </p>
+              <div class="flex-grow overflow-y-auto overflow-x-hidden custom-scrollbar min-h-[150px]">
+                <table class="table-auto w-full">
+                  <tbody>
+                    <ng-container *ngIf="searchEmpRole.length > 0; else noMatch">
+                      <tr class="h-9 text-gray-600 text-sm font-light" *ngFor="let emp of searchEmpRole">
+                        <td>
+                          <input type="checkbox" (change)="onCheckboxChange(emp.user_id, $event)">
+                        </td>
+                        <td class="w-full">{{ emp.firstname }} {{ emp.midname }} {{ emp.surname }}</td>
+                      </tr>
+                    </ng-container>
+                    <ng-template #noMatch>
+                      <tr class="h-9 text-gray-600 text-sm font-light">
+                        <td colspan="2" class="text-center p-4">No matching employees found</td>
+                      </tr>
+                    </ng-template>
+                  </tbody>
+                </table>
+              </div>
+              <div class="flex gap-2 justify-start mt-3">
+                <button class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600" (click)="assignRole()">Assign</button>
+                <button class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600" (click)="closeAssignPopup()">Cancel</button>
+              </div>
+            </div>
+          </div>                        
+        </div>
+
+        <div *ngIf="showDeleteAssigneePopup" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
+          <div class="w-[20%] shadow-xl rounded-lg bg-white flex flex-col">
+            <div class="flex flex-col h-full p-4 md:p-6 justify-between">
+              <div class="flex flex-col justify-center items-center mb-2">
+                <p class="text-xl md:text-2xl font-black text-center">Delete Assignee</p>
+                <p class="text-gray-600 text-center">This action cannot be undone. By deleting the assignee, all associated information will be permanently lost.</p>
+              </div>
+              <div class="flex gap-2 justify-center w-full">
+                <button class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 flex-grow" (click)="confirmDeleteAssignee()">Delete</button>
+                <button class="border border-gray-500 text-gray-500 px-4 py-2 rounded hover:bg-gray-100 flex-grow" (click)="closeDeleteAssigneePopup()">Cancel</button>
+              </div>
+            </div>
+          </div>
+        </div>        
+        
+        
+
+
       </section>
 
 <!-- Popup Overlay -->
@@ -471,226 +880,12 @@
           <h2 class="text-2xl font-bold mb-4">Manage Roles and Departments</h2>
           <div class="space-y-4">
             <button (click)="toggleAddPopup()" class="w-full px-4 py-2 bg-blue-500 text-white rounded">Add Role</button>
-            <button (click)="toggleAddDepartmentPopup()" class="w-full px-4 py-2 bg-green-500 text-white rounded">Add Department</button>
             <button (click)="toggleEditPopup()" class="w-full px-4 py-2 bg-green-500 text-white rounded">Edit Role/Department</button>
             <button (click)="toggleAccessRightsPopup()" class="w-full px-4 py-2 bg-yellow-500 text-white rounded">Manage Access Rights</button>
           </div>
           <button (click)="toggleManagePopup()" class="mt-4 px-4 py-2 bg-gray-200 text-gray-800 rounded">Close</button>
         </div>
       </div>
-
-<!-- Add Role Popup -->
-      <div *ngIf="showAddPopup" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-        <div class="bg-white rounded-lg p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-          <h2 class="text-2xl font-bold mb-4">Create New Role</h2>
-          
-          <div class="mb-4">
-            <label for="role" class="block text-sm font-medium text-gray-700">Role Name</label>
-            <input type="text" id="role" [(ngModel)]="newRole" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
-          </div>
-          
-          <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700">Department</label>
-            <div class="mt-2">
-              <label class="inline-flex items-center">
-                <input type="radio" [(ngModel)]="departmentType" value="all" class="form-radio">
-                <span class="ml-2">All Departments</span>
-              </label>
-              <label class="inline-flex items-center ml-6">
-                <input type="radio" [(ngModel)]="departmentType" value="specific" class="form-radio">
-                <span class="ml-2">Specific Departments</span>
-              </label>
-              <label class="inline-flex items-center ml-6">
-                <input type="radio" [(ngModel)]="departmentType" value="multiple" class="form-radio">
-                <span class="ml-2">Multiple Departments</span>
-              </label>
-            </div>
-            <select *ngIf="departmentType === 'specific'" [(ngModel)]="selectedDepartments" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
-              <option value="">Select Department</option>
-              <option *ngFor="let dept of departments" [value]="dept">{{ dept }}</option>
-            </select>
-            <select *ngIf="departmentType === 'multiple'" [(ngModel)]="selectedDepartments" multiple class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
-              <option *ngFor="let dept of departments" [value]="dept">{{ dept }}</option>
-            </select>
-          </div>
-      
-          <div class="mb-4">
-            <h3 class="text-lg font-semibold mb-2">Modules Access</h3>
-            <div *ngFor="let module of modules" class="flex items-center mb-2">
-              <input type="checkbox" [id]="module" [value]="module" (change)="updateSelectedModules($event)" class="mr-2">
-              <label [for]="module">{{ module }}</label>
-            </div>
-          </div>
-      
-          <div class="mb-4">
-            <h3 class="text-lg font-semibold mb-2">Reports Access</h3>
-            <div *ngFor="let report of reports" class="flex items-center mb-2">
-              <input type="checkbox" [id]="report" [value]="report" (change)="updateSelectedReports($event)" class="mr-2">
-              <label [for]="report">{{ report }}</label>
-            </div>
-          </div>
-      
-          <div class="mb-4">
-            <h3 class="text-lg font-semibold mb-2">Data Access</h3>
-            <div *ngFor="let data of dataAccess" class="flex items-center mb-2">
-              <input type="checkbox" [id]="data" [value]="data" (change)="updateSelectedDataAccess($event)" class="mr-2">
-              <label [for]="data">{{ data }}</label>
-            </div>
-          </div>
-      
-          <div class="mb-4">
-            <h3 class="text-lg font-semibold mb-2">Privileges</h3>
-            <div *ngFor="let privilege of privileges" class="flex items-center mb-2">
-              <input type="checkbox" [id]="privilege" [value]="privilege" (change)="updateSelectedPrivileges($event)" class="mr-2">
-              <label [for]="privilege">{{ privilege }}</label>
-            </div>
-          </div>
-      
-          <div class="flex justify-end space-x-2 mt-4">
-            <button (click)="closeAddPopup()" class="mt-4 px-4 py-2 bg-gray-200 text-gray-800 rounded">Cancel</button>
-            <button (click)="addRole()" class="mt-4 px-4 py-2 bg-green-500 text-white rounded">Save Role</button>
-          </div>
-          
-          <button (click)="closeAddPopup()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6L18 18"/>
-            </svg>
-          </button>
-        </div>
-      </div>
-
-<!-- Add Department Popup-->
-    <div *ngIf="showAddDepartmentPopup" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-      <div class="bg-white rounded-lg p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-        <h2 class="text-2xl font-bold mb-4">Add New Department</h2>
-        
-        <div class="mb-4">
-          <label for="department" class="block text-sm font-medium text-gray-700">Department Name</label>
-          <input type="text" id="department" [(ngModel)]="newDepartment" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
-        </div>
-    
-        <div class="mb-4">
-          <h3 class="text-lg font-semibold mb-2">Department-specific Access Rights</h3>
-          <div *ngFor="let access of departmentAccessRights" class="flex items-center mb-2">
-            <input type="checkbox" [id]="access" [(ngModel)]="departmentAccess[access]" class="mr-2">
-            <label [for]="access">{{ access }}</label>
-          </div>
-        </div>
-
-        <div class="mb-4">
-          <h3 class="text-lg font-semibold mb-2">Modules Access</h3>
-          <div *ngFor="let module of modules" class="flex items-center mb-2">
-            <input type="checkbox" [id]="module" [value]="module" (change)="updateSelectedModules($event)" class="mr-2">
-            <label [for]="module">{{ module }}</label>
-          </div>
-        </div>
-    
-        <div class="mb-4">
-          <h3 class="text-lg font-semibold mb-2">Reports Access</h3>
-          <div *ngFor="let report of reports" class="flex items-center mb-2">
-            <input type="checkbox" [id]="report" [value]="report" (change)="updateSelectedReports($event)" class="mr-2">
-            <label [for]="report">{{ report }}</label>
-          </div>
-        </div>
-    
-        <div class="mb-4">
-          <h3 class="text-lg font-semibold mb-2">Data Access</h3>
-          <div *ngFor="let data of dataAccess" class="flex items-center mb-2">
-            <input type="checkbox" [id]="data" [value]="data" (change)="updateSelectedDataAccess($event)" class="mr-2">
-            <label [for]="data">{{ data }}</label>
-          </div>
-        </div>
-    
-        <div class="mb-4">
-          <h3 class="text-lg font-semibold mb-2">Privileges</h3>
-          <div *ngFor="let privilege of privileges" class="flex items-center mb-2">
-            <input type="checkbox" [id]="privilege" [value]="privilege" (change)="updateSelectedPrivileges($event)" class="mr-2">
-            <label [for]="privilege">{{ privilege }}</label>
-          </div>
-        </div>
-    
-        <div class="flex justify-end space-x-2 mt-4">
-          <button (click)="closeAddDepartmentPopup()" class="mt-4 px-4 py-2 bg-gray-200 text-gray-800 rounded">Cancel</button>
-          <button (click)="saveDepartment()" class="mt-4 px-4 py-2 bg-green-500 text-white rounded">Save Department</button>
-        </div>
-        
-        <button (click)="closeAddDepartmentPopup()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6L18 18"/>
-          </svg>
-        </button>
-      </div>
-    </div>
-
-  
-<!-- Edit Role/Department Popup -->
-      <div *ngIf="showEditPopup" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-        <div class="bg-white rounded-lg p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-          <h2 class="text-2xl font-bold mb-4">Edit Department / Roles</h2>
-      
-          <div class="flex space-x-4 mb-4">
-            <div class="w-1/2">
-              <select id="department" [(ngModel)]="selectedDepartments" class="w-full border rounded p-2">
-                <option value="" disabled selected>Department</option>
-                <option *ngFor="let department of departments" [value]="department">{{ department }}</option>
-              </select>
-            </div>
-      
-            <div class="w-1/2">
-              <select id="department" [(ngModel)]="selectedDepartments" class="w-full border rounded p-2">
-                <option value="" disabled selected>Department</option>
-                <option *ngFor="let department of departments" [value]="department">{{ department }}</option>
-              </select>
-            </div>
-          </div>
-      
-          <div class="mb-4">
-            <h3 class="text-lg font-semibold mb-2">Department-specific Access Rights</h3>
-            <div *ngFor="let access of departmentAccessRights" class="flex items-center mb-2">
-              <input type="checkbox" [id]="access" [(ngModel)]="departmentAccess[access]" class="mr-2">
-              <label [for]="access">{{ access }}</label>
-            </div>
-          </div>
-      
-          <div class="mb-4">
-            <h3 class="text-lg font-semibold mb-2">Modules Access</h3>
-            <div *ngFor="let module of modules" class="flex items-center mb-2">
-              <input type="checkbox" [id]="module" [value]="module" (change)="updateSelectedModules($event)" class="mr-2">
-              <label [for]="module">{{ module }}</label>
-            </div>
-          </div>
-      
-          <div class="mb-4">
-            <h3 class="text-lg font-semibold mb-2">Reports Access</h3>
-            <div *ngFor="let report of reports" class="flex items-center mb-2">
-              <input type="checkbox" [id]="report" [value]="report" (change)="updateSelectedReports($event)" class="mr-2">
-              <label [for]="report">{{ report }}</label>
-            </div>
-          </div>
-      
-          <div class="mb-4">
-            <h3 class="text-lg font-semibold mb-2">Data Access</h3>
-            <div *ngFor="let data of dataAccess" class="flex items-center mb-2">
-              <input type="checkbox" [id]="data" [value]="data" (change)="updateSelectedDataAccess($event)" class="mr-2">
-              <label [for]="data">{{ data }}</label>
-            </div>
-          </div>
-      
-          <div class="mb-4">
-            <h3 class="text-lg font-semibold mb-2">Privileges</h3>
-            <div *ngFor="let privilege of privileges" class="flex items-center mb-2">
-              <input type="checkbox" [id]="privilege" [value]="privilege" (change)="updateSelectedPrivileges($event)" class="mr-2">
-              <label [for]="privilege">{{ privilege }}</label>
-            </div>
-          </div>
-      
-          <div class="flex justify-end space-x-2 mt-4">
-            <button (click)="closeEditPopup()" class="mt-4 px-4 py-2 bg-gray-200 text-gray-800 rounded">Cancel</button>
-            <button class="mt-4 px-4 py-2 bg-green-500 text-white rounded">Update</button>
-          </div>
-        </div>
-      </div>
-      
   
 <!-- Manage Access Rights Popup -->
       <div *ngIf="showAccessRightsPopup" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">

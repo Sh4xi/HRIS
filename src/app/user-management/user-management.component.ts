@@ -22,15 +22,14 @@ interface User {
 }
 
 interface Employee {
-  profile: string;
-  name: string;
   email: string;
-  password: string;
-  department: string;
+  firstName: string;
+  middleName: string;
+  surname: string;
   position: string;
+  department: string;
   type: string;
-  status: string;
-  access: boolean;
+  photoUrl?: string; // Add a new property for photo URL
 }
 
 
@@ -42,6 +41,7 @@ interface Ticket {
   description: string;
   status: string;
   dateTime: Date;
+  priority: 'Low' | 'Medium' | 'High' | 'Urgent';
 }
 interface AuditLogEntry {
   user_id: string;
@@ -53,6 +53,7 @@ interface AuditLogEntry {
   ip_address: string;
   date: string;
 }
+
 
 @Component({
   selector: 'app-user-management',
@@ -68,13 +69,14 @@ export class UserManagementComponent implements OnInit {
   paginatedUsers: User[] = [];
   searchTerm: string = '';
   currentPage: number = 1;
-  itemsPerPage: number = 10;
+  itemsPerPage: number = 5;
   totalPages: number = 1;
   activeTab: string = 'users';
   showManagePopup = false;
   showAddPopup = false;
   showEditPopup = false;
   employees: any[] = [];
+  roles: any[] = [];
 
   showAccessRightsPopup = false;
   showAddDepartmentPopup = false;
@@ -82,7 +84,27 @@ export class UserManagementComponent implements OnInit {
   showModal = false;
   photoPreviewUrl: string = 'https://via.placeholder.com/200x200';;
   showPasswordGeneratedMessage: boolean = false;
+
   newRole = '';
+  selectedRole: any = {};
+  usersRights: string = 'none';
+  rolesRights: string = 'none';
+  supportRights: string = 'none';
+  parametersRights: string = 'none';
+  dailyRights: string = 'none';
+  monthlyRights: string = 'none';
+  weeklyRights: string = 'none';
+  entriesRights: string = 'none';
+
+popupUsersRights: string = 'none';
+popupRolesRights: string = 'none';
+popupSupportRights: string = 'none';
+popupParametersRights: string = 'none';
+popupDailyRights: string = 'none';
+popupMonthlyRights: string = 'none'; 
+popupWeeklyRights: string = 'none';
+popupEntriesRights: string = 'none';
+
   newDepartment = '';
   departmentType = 'all';
   selectedDepartments: string[] = [];
@@ -99,13 +121,16 @@ export class UserManagementComponent implements OnInit {
   searchTicketTerm: string = '';
   ticket_currentPage: number = 1;
   ticket_itemsPerPage: number = 10;
+  ticket_totalPages: number = 1;  
 
-  filteredTickets: Ticket[] = [];
-  selectedTickets: boolean[] = [];
+  filteredTickets: Ticket[] = []; // Array to hold the tickets after applying any filters
+  selectedTickets: boolean[] = []; // Array to keep track of selected state for each ticket (true if selected, false otherwise)  
   filterOption: string = 'all'; // Default filter option
 
-  selectedTicket: any = null;
+  selectedTicket: any;
   isModalVisible = false;
+  replyText: string = ''; // Text for the reply
+  currentUser: any; // Make sure this is set with the logged-in user's information
 
   employee = {
     email: '',
@@ -118,40 +143,6 @@ export class UserManagementComponent implements OnInit {
     type: ''
   };
 
-  modules = [
-    'Personnel Information Management',
-    'Payroll Management',
-    'Employee Information Management',
-    'Time & Attendance Management',
-    'Online Job Application Portal',
-    'Recruitment, Selection and PlaFrcement',
-    'Learning and Development (L&D)',
-    'Rewards and Recognition',
-    'Performance Management',
-    'Health and Wellness',
-    'Forms and Workflow',
-    'Reports',
-    'Data Exchange (Export and Import)',
-    'Data Visualization'
-  ];
-
-  reports = [
-    'Employee Performance Reports',
-    'Payroll Summaries',
-    'Recruitment Reports',
-    'Training Reports',
-    'No Access'
-  ];
-
-  dataAccess = [
-    'Employee Records',
-    'Financial Data',
-    'Attendance Records',
-    'Job Applications',
-    'Training Data',
-    'No Access'
-  ];
-
   assignedEmployees: string[] = ['Kobe Bryant', 'Alice Guo', 'Carlo Sotto', 'Harry Roque'];
   showCheckboxes = false;
   logAction: any;
@@ -160,17 +151,90 @@ export class UserManagementComponent implements OnInit {
     this.showCheckboxes = !this.showCheckboxes;
   }
 
-  roles: string[] = [];
-  assignedRole: string = '';
+
   showRolePopup: boolean = false;
   newManageRole: string = '';
+  showAssignPopup: boolean = false;
+  showDeleteAssigneePopup = false
+  searchRoleTerm: string = '';
+  assignedUsers: any[] = [];
+  assignedRole: { role_id: number; role_name: string } = { role_id: 0, role_name: '' };  // Default value
+  selectedUserIds: Set<number> = new Set();
+
+  isManageMode = false; // Add this line
+
+  editingRoleId: number | null = null;
+  originalRoleName: string | null = null;
+
+  selectedCount: number = 0;
+
+  deselectAllCheckboxes(): void {
+    this.selectedUserIds.clear();
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    checkboxes.forEach((checkbox: any) => {
+      checkbox.checked = false;
+    });
+  }
+
+  startEdit(role: any) {
+  this.editingRoleId = role.role_id;
+  this.originalRoleName = role.role_name; // Store the original name
+}
+
+cancelEdit() {
+  if (this.originalRoleName !== null && this.editingRoleId) {
+    const roleToEdit = this.searchroletab.find(r => r.role_id === this.editingRoleId);
+    if (roleToEdit) {
+      roleToEdit.role_name = this.originalRoleName; // Revert to the original name
+    }
+  }
+  this.editingRoleId = null; // Exit edit mode
+  this.originalRoleName = null; // Clear the original name
+}
+
+  toggleManageMode() { // Add this method
+    this.isManageMode = !this.isManageMode;
+  }
+
+  openDeleteAssigneePopup(userId: number, roleId: number): void {
+    this.currentUserId = userId;
+    this.currentRoleId = roleId;
+    this.showDeleteAssigneePopup = true;
+  }
+
+  async confirmDeleteAssignee(): Promise<void> {
+    if (this.currentUserId !== null && this.currentRoleId !== null) {
+      await this.unassignUser(this.currentUserId, this.currentRoleId);
+      this.showDeleteAssigneePopup = false;
+      this.currentUserId = null;
+      this.currentRoleId = null;
+    }
+  }
+
+  closeDeleteAssigneePopup(): void {
+    this.showDeleteAssigneePopup = false;
+    this.currentUserId = null;
+    this.currentRoleId = null;
+  }
 
   openRolePopup() {
     this.showRolePopup = true;
+    this.isManageMode = false;
+
   }
 
   closeRolePopup() {
     this.showRolePopup = false;
+  }
+
+  openAssignPopup() {
+    this.showAssignPopup = true;
+    this.isManageMode = false;
+  }
+
+  closeAssignPopup() {
+    this.showAssignPopup = false;
+    this.selectedUserIds.clear();
   }
 
   confirmRolePopup() {
@@ -186,29 +250,55 @@ export class UserManagementComponent implements OnInit {
     this.showRolePopup = false;
   }
 
-  // Handle clicking a role in the Manage Roles table
-  onRoleClick(role: string) {
+  selectRoleForEditing(role: any) {
+    this.selectedRole = { ...role };
+    this.fetchAccessRights(role.role_id);
+  }
+
+  // Delete a role
+  async deleteRole(role: any) {
+    await this.supabaseService.deleteRole(role.role_name);
+    this.roles = this.roles.filter(r => r.role_name !== role.role_name);
+  }
+  
+  filteredRoles: any[] = [];
+
+  searchRoleTable() {
+    const searchTerm = this.searchTerm.toLowerCase();
+    this.filteredRoles = this.roles.filter(role =>
+      role.role_name.toLowerCase().includes(searchTerm)
+    );
+  }
+  
+  
+  clickedRoleId: number | null = null;
+
+  async onRoleClick(role: { role_id: number, role_name: string }) {
+    console.log('Role clicked:', role);
     this.assignedRole = role;
+    this.clickedRoleId = this.clickedRoleId === role.role_id ? null : role.role_id; // Toggle clicked state
+    if (this.clickedRoleId) {
+      const { data, error } = await this.supabaseService.getRoleById(role.role_id);
+      if (error) {
+        console.error('Error fetching role:', error.message);
+      } else if (data) {
+        this.usersRights = data.users_rights;
+        this.rolesRights = data.roles_rights;
+        this.supportRights = data.sup_rights;
+        this.parametersRights = data.par_rights;
+        this.dailyRights = data.daily_rights;
+        this.monthlyRights = data.monthly_rights;
+        this.weeklyRights = data.weekly_rights;
+        this.entriesRights = data.entries;
+      }
+    }
+    await this.loadAssignedUsers(role);
+    console.log('Assigned Role:', this.assignedRole);
   }
 
   // Mockdata for Tickets
   tickets: Ticket[] = [];
 
-  privileges = ['View', 'Edit', 'Delete', 'Approve'];
-
-  selectedModules: string[] = [];
-  selectedReports: string[] = [];
-  selectedDataAccess: string[] = [];
-  selectedPrivileges: string[] = [];
-
-  departmentAccessRights = [
-    'View Department Data',
-    'Edit Department Data',
-    'Manage Department Members',
-    'Approve Department Requests'
-  ];
-
-  departmentAccess: AccessRights = {};
   showPassword: any;
 
   constructor(private supabaseService: SupabaseService) {}
@@ -292,6 +382,7 @@ export class UserManagementComponent implements OnInit {
   }
 
   async onSubmit() {
+    console.log('Submitting employee data:', this.employee);
     if (!this.isValidEmail(this.employee.email)) {
       console.error('Invalid email format');
       alert('Please enter a valid email address.');
@@ -314,6 +405,7 @@ export class UserManagementComponent implements OnInit {
         photo_url: photoUrl || this.photoPreviewUrl
       };
   
+      console.log('Employee data on submit:', this.employee);
       console.log('Employee data to be sent:', employeeData);
   
       let response;
@@ -359,6 +451,13 @@ export class UserManagementComponent implements OnInit {
       alert('An unexpected error occurred. Please try again.');
     }
   }
+
+  showRoleSuccessMessage: boolean = false;
+  showRoleErrorMessage: boolean = false;
+  showEmpSuccessMessage: boolean = false;
+  showEmpErrorMessage: boolean = false;
+
+
   
   
   
@@ -401,43 +500,160 @@ export class UserManagementComponent implements OnInit {
       alert('Please enter a role name');
       return;
     }
-  
-    if (this.departmentType === 'specific' && !this.selectedDepartments) {
-      alert('Please select a department');
-      return;
-    }
-  
     const roleData = {
       role_name: this.newRole,
-      mod_access: this.selectedModules.length > 0 ? this.selectedModules : [],
-      rep_access: this.selectedReports.length > 0 ? this.selectedReports : [],
-      data_access: this.selectedDataAccess.length > 0 ? this.selectedDataAccess : [],
-      privileges: this.selectedPrivileges.length > 0 ? this.selectedPrivileges : [],
-      department: this.departmentType === 'all'
-        ? ['All Departments']
-        : this.departmentType === 'specific'
-        ? this.selectedDepartments
-        : this.selectedDepartments.length > 0
-        ? this.selectedDepartments
-        : []
+      users_rights: this.popupUsersRights,
+      roles_rights: this.popupRolesRights,
+      sup_rights: this.popupSupportRights,
+      par_rights: this.popupParametersRights,
+      daily_rights: this.popupDailyRights,
+      monthly_rights: this.popupMonthlyRights,
+      weekly_rights: this.popupWeeklyRights,
+      entries: this.popupEntriesRights,
     };
-  
     this.supabaseService.createRole(roleData)
     .then(response => {
       if (response.error) {
         console.error('Error creating role:', response.error.message);
+        this.showRoleErrorMessage = true;
+        setTimeout(() => {
+          this.showRoleErrorMessage = false;
+        }, 5000); // Hide the message after 3 seconds
       } else {
         if (response.data) {
           console.log('Role created successfully:', response.data);
+          this.showRoleSuccessMessage = true;
+          setTimeout(() => {
+            this.showRoleSuccessMessage = false;
+          }, 5000); // Hide the message after 3 seconds
         } else {
           console.log('Role created successfully, but no data returned.');
+          this.showRoleSuccessMessage = true;
+          setTimeout(() => {
+            this.showRoleSuccessMessage = false;
+          }, 5000);
         }
         this.closeAddPopup();
       }
     });
-  }
+    this.showRolePopup = false;
+    this.loadRoles();
+  }  
   
+    async loadAssignedUsers(role: { role_id: number; role_name: string }): Promise<void> {
+      this.assignedRole = role;
+      console.log('Loading assigned users for role:', this.assignedRole);
+    
+      try {
+        const users = await this.supabaseService.getUsersAssignedToRole(role.role_id);
+        this.assignedUsers = users; // Directly assign the fetched users
+        console.log('Assigned users:', this.assignedUsers);
+      } catch (error) {
+        if (error instanceof Error) {
+          console.error('Error loading assigned users:', error.message);
+        } else {
+          console.error('An unknown error occurred');
+        }
+      }
+    }
 
+    //used in the assigning of role in "Roles" tab
+    onCheckboxChange(userId: number, event: any): void {
+      if (event.target.checked) {
+        this.selectedUserIds.add(userId);
+      } else {
+        this.selectedUserIds.delete(userId);
+      }
+    }
+
+    //Used to assign checked user names in the second container in "Roles" tab
+    async assignRole(): Promise<void> {
+      if (!this.assignedRole || !this.selectedUserIds.size) {
+        console.error('No role or users selected.');
+        return;
+      }
+  
+      try {
+        await this.supabaseService.assignRoleToUsers(this.assignedRole.role_id, Array.from(this.selectedUserIds));
+        console.log('Role assigned successfully.');
+        this.closeAssignPopup();
+      } catch (error) {
+        if (error instanceof Error) {
+          console.error('Error assigning role:', error.message);
+        } else {
+          console.error('An unknown error occurred');
+        }
+      }
+    }
+
+  currentUserId: number | null = null;
+  currentRoleId: number | null = null;
+
+  async unassignUser(userId: number, roleId: number): Promise<void> {
+    try {
+      await this.supabaseService.unassignUserFromRole(userId, roleId);
+      console.log('User unassigned successfully.');
+      this.loadAssignedUsers(this.assignedRole);
+      this.showEmpSuccessMessage = true;
+      setTimeout(() => {
+        this.showEmpSuccessMessage = false;
+      }, 5000);
+    } catch (error) {
+      if (error instanceof Error) {
+        console.error('Error unassigning user:', error.message);
+        this.showEmpErrorMessage = true;
+        setTimeout(() => {
+          this.showEmpErrorMessage = false;
+        }, 5000);
+      } else {
+        console.error('An unknown error occurred');
+      }
+    }
+  }
+
+    async updateRoleName(role: any) {
+      try {
+        await this.supabaseService.updateRoleName(role.role_id, role.role_name);
+        this.editingRoleId = null; // Exit edit mode
+        this.originalRoleName = null; // Clear the original name
+        this.loadRoles(); // Refresh the roles list
+      } catch (error) {
+        console.error('Error saving role:', error);
+      }
+    }
+
+    //for updating access rights
+    async fetchAccessRights(roleId: string) {
+      try {
+        const accessRights = await this.supabaseService.fetchRoleAccessRights(roleId);
+        this.selectedRole = { ...this.selectedRole, ...accessRights };
+      } catch (error) {
+        console.error('Error fetching access rights:', error);
+      }
+    }
+    
+    //for access rights update
+    async onAccessRightChange(rightType: string, event: any) {
+      this.selectedRole[rightType] = event.target.value;
+      await this.saveAccessRights(rightType);
+    }
+
+    //for updating access rights
+    async saveAccessRights(changedRight: string) {
+      if (!this.isManageMode) return;
+  
+      try {
+        await this.supabaseService.updateRoleAccessRight(
+          this.selectedRole.role_id,
+          changedRight,
+          this.selectedRole[changedRight]
+        );
+        console.log(`${changedRight} updated successfully`);
+      } catch (error) {
+        console.error(`Error updating ${changedRight}:`, error);
+      }
+    }
+  
   toggleUserSelection(user: User) {
     user.selected = !user.selected;
   }
@@ -687,14 +903,32 @@ export class UserManagementComponent implements OnInit {
     this.updateDateTimeForTickets();
     this.loadTickets();
     this.loadEmployeeNames();
+    this.loadRoles();
+    this.filteredRoles = this.roles;
 
   } 
+
+  async loadRoles() {
+    try {
+      this.roles = await this.supabaseService.getRoles();
+      this.filteredRoles = this.roles;
+
+      if (this.roles.length > 0) { /*checks if there is a role and displays the first row when you load the page */ 
+        this.clickedRoleId = this.roles[0].role_id;
+        this.assignedRole = this.roles[0];
+        await this.loadAssignedUsers(this.roles[0]);
+      }
+    } catch (error) {
+      console.error('Error fetching roles:', error);
+    }
+  }
 
     // Added method to fetch employee names
     loadEmployeeNames(): void {
       this.supabaseService.getEmployeeNames().then(data => {
-        if (data) {  // Ensure data is not null
+        if (data) {
           this.employees = data.map(emp => ({
+            user_id: emp.user_id,
             firstname: emp.first_name,
             midname: emp.mid_name,
             surname: emp.surname
@@ -776,7 +1010,7 @@ export class UserManagementComponent implements OnInit {
           password: employee.password || '',
           department: employee.department?.trim() || 'Unassigned',
           position: employee.position?.trim() || 'Unassigned',
-          type: employee.types?.trim() || 'Unassigned',
+          type: employee.type?.trim() || 'Unassigned',
           status: 'Active',
           access: true,
         };
@@ -809,7 +1043,21 @@ export class UserManagementComponent implements OnInit {
     );
     this.updatePagination();
   }
+
+  get searchEmpRole() {
+    return this.employees.filter(emp => 
+      `${emp.firstname} ${emp.midname} ${emp.surname}`
+        .toLowerCase()
+        .includes(this.searchTerm.toLowerCase())
+    );
+  }
   
+  get searchroletab() {
+    return this.roles.filter(role => 
+      role.role_name.toLowerCase().includes(this.searchRoleTerm.toLowerCase())
+    );
+  }
+
   getContractType(position: string): string {
     const positionLower = position.toLowerCase();
     switch (positionLower) {
@@ -885,38 +1133,44 @@ export class UserManagementComponent implements OnInit {
   
 
 
-  clearSelections() {
-    this.users.forEach(user => user.selected = false);
-  }
+clearSelections() {
+  // Clear selection for each user in the array
+  this.users.forEach(user => user.selected = false);
+}
 
-  updatePagination() {
-    this.totalPages = Math.ceil(this.filteredUsers.length / this.itemsPerPage);
-    this.currentPage = 1;
-    this.paginate();
-  }
+updatePagination() {
+  // Update pagination information based on filtered user list
+  this.totalPages = Math.ceil(this.filteredUsers.length / this.itemsPerPage); // Calculate total pages
+  this.currentPage = 1; // Reset current page to 1
+  this.paginate(); // Paginate to display users on the first page
+}
 
-  paginate() {
-    const start = (this.currentPage - 1) * this.itemsPerPage;
-    const end = start + this.itemsPerPage;
-    this.paginatedUsers = this.filteredUsers.slice(start, end);
-  }
+paginate() {
+  // Paginate the filtered user list based on current page and items per page
+  const start = (this.currentPage - 1) * this.itemsPerPage; // Calculate start index
+  const end = start + this.itemsPerPage; // Calculate end index (exclusive)
+  this.paginatedUsers = this.filteredUsers.slice(start, end); // Extract users for the current page
+}
 
-  prevPage() {
-    if (this.currentPage > 1) {
-      this.currentPage--;
-      this.paginate();
-    }
+prevPage() {
+  // Navigate to the previous page if current page is greater than 1
+  if (this.currentPage > 1) {
+    this.currentPage--; // Decrease current page number
+    this.paginate(); // Update paginated users
   }
+}
 
-  nextPage() {
-    if (this.currentPage < this.totalPages) {
-      this.currentPage++;
-      this.paginate();
-    }
+nextPage() {
+  // Navigate to the next page if current page is less than total pages
+  if (this.currentPage < this.totalPages) {
+    this.currentPage++; // Increase current page number
+    this.paginate(); // Update paginated users
   }
+}
 
   setActiveTab(tab: string) {
     this.activeTab = tab;
+    this.searchRoleTerm = '';
   }
 
   toggleEditMode() {
@@ -944,12 +1198,6 @@ export class UserManagementComponent implements OnInit {
 
   resetAccessForm() {
     this.newRole = '';
-    this.departmentType = 'all';
-    this.selectedDepartments = [];
-    this.selectedModules = [];
-    this.selectedReports = [];
-    this.selectedDataAccess = [];
-    this.selectedPrivileges = [];
   }
 
 
@@ -990,242 +1238,242 @@ export class UserManagementComponent implements OnInit {
     this.showManagePopup = false;
   }
 
-  toggleAddDepartmentPopup() {
-    this.showAddDepartmentPopup = !this.showAddDepartmentPopup;
-    if (this.showAddDepartmentPopup) {
-      this.resetDepartmentForm();
-    }
-  }
-
-  closeAddDepartmentPopup() {
-    this.showAddDepartmentPopup = false;
-    this.resetDepartmentForm();
-  }
-
-  resetDepartmentForm() {
-    this.newDepartment = '';
-    this.departmentAccessRights.forEach(access => this.departmentAccess[access] = false);
-  }
-
-  saveDepartment() {
-    if (!this.newDepartment) {
-      alert('Please enter a department name');
-      return;
-    }
-
-    const departmentData = {
-      department_name: this.newDepartment,
-      mod_access: this.selectedModules.length > 0 ? this.selectedModules : [],
-      rep_access: this.selectedReports.length > 0 ? this.selectedReports : [],
-      data_access: this.selectedDataAccess.length > 0 ? this.selectedDataAccess : [],
-      privileges: this.selectedPrivileges.length > 0 ? this.selectedPrivileges : [],
-    };
-  
-    this.supabaseService.createDepartment(departmentData)
-    .then(response => {
-      if (response.error) {
-        console.error('Error creating department:', response.error.message);
-      } else {
-        if (response.data) {
-          console.log('Department created successfully:', response.data);
-        } else {
-          console.log('Department created successfully, but no data returned.');
-        }
-        this.closeAddDepartmentPopup();
-      }
-    });
-  }
-
-  updateSelectedModules(event: any) {
-    const value = event.target.value;
-    if (event.target.checked) {
-      this.selectedModules.push(value);
-    } else {
-      this.selectedModules = this.selectedModules.filter(module => module !== value);
-    }
-  }
-  
-  updateSelectedReports(event: any) {
-    const value = event.target.value;
-    if (event.target.checked) {
-      this.selectedReports.push(value);
-    } else {
-      this.selectedReports = this.selectedReports.filter(report => report !== value);
-    }
-  }
-  
-  updateSelectedDataAccess(event: any) {
-    const value = event.target.value;
-    if (event.target.checked) {
-      this.selectedDataAccess.push(value);
-    } else {
-      this.selectedDataAccess = this.selectedDataAccess.filter(data => data !== value);
-    }
-  }
-  
-  updateSelectedPrivileges(event: any) {
-    const value = event.target.value;
-    if (event.target.checked) {
-      this.selectedPrivileges.push(value);
-    } else {
-      this.selectedPrivileges = this.selectedPrivileges.filter(privilege => privilege !== value);
-    }
-  }
-
- // Method to search tickets
+ //Ticket Management Functions: Method to search tickets
   searchTicketTable() {
     const searchTerm = this.searchTicketTerm.toLowerCase();
     this.filteredTickets = this.tickets.filter(ticket =>
       ticket.title.toLowerCase().includes(searchTerm) ||
       ticket.description.toLowerCase().includes(searchTerm) ||
-      ticket.status.toLowerCase().includes(searchTerm)
+      ticket.status.toLowerCase().includes(searchTerm) ||
+      ticket.email.toLowerCase().includes(searchTerm)
     );
     this.ticketUpdatePagination();
   }
 
-// Method to toggle all tickets selection
-toggleAllTickets() { 
-    const selectAll = this.selectedTickets.every(selected => selected);
-    this.selectedTickets.fill(!selectAll);
-  }
+// Method to toggle selection of all tickets
+toggleAllTickets() {
+  const selectAll = this.selectedTickets.every(selected => selected); // Check if all tickets are selected
+  this.selectedTickets.fill(!selectAll); // Toggle selection status for all tickets
+}
 
 // Method to get selected tickets
 getSelectedTickets(): Ticket[] {
-    return this.tickets.filter((ticket, index) => this.selectedTickets[index]);
-  }
+  return this.tickets.filter((ticket, index) => this.selectedTickets[index]); // Return selected tickets
+}
 
 // Method to update a ticket
-updateTicket(updatedTicket: Ticket) {             // Neeed to fix
-  const index = this.tickets.findIndex(ticket => ticket.id === updatedTicket.id);
+updateTicket(updatedTicket: Ticket) {
+  const index = this.tickets.findIndex(ticket => ticket.id === updatedTicket.id); // Find index of ticket to update
   if (index !== -1) {
-    this.tickets[index] = updatedTicket;
-    this.filteredTickets = [...this.tickets];
-    this.ticketUpdatePagination();
-    }
+    this.tickets[index] = updatedTicket; // Update ticket in main list
+    this.filteredTickets = [...this.tickets]; // Update filtered list
+    this.ticketUpdatePagination(); // Update pagination
   }
+}
 
 // Method to delete a ticket
-deleteTicket(ticketId: number) {           // Need to Fix
-  const index = this.tickets.findIndex(ticket => ticket.id === ticketId);
+deleteTicket(ticketId: number) {
+  const index = this.tickets.findIndex(ticket => ticket.id === ticketId); // Find index of ticket to delete
   if (index !== -1) {
-    this.tickets.splice(index, 1);
-    this.filteredTickets = [...this.tickets];
-    this.selectedTickets.splice(index, 1);
-    this.ticketUpdatePagination();
-    }
+    this.tickets.splice(index, 1); // Remove ticket from main list
+    this.filteredTickets = [...this.tickets]; // Update filtered list
+    this.selectedTickets.splice(index, 1); // Remove selection status
+    this.ticketUpdatePagination(); // Update pagination
   }
+}
 
 // Method to delete selected tickets
-deleteSelectedTickets() {               // Need to fix
-  const selectedIndexes = this.selectedTickets
-    .map((selected, index) => selected ? index : -1)
-    .filter(index => index !== -1);
+async deleteSelectedTickets() {
+  const selectedTickets = this.getSelectedTickets();
+  if (selectedTickets.length === 0) {
+    console.log("No tickets selected for deletion");
+    return;
+  }
 
-  for (let i = selectedIndexes.length - 1; i >= 0; i--) {
-    const index = selectedIndexes[i];
-    this.tickets.splice(index, 1);
-    this.selectedTickets.splice(index, 1);
+  try {
+    for (const ticket of selectedTickets) {
+      const { error } = await this.supabaseService.deleteTicket(ticket.id);
+      if (error) {
+        console.error(`Error deleting ticket ${ticket.id}:`, error.message);
+      } else {
+        console.log(`Ticket ${ticket.id} deleted successfully`);
+      }
+  }
+
+// Remove deleted tickets from local arrays
+this.tickets = this.tickets.filter(ticket => !selectedTickets.includes(ticket));
+this.filteredTickets = this.filteredTickets.filter(ticket => !selectedTickets.includes(ticket));
+this.selectedTickets = this.selectedTickets.filter((_, index) => !this.selectedTickets[index]);
+  console.log(`Deleted ${selectedTickets.length} tickets`);
+    // Update pagination
+      this.ticketUpdatePagination();
+     // Refresh the ticket list
+      await this.loadTickets();
+    } catch (error) {
+      console.error('Error deleting tickets:', error);
     }
-    this.filteredTickets = [...this.tickets];
-    this.ticketUpdatePagination();
-  }
-
-// Method to prompt user for filter options
-promptFilterOptions() {
-  const markAsRead = confirm("Mark all tickets as read? Click 'Cancel' to mark all as unread.");
-  if (markAsRead) {
-    this.markAllAsRead();
-    } else {
-    this.markAllAsUnread();
-    }
-  }
-
-// Method to mark all tickets as read
-markAllAsRead() {                   // Need to Fix
-    this.tickets.forEach(ticket => ticket.status = 'Read');
-    this.filteredTickets = [...this.tickets];
-    this.ticketUpdatePagination();
-  }
-
-// Method to mark all tickets as unread
-markAllAsUnread() {                 // Need to Fix
-    this.tickets.forEach(ticket => ticket.status = 'Unread');
-    this.filteredTickets = [...this.tickets];
-    this.ticketUpdatePagination();
-  }
+}
 
 // Method to filter tickets based on selected option
-filterTickets() {                   // Need to Fix
-  switch (this.filterOption) {
-    case 'read':
-      this.filteredTickets = this.tickets.filter(ticket => ticket.status.toLowerCase() === 'read');
+filterTickets() {
+  switch (this.filterOption.toLowerCase()) {
+    case 'low':
+      this.filteredTickets = this.tickets.filter(ticket => ticket.priority.toLowerCase() === 'low');
       break;
-    case 'unread':
-      this.filteredTickets = this.tickets.filter(ticket => ticket.status.toLowerCase() === 'unread');
+    case 'medium':
+      this.filteredTickets = this.tickets.filter(ticket => ticket.priority.toLowerCase() === 'medium');
+      break;
+    case 'high':
+      this.filteredTickets = this.tickets.filter(ticket => ticket.priority.toLowerCase() === 'high');
+      break;
+    case 'urgent':
+      this.filteredTickets = this.tickets.filter(ticket => ticket.priority.toLowerCase() === 'urgent');
       break;
     default:
       this.filteredTickets = [...this.tickets];
       break;
-    }
-    this.ticketUpdatePagination();
   }
+  this.ticketUpdatePagination();
+}
 
-// Pagination Methods for Support Tickets
+// Method to calculate the total number of pages
 ticketTotalPages(): number {
-    return Math.ceil(this.filteredTickets.length / this.ticket_itemsPerPage);
+  if (!this.ticket_itemsPerPage || this.ticket_itemsPerPage <= 0) {
+    console.error('Invalid ticket_itemsPerPage value:', this.ticket_itemsPerPage);
+    return 0;
   }
 
+  const totalFilteredTickets = this.filteredTickets.length;
+  return Math.ceil(totalFilteredTickets / this.ticket_itemsPerPage);
+}
+
+
+// Method to update pagination and calculate the total number of pages
 ticketUpdatePagination() {
-    this.ticket_currentPage = 1;
-    this.ticketPaginate();
-  }
+  this.ticket_totalPages = this.ticketTotalPages(); // Update total pages
+  this.ticket_currentPage = 1; // Reset current page to 1
+  this.ticketPaginate(); // Paginate to display tickets on the first page
+}
 
+// Method to paginate tickets based on current page
 ticketPaginate(): Ticket[] {
-    const start = (this.ticket_currentPage - 1) * this.ticket_itemsPerPage;
-    const end = start + this.ticket_itemsPerPage;
-    return this.filteredTickets.slice(start, end);
-  }
+  const start = (this.ticket_currentPage - 1) * this.ticket_itemsPerPage; // Calculate start index
+  const end = start + this.ticket_itemsPerPage; // Calculate end index (exclusive)
+  return this.filteredTickets.slice(start, end); // Extract tickets for the current page
+}
 
-ticketPrevPage() {                      // Need to Fix
+// Method to navigate to the previous page
+ticketPrevPage() {
   if (this.ticket_currentPage > 1) {
-    this.ticket_currentPage--;
-    this.ticketPaginate();
-    }
+    this.ticket_currentPage--; // Decrease current page number
+    this.ticketPaginate(); // Update displayed tickets
   }
+}
 
-ticketNextPage() {                        // Need to fix
+// Method to navigate to the next page
+ticketNextPage() {
   if (this.ticket_currentPage < this.ticketTotalPages()) {
-    this.ticket_currentPage++;
-    this.ticketPaginate();
-    }
+    this.ticket_currentPage++; // Increase current page number
+    this.ticketPaginate(); // Update displayed tickets
   }
+}
 
+
+// Method to update datetime for tickets
 updateDateTimeForTickets() {
-    // Update dateTime property for each ticket
-    this.tickets.forEach(ticket => {
-      ticket.dateTime = new Date(); // Assign current date and time
-    });
-  }
-  
+  this.tickets.forEach(ticket => {
+    ticket.dateTime = new Date(); // Update datetime for each ticket
+  });
+}
+
+// Method to open ticket details in modal
 openTicketDetails(ticket: any) {
-    this.selectedTicket = ticket;
-    this.isModalVisible = true;
-  }
+  this.selectedTicket = ticket; // Set selected ticket
+  this.isModalVisible = true; // Show modal
+}
 
-  closeModal() {
-    this.isModalVisible = false;
-  }
+ // Method to update ticket priority
+// In your component file
 
-  editTicket(){
-    // Update selectedTicket with changes
-    this.updateTicket(this.selectedTicket);
-    this.closeModal();
+async updateTicketPriority(ticket: Ticket, event: Event): Promise<void> {
+  const selectElement = event.target as HTMLSelectElement;
+  const newPriority = selectElement.value as 'Low' | 'Medium' | 'High' | 'Urgent';
+  
+  try {
+    // Update in Supabase
+    await this.supabaseService.updateTicketPriority(ticket.id, newPriority);
+    
+    // If successful, update local state
+    ticket.priority = newPriority;
+    
+    console.log(`Ticket ${ticket.id} priority updated to ${newPriority}`);
+  } catch (error) {
+    console.error('Failed to update ticket priority:', error);
+    // Revert the select element to the previous value
+    selectElement.value = ticket.priority;
+    // Optionally, show an error message to the user
   }
+}
 
-  doneTicket(){
-    // Mark selectedTicket as done
-    this.selectedTicket.status = 'Done';
-    this.updateTicket(this.selectedTicket);
-    this.closeModal();
+closeModal() {
+  this.isModalVisible = false;
+}
+
+async replyTicket(): Promise<void> {
+  if (this.selectedTicket) {
+    try {
+      // Update the ticket with the new reply
+      this.selectedTicket.reply = this.replyText;
+      this.selectedTicket.status = 'Replied'; // Or any other appropriate status
+      this.selectedTicket.logres = new Date().toISOString(); // Update last response time
+
+      // Update the ticket in the database
+      const { data, error } = await this.supabaseService.updateTicket(this.selectedTicket);
+
+      if (error) throw error;
+
+      this.closeModal();
+      this.replyText = ''; // Reset reply text after sending
+    } catch (error) {
+      console.error('Error replying to ticket:', error);
+      // Handle error (e.g., show an error message to the user)
+    }
+  } else {
+    console.log('No ticket selected to reply.');
   }
+}
+
+
+//DO NOT DELETE: These codes below might be useful in the future
+
+  // doneTicket(){
+  //   // Mark selectedTicket as done
+  //   this.selectedTicket.status = 'Done';
+  //   this.updateTicket(this.selectedTicket);
+  //   this.closeModal();
+  // }
+
+  // Method to prompt user for filter options
+//   promptFilterOptions() {
+//   const markAsRead = confirm("Mark all tickets as read? Click 'Cancel' to mark all as unread.");
+//   if (markAsRead) {
+//     this.markAllAsRead();
+//     } else {
+//     this.markAllAsUnread();
+//     }
+//   }
+
+//   // Method to mark all tickets as read
+//   markAllAsRead() {
+//     this.tickets.forEach(ticket => ticket.status = 'Read');
+//     this.filteredTickets = [...this.tickets];
+//     this.ticketUpdatePagination();
+//   }
+
+//   // Method to mark all tickets as unread
+//   markAllAsUnread() {
+//     this.tickets.forEach(ticket => ticket.status = 'Unread');
+//     this.filteredTickets = [...this.tickets];
+//     this.ticketUpdatePagination();
+//   }
 }

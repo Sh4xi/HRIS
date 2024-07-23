@@ -1,7 +1,10 @@
 <div class="flex">
   <app-sidebar-navigation></app-sidebar-navigation>
   <div class="flex-grow">
-    <div class="flex flex-col items-center px-16 pt-5 pb-20 w-full bg-white max-md:px-5 max-md:max-w-full">
+    <div class="flex flex-col items-center px-16 pt-5 pb-4 w-full bg-white max-md:px-5 max-md:max-w-full">
+      <div *ngIf="message" [class]="isError ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'" class="p-4 rounded-md mb-4 w-full max-w-[960px]">
+        {{ message }}
+      </div>
       <div *ngIf="!showTable" class="flex flex-col p-4 mb-96 w-full max-w-[960px] max-md:mb-10 max-md:max-w-full">
         <div class="self-start text-3xl font-bold text-neutral-900 max-md:max-w-full">System Management</div>
         <div class="self-start mt-3 text-sm leading-5 text-slate-500 max-md:max-w-full">Configure system settings and manage your organization's data</div>
@@ -47,46 +50,47 @@
       </div>
 
       <!-- Popup overlay -->
-      <div *ngIf="showPopup" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <!-- Popup content -->
+      <div *ngIf="showPopup && selectedParameter" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div class="bg-white rounded-lg p-8 max-w-md w-full">
           <div class="flex flex-col bg-white">
             <div class="flex flex-col pb-10 w-full bg-white">
               <div class="flex flex-col max-w-full text-base text-neutral-900">
-                <div class="self-start text-3xl font-bold">Create parameter</div>
-                <div class="self-start mt-3 text-sm leading-5 text-slate-500">Create a new parameter for use in your events</div>
+                <div class="self-start text-3xl font-bold">{{ isManageMode ? 'Edit Parameter' : 'Create Parameter' }}</div>
+                <div class="self-start mt-3 text-sm leading-5 text-slate-500">{{ isManageMode ? 'Edit the parameter details' : 'Create a new parameter for use in your events' }}</div>
                 <div class="mt-9 font-medium leading-[150%]">Name</div>
-                <input [(ngModel)]="parameterName" type="text" placeholder="Parameter name" class="w-full px-4 pt-4 pb-2 mt-2 bg-white rounded-xl border border-solid border-zinc-200 leading-[150%] text-slate-500">
+                <input [(ngModel)]="selectedParameter!.parameter_name" type="text" placeholder="Parameter name" class="w-full px-4 pt-4 pb-2 mt-2 bg-white rounded-xl border border-solid border-zinc-200 leading-[150%] text-slate-500">
                 <div class="mt-8 font-medium leading-[150%]">Type</div>
                 <div class="relative">
-                  <select [(ngModel)]="selectedType" class="w-full justify-center py-2 mt-2 bg-white rounded-xl border border-solid border-zinc-200 leading-[150%]">
-                    <option value="" disabled selected>Select type</option>
-                    <option *ngFor="let type of types" [value]="type">{{type}}</option>
+                  <select [(ngModel)]="selectedParameter!.parameter_type" class="w-full justify-center py-2 mt-2 bg-white rounded-xl border border-solid border-zinc-200 leading-[150%]">
+                    <option value="" disabled>Select type</option>
+                    <option *ngFor="let type of types" [value]="type">{{ type }}</option>
                   </select>
                 </div>
                 <!-- Date input for Holiday type -->
-                <div *ngIf="selectedType === 'Holiday'" class="mt-7">
+                <div *ngIf="selectedParameter!.parameter_type === 'Holiday'" class="mt-7">
                   <div class="font-medium leading-[150%]">Date</div>
-                  <input [(ngModel)]="holidayDate" type="date" class="w-full px-4 pt-4 pb-2 mt-2 bg-white rounded-xl border border-solid border-zinc-200 leading-[150%] text-slate-500">
+                  <input [(ngModel)]="selectedParameter!.parameter_date" type="date" class="w-full px-4 pt-4 pb-2 mt-2 bg-white rounded-xl border border-solid border-zinc-200 leading-[150%] text-slate-500">
                 </div>
                 <!-- Time inputs for Schedule type -->
-                <div *ngIf="selectedType === 'Schedule'" class="mt-7">
+                <div *ngIf="selectedParameter!.parameter_type === 'Schedule'" class="mt-7">
                   <div class="font-medium leading-[150%] mb-2">Schedule</div>
                   <div class="flex space-x-4">
                     <div class="w-1/2">
                       <label for="startTime" class="block text-sm font-medium text-gray-700 mb-1">Start Time</label>
-                      <input [(ngModel)]="scheduleStartTime" type="time" id="startTime" class="w-full px-4 py-2 bg-white rounded-xl border border-solid border-zinc-200 leading-[150%] text-slate-500" min="00:00" max="11:59">
+                      <input [(ngModel)]="selectedParameter!.parameter_time" type="time" id="startTime" class="w-full px-4 py-2 bg-white rounded-xl border border-solid border-zinc-200 leading-[150%] text-slate-500" min="00:00" max="23:59">
                     </div>
                     <div class="w-1/2">
                       <label for="endTime" class="block text-sm font-medium text-gray-700 mb-1">Finish Time</label>
-                      <input [(ngModel)]="scheduleEndTime" type="time" id="endTime" class="w-full px-4 py-2 bg-white rounded-xl border border-solid border-zinc-200 leading-[150%] text-slate-500" min="12:00" max="23:59">
+                      <input [(ngModel)]="selectedParameter!.parameter_time2" type="time" id="endTime" class="w-full px-4 py-2 bg-white rounded-xl border border-solid border-zinc-200 leading-[150%] text-slate-500" min="00:00" max="23:59">
                     </div>
                   </div>
                 </div>
               </div>
               <div class="flex justify-end mt-6">
                 <button (click)="closePopup()" class="px-4 py-2 mr-2 text-sm font-bold text-gray-700 bg-gray-200 rounded-xl">Cancel</button>
-                <button (click)="saveParameter()" class="px-4 py-2 text-sm font-bold text-white bg-blue-500 rounded-xl">Save</button>
+                <button (click)="saveOrUpdateParameter()" class="px-4 py-2 text-sm font-bold text-white bg-blue-500 rounded-xl">
+                  {{ isEdit ? 'Update' : 'Save' }}
+                </button>
               </div>
             </div>
           </div>
@@ -94,16 +98,19 @@
       </div>
 
       <!-- Display Table -->
-      <div *ngIf="showTable" class="flex justify-center items-start min-h-screen bg-white-100 pt-10 px-6">
-        <div class="flex flex-col w-full max-w-6xl">
-          <div class="flex justify-between items-center mb-6">
-            <h2 class="text-2xl font text-neutral-900">Parameters</h2>
-            <button (click)="closeTable()" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-300">Back</button>
+      <div *ngIf="showTable" class="flex flex-col w-full bg-white pt-8 px-6">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-2xl font text-neutral-900">Parameters</h2>
+          <div class="flex">
+            <button (click)="closeTable()" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-300 ml-4">Back</button>
           </div>
-          <p class="text-sm text-gray-500 mb-6">View parameters made into your data</p>
-          <!-- Search input -->
-          <div class="mb-6">
-            <div class="relative">
+        </div>
+        
+        <p class="text-sm text-gray-500 mb-6">View parameters made into your data</p>
+        <!-- Search input -->
+        <div class="mb-6">
+          <div class="flex items-center space-x-4">
+            <div class="relative flex-grow">
               <input type="text" placeholder="Search parameters" class="w-full py-3 px-4 pr-10 rounded-lg bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" [(ngModel)]="searchTerm" (keyup)="applySearch()">
               <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                 <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
@@ -111,31 +118,58 @@
                 </svg>
               </div>
             </div>
-          </div>
-          <!-- Table displaying parameters -->
-          <div class="overflow-x-auto bg-white shadow-md rounded-lg">
-            <table class="w-full text-left border-collapse">
-              <thead class="bg-gray-50">
-                <tr>
-                  <th class="px-6 py-4 text-sm font-thin text-gray-600 tracking-wider">Parameter Name</th>
-                  <th class="px-6 py-4 text-sm font-thin text-gray-600 tracking-wider">Parameter Type</th>
-                  <th class="px-6 py-4 text-sm font-thin text-gray-600 tracking-wider">Date</th>
-                  <th class="px-6 py-4 text-sm font-thin text-gray-600 tracking-wider">Schedule</th>
-                </tr>
-              </thead>
-              <tbody class="bg-white divide-y divide-gray-200">
-                <tr *ngFor="let param of filteredParameters">
-                  <td class="px-6 py-4 whitespace-nowrap">{{ param.name }}</td>
-                  <td class="px-6 py-4 whitespace-nowrap">{{ param.type }}</td>
-                  <td class="px-6 py-4 whitespace-nowrap">{{ param.date ? (param.date | date:'mediumDate') : '-' }}</td>
-                  <td class="px-6 py-4 whitespace-nowrap">
-                    {{ param.startTime ? (param.startTime + ' - ' + param.endTime) : '-' }}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+            <button *ngIf="isManageMode" (click)="deleteSelectedParameters()" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition duration-300 ml-4">Delete</button>
+            <button (click)="toggleManageMode()" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-300">Manage</button>
           </div>
         </div>
+
+      <!-- Table displaying parameters -->
+      <div class="overflow-x-auto bg-white shadow-md rounded-lg">
+        <table class="w-full text-left border-collapse" *ngIf="paginatedParameters && paginatedParameters.length > 0">
+          <thead class="bg-gray-50">
+            <tr>
+              <th *ngIf="isManageMode" class="px-6 py-4 text-sm font-thin text-gray-600 tracking-wider min-w-[100px]">Select</th>
+              <th class="px-8 py-4 text-sm font-thin text-gray-600 tracking-wider min-w-[200px]">Parameter Name</th>
+              <th class="px-8 py-4 text-sm font-thin text-gray-600 tracking-wider min-w-[200px]">Parameter Type</th>
+              <th class="px-8 py-4 text-sm font-thin text-gray-600 tracking-wider min-w-[200px]">Date</th>
+              <th class="px-8 py-4 text-sm font-thin text-gray-600 tracking-wider min-w-[200px]">Schedule AM</th>
+              <th class="px-8 py-4 text-sm font-thin text-gray-600 tracking-wider min-w-[100px]">Schedule PM</th>
+              <th *ngIf="isManageMode" class="px-6 py-4 text-sm font-thin text-gray-600 tracking-wider">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <tr *ngFor="let param of paginatedParameters">
+              <td *ngIf="isManageMode" class="px-6 py-4 whitespace-nowrap">
+                <input type="checkbox" [(ngModel)]="param.selected" class="form-checkbox h-4 w-4 text-blue-600 transition duration-150 ease-in-out">
+              </td>
+              <td class="px-8 py-4 whitespace-nowrap">{{ param.parameter_name || 'N/A' }}</td>
+              <td class="px-8 py-4 whitespace-nowrap">{{ param.parameter_type || 'N/A' }}</td>
+              <td class="px-8 py-4 whitespace-nowrap">{{ param.parameter_date ? (param.parameter_date | date:'mediumDate') : '-' }}</td>
+              <td class="px-8 py-4 whitespace-nowrap">{{ param.parameter_time || '-' }}</td>
+              <td class="px-8 py-4 whitespace-nowrap">{{ param.parameter_time2 || '-' }}</td>
+              <td *ngIf="isManageMode" class="px-6 py-4 whitespace-nowrap">
+                <button (click)="editParameter(param)" class="text-blue-600 hover:text-blue-800">
+                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 013.536 3.536L7.5 18.5H3v-4.5L16.732 3.732z"></path>
+                  </svg>
+                </button>
+              </td>
+            </tr>
+          </tbody>              
+        </table>
+        <div *ngIf="!paginatedParameters || paginatedParameters.length === 0" class="p-4 text-center text-gray-500">
+          No parameters found.
+        </div>
+      </div>   
+        <div class="flex justify-between items-center mt-4">
+          <div class="flex"> <!-- This div ensures the buttons are aligned to the left -->
+            <button (click)="prevPage()" [disabled]="currentPage === 1" class="px-3 py-1 bg-gray-200 rounded disabled:opacity-50">Previous</button>
+          </div>
+          <div>Page {{ currentPage }} of {{ totalPages }}</div> <!-- This div centers the page number text -->
+            <div class="flex"> <!-- This div ensures the buttons are aligned to the right -->
+              <button (click)="nextPage()" [disabled]="currentPage === totalPages" class="px-3 py-1 bg-gray-200 rounded disabled:opacity-50">Next</button>
+            </div>
+        </div>       
       </div>
     </div>
   </div>
