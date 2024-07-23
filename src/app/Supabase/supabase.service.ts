@@ -407,54 +407,101 @@ export class SupabaseService {
     }
     return response;
   }
-
+  // Connected to Audit trail
   // Delete the user profile
-  async deleteUser(email: string): Promise<{ success: boolean; error: any }> {
+  async deleteUser(email: string): Promise<PostgrestSingleResponse<any>> {
     try {
-      // Retrieve the user's profile to get the image path
-      // Get the old user data before deletion
-    const { data: oldUserData, error: oldDataError } = await this.supabase
-    .from('profile')
-    .select('*')
-    .eq('email', email)
-    .single();
-
-  if (oldDataError) {
-    console.error('Error retrieving old user data:', oldDataError.message);
-    return { success: false, error: oldDataError };
+      console.log(`Starting deletion process for user: ${email}`);
+  
+      // Retrieve the user's profile
+      const { data: userProfile, error: userProfileError } = await this.supabase
+        .from('profile')
+        .select('user_id, photo_url, first_name, surname')
+        .eq('email', email)
+        .single();
+  
+      if (userProfileError) {
+        console.error('Error retrieving user profile:', userProfileError.message);
+        return {
+          data: null,
+          error: userProfileError,
+          count: null,
+          status: 500,
+          statusText: 'Error retrieving user profile'
+        };
+      }
+  
+      console.log('User profile retrieved:', userProfile);
+  
+      // Delete the photo from storage if it exists
+      if (userProfile?.photo_url) {
+        const fileName = userProfile.photo_url.split('/').pop();
+        if (fileName) {
+          const { error: storageError } = await this.supabase
+            .storage
+            .from('photos')
+            .remove([fileName]);
+  
+          if (storageError) {
+            console.error('Error deleting image from storage:', storageError.message);
+          } else {
+            console.log('Image deleted successfully from storage');
+          }
+        }
+      }
+  
+      // Delete the user profile
+      const response = await this.supabase
+        .from('profile')
+        .delete()
+        .eq('email', email);
+  
+      if (response.error) {
+        console.error('Error deleting user:', response.error.message);
+        return response;
+      }
+  
+      console.log('User deleted successfully:', response.data);
+  
+      // Create audit log
+      const auditLogData = {
+        email: await this.getCurrentUserEmail(),
+        affected_page: 'Employee Management',
+        action: 'Delete',
+        parameter: 'Employee deleted',
+        old_parameter: JSON.stringify({
+          user_id: userProfile.user_id,
+          email: email,
+          first_name: userProfile.first_name,
+          surname: userProfile.surname
+        }),
+        new_parameter: null
+      };
+  
+      console.log('Attempting to create audit log with data:', auditLogData);
+  
+      const auditLogResult = await this.createAuditLog(auditLogData);
+      if (!auditLogResult.success) {
+        console.error('Failed to create audit log:', auditLogResult.error);
+      } else {
+        console.log('Audit log created successfully:', auditLogResult.data);
+      }
+  
+      // Refresh the session after the delete operation
+      await this.refreshSession();
+  
+      return response;
+    } catch (error) {
+      console.error('Unexpected error deleting user:', error);
+      return {
+        data: null,
+        error: error as any,
+        count: null,
+        status: 500,
+        statusText: 'Internal Server Error'
+      };
+    }
   }
-
-  // Delete the user profile
-  const { error: deleteError } = await this.supabase
-    .from('profile')
-    .delete()
-    .eq('email', email);
-
-  if (deleteError) {
-    console.error('Error deleting user:', deleteError.message);
-    return { success: false, error: deleteError };
-  }
-
-  // Create audit log
-  await this.createAuditLog({
-    user_id: await this.getCurrentUserId(),
-    affected_page: 'User Management',
-    action: 'Delete',
-    old_parameter: JSON.stringify(oldUserData),
-    new_parameter: null
-  });
-
-  console.log('User deleted successfully');
-
-  // Refresh the session after the delete operation
-  await this.refreshSession();
-
-  return { success: true, error: null };
-} catch (error) {
-  console.error('Unexpected error deleting user:', error);
-  return { success: false, error };
-}
-}
   
   
   
