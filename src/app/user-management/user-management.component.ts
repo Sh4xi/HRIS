@@ -1250,6 +1250,11 @@ nextPage() {
     this.ticketUpdatePagination();
   }
 
+  refreshTable() {
+    // Fetch the latest tickets
+    this.loadTickets();
+  }
+
 // Method to toggle selection of all tickets
 toggleAllTickets() {
   const selectAll = this.selectedTickets.every(selected => selected); // Check if all tickets are selected
