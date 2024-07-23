@@ -246,86 +246,6 @@ export class SupabaseService {
   }
   
 
-  // async createEmployee(employee: any): Promise<PostgrestSingleResponse<any>> {
-  //   console.log('Creating employee:', JSON.stringify(employee, null, 2));
-  //    // Step 1: Insert the employee data into the 'profile' table
-  //   const response = await this.supabase.from('profile').insert([
-  //     {
-  //       email: employee.email,
-  //       first_name: employee.firstname,
-  //       mid_name: employee.midname,
-  //       surname: employee.surname,
-  //       password: employee.password, // Hash the password before storing
-  //       department: employee.department,
-  //       position: employee.position,
-  //       types: employee.type,
-  //       access: employee.access,
-  //       photo_url: employee.photo_url
-  //     },
-  //   ]).select('user_id');
-
-  // // Step 2: Handle potential errors in the employee creation process
-  // if (response.error) {
-  //   console.error('Error creating employee:', response.error.message);
-  //   return response; // Return early if there was an error
-  // } else {
-  //   console.log('Employee created successfully:', response.data);
-  //   const newUserId = response.data[0].user_id;
-  
-  //   // Step 3: Fetch the corresponding role_id for the role_name
-  //   const { data: rolesData, error: rolesError } = await this.supabase
-  //     .from('roles')
-  //     .select('role_id')
-  //     .eq('role_name', employee.position)
-  //     .single();
-
-  //   // Step 4: Handle potential errors in fetching the role_id
-  //   if (rolesError) {
-  //     console.error('Error fetching role_id:', rolesError.message);
-  //     return { data: null, error: rolesError } as PostgrestSingleResponse<any>; // Return early if there was an error
-  //   }
-
-  //   const roleId = rolesData.role_id;
-
-  //   // Step 5: Assign role to the user and store role_name
-  //   const assignRoleResponse = await this.assignUserRole(newUserId, roleId);
-
-  //   // Step 6: Handle potential errors in the role assignment process
-  //   if (assignRoleResponse.error) {
-  //     console.error('Error assigning role:', assignRoleResponse.error.message);
-  //   } else {
-  //     console.log('Role assigned successfully:', assignRoleResponse.data);
-  //   }
-
-  //     // Step 4: Create an audit log entry
-  // const auditLogData: AuditLogEntry = {
-  //   user_id: await this.getCurrentUserId(),
-  //   action: 'Create',
-  //   affected_page: 'Employee Management',
-  //   parameter: 'New employee created',
-  //   old_value: '',  // No old value for a new employee
-  //   new_value: JSON.stringify(data[0]),
-  //   ip_address: await this.getUserIpAddress(),
-  //   date: new Date().toISOString(),
-  //   email: await this.getCurrentUserEmail()
-  // };
-
-  // console.log('Audit log data being sent:', JSON.stringify(auditLogData, null, 2));
-
-  // const auditLogResult = await this.createAuditLog(auditLogData);
-  // if (!auditLogResult.success) {
-  //   console.error('Failed to create audit log:', auditLogResult.error);
-  // } else {
-  //   console.log('Audit log created successfully:', JSON.stringify(auditLogResult.data, null, 2));
-  // }
-
-  //   // Step 7: Refresh the session
-  //   await this.refreshSession();
-  // }
-
-  // return response;
-  // }
-
   //Writes in the "user_roles" table in Supabase. Relates a user_id to an assigned role_id
   async assignUserRole(userId: number, roleId: number): Promise<PostgrestSingleResponse<any>> {
     const response = await this.supabase
@@ -694,49 +614,7 @@ async isAuditTrailEmpty(): Promise<boolean> {
       return { data: null, error };
     }
   }
-  // async createEmployee(employeeData: any): Promise<{ data: any; error: any }> {
-  //   console.log('Creating employee:', JSON.stringify(employeeData, null, 2));
-  //   try {
-  //     const { data, error } = await this.supabase
-  //       .from('profile')
-  //       .insert([employeeData])
-  //       .select();
-  
-  //     if (error) {
-  //       console.error('Error creating employee:', error);
-  //       return { data: null, error };
-  //     }
-  
-  //     console.log('Employee created successfully:', JSON.stringify(data, null, 2));
-  
-  //     // Create audit log
-  //     const auditLogData: AuditLogEntry = {
-  //       user_id: await this.getCurrentUserId(),
-  //       action: 'Create',
-  //       affected_page: 'Employee Management',
-  //       parameter: 'New employee created',
-  //       old_value: '',  // No old value for a new employee
-  //       new_value: JSON.stringify(data[0]),
-  //       ip_address: await this.getUserIpAddress(),
-  //       date: new Date().toISOString(),
-  //       email: await this.getCurrentUserEmail()
-  //     };
-  
-  //     console.log('Audit log data being sent:', JSON.stringify(auditLogData, null, 2));
-  
-  //     const auditLogResult = await this.createAuditLog(auditLogData);
-  //     if (!auditLogResult.success) {
-  //       console.error('Failed to create audit log:', auditLogResult.error);
-  //     } else {
-  //       console.log('Audit log created successfully:', JSON.stringify(auditLogResult.data, null, 2));
-  //     }
-  
-  //     return { data: data[0], error: null };
-  //   } catch (error) {
-  //     console.error('Unexpected error in createEmployee:', error);
-  //     return { data: null, error: error instanceof Error ? error.message : 'Unknown error' };
-  //   }
-  // }
+
   
   // Method to get the current user's email
   async getCurrentUserEmail(): Promise<string> {
