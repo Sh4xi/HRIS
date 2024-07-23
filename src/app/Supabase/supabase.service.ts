@@ -394,52 +394,88 @@ export class SupabaseService {
   }
 
   // Delete the user profile
-  async deleteUser(email: string): Promise<{ success: boolean; error: any }> {
+  async deleteUser(email: string): Promise<PostgrestSingleResponse<any>> {
     try {
       // Retrieve the user's profile to get the image path
-      // Get the old user data before deletion
-    const { data: oldUserData, error: oldDataError } = await this.supabase
-    .from('profile')
-    .select('*')
-    .eq('email', email)
-    .single();
+      const { data: userProfile, error: userProfileError } = await this.supabase
+        .from('profile')
+        .select('photo_url') // Adjust this to match your actual image path column
+        .eq('email', email)
+        .single();
 
-  if (oldDataError) {
-    console.error('Error retrieving old user data:', oldDataError.message);
-    return { success: false, error: oldDataError };
+      if (userProfileError) {
+        console.error('Error retrieving user profile:', userProfileError.message);
+        return {
+          data: null,
+          error: userProfileError,
+          count: null,
+          status: 500,
+          statusText: 'Error retrieving user profile'
+        };
+      }
+  // Delete the photo from storage if it exists
+  if (userProfile && userProfile.photo_url) {
+    const fileName = userProfile.photo_url.split('/').pop();
+    if (fileName) {
+      const { error: storageError } = await this.supabase
+        .storage
+        .from('photos')
+        .remove([fileName]);
+
+      if (storageError) {
+        console.error('Error deleting image from storage:', storageError.message);
+      } else {
+        console.log('Image deleted successfully from storage');
+      }
+    }
   }
+      // Delete the user profile
+      const response = await this.supabase
+        .from('profile')
+        .delete()
+        .eq('email', email);
 
-  // Delete the user profile
-  const { error: deleteError } = await this.supabase
-    .from('profile')
-    .delete()
-    .eq('email', email);
+      if (response.error) {
+        console.error('Error deleting user:', response.error.message);
+      } else {
+        console.log('User deleted successfully:', response.data);
+        // Refresh the session after the delete operation
+        await this.refreshSession();
+        return response;
+      }
 
-  if (deleteError) {
-    console.error('Error deleting user:', deleteError.message);
-    return { success: false, error: deleteError };
+      console.log('User deleted successfully:', response.data);
+
+      // Refresh the session after the delete operation
+      await this.refreshSession();
+
+      // Check if the user profile exists and has an image path
+      if (userProfile && userProfile.photo_url) {
+        const { error: storageError } = await this.supabase
+          .storage
+          .from('photos') // Replace with your actual bucket name
+          .remove([userProfile.photo_url]);
+
+        if (storageError) {
+          console.error('Error deleting image from storage:', storageError.message);
+        } else {
+          console.log('Image deleted successfully from storage');
+        }
+      }
+
+      return response;
+    } catch (error) {
+      console.error('Unexpected error deleting user:', error);
+      // Create a PostgrestSingleResponse-like object for unexpected errors
+      return {
+        data: null,
+        error: error as any,
+        count: null,
+        status: 500,
+        statusText: 'Internal Server Error'
+      };
+    }
   }
-
-  // Create audit log
-  await this.createAuditLog({
-    user_id: await this.getCurrentUserId(),
-    affected_page: 'User Management',
-    action: 'Delete',
-    old_parameter: JSON.stringify(oldUserData),
-    new_parameter: null
-  });
-
-  console.log('User deleted successfully');
-
-  // Refresh the session after the delete operation
-  await this.refreshSession();
-
-  return { success: true, error: null };
-} catch (error) {
-  console.error('Unexpected error deleting user:', error);
-  return { success: false, error };
-}
-}
   
   
   
